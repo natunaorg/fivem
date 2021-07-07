@@ -182,8 +182,10 @@ class Server {
                 }
 
                 userCheck = await this.db("users").update({
-                    data: {
-                        ...newCheckpointData,
+                    data: (data) => {
+                        return {
+                            ...newCheckpointData,
+                        };
                     },
                     where: {
                         id: playerIds.steam,

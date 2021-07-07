@@ -59,11 +59,26 @@ declare interface Database {
      *          name: "Don Chad"
      *      },
      *      data: {
+     *          // This could be a function too! See other example below.
      *          name: "John Doe"
      *      }
      * })
+     *
+     * @example
+     * // Function Delivered Version.
+     * db('users').update({
+     *      where: {
+     *          name: "Don Chad"
+     *      },
+     *      data: (data) => {
+     *          // MUST RETURNS as an OBJECT
+     *          return {
+     *              count: data.count += 1
+     *          }
+     *      }
+     * })
      */
-    update: (obj: { data: object; where: object }) => Promise<Array<any>>;
+    update: (obj: { data: object | Function; where: object }) => Promise<Array<any>>;
 
     /**
      * Delete a data from database table

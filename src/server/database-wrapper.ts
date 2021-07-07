@@ -14,7 +14,7 @@ class DatabaseWrapper {
                 .join(",");
             const values = Object.values(obj.data).join(",");
 
-            const query = `INSERT INTO \`users\`(${keys}) VALUES (${values})`;
+            const query = `INSERT INTO \`${this.table}\`(${keys}) VALUES (${values})`;
 
             return this.utils.executeQuery(query);
         }
@@ -44,8 +44,21 @@ class DatabaseWrapper {
 
     update = (obj) => {
         if (this.utils.validateQueryObject(obj, ["data", "where"])) {
-            const updateOptions = this.parser.keyVal(obj.data);
             const whereOptions = this.parser.keyVal(obj.where);
+            let updateOptions;
+
+            if (typeof obj.data == "function") {
+                const data: any = this.find({ where: obj.where });
+                const newInputData = obj.data(data);
+
+                if (typeof newInputData !== "object" || Array.isArray(newInputData)) {
+                    throw new Error("Returned Data Must be an Object!");
+                }
+
+                updateOptions = this.parser.keyVal(newInputData);
+            } else {
+                updateOptions = this.parser.keyVal(obj.data);
+            }
 
             const query = `UPDATE \`${this.table}\` SET ${updateOptions} WHERE ${whereOptions}`;
 
