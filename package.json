@@ -1,0 +1,41 @@
+{
+    "name": "@raflymln/fivem-koijs",
+    "version": "1.0.0",
+    "description": "Javascript Framework for FiveM",
+    "main": "index.js",
+    "repository": "https://github.com/raflymln",
+    "author": "Rafly Maulana",
+    "scripts": {
+        "build": "webpack --mode production",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+        "watch": "webpack --mode development --watch true"
+    },
+    "license": "MIT",
+    "private": false,
+    "dependencies": {
+        "@citizenfx/client": "^1.0.2792-1",
+        "@citizenfx/server": "^1.0.2792-1",
+        "@types/glob": "^7.1.3",
+        "@types/node": "^14.0.27",
+        "crypto": "^1.0.1",
+        "fivem-js": "^1.5.2",
+        "mysql2": "^2.2.5",
+        "prettier": "^2.3.1"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.14.6",
+        "@babel/preset-env": "^7.14.5",
+        "@typescript-eslint/eslint-plugin": "^3.8.0",
+        "@typescript-eslint/parser": "^2.34.0",
+        "babel-loader": "^8.2.2",
+        "eslint": "^7.6.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-loader": "^4.0.2",
+        "remove-files-webpack-plugin": "^1.4.3",
+        "ts-loader": "^8.0.2",
+        "typescript": "^3.9.7",
+        "webpack": "^4.44.1",
+        "webpack-cli": "^3.3.12"
+    }
+}

@@ -1,0 +1,1 @@
+export { IDrawable } from './IDrawable';
