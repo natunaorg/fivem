@@ -4,7 +4,17 @@
  * Module based files allows you to import this script on Client or Server but there would be a HIGH SECURITY ISSUES if you pull this files outside the core of this framework.
  */
 
-module.export = {
+module.exports = {
+    /**
+     * Koi Framework using persistent Steam ID instead of other dynamic ID, to whitelist a person just put the SteamID64 on the array below
+     * [IMPORTANT] KEEP IT EMPTY TO SET IT OFF
+     * @example
+     * whitelistedSteamID: [
+     *      76345198181789231,
+     *      76561112381745631
+     * ]
+     */
+    whitelistedSteamID: [],
     /**
      * We used MYSQL because it provides more persistant data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
      * [IMPORTANT] If your server players was high, i'd recommend you to use a fast SQL Database like PostgreSQL, but you would need to configure some script first.
@@ -67,16 +77,11 @@ module.export = {
              * Disable Wanted Level
              */
             noWantedLevel: true,
-
-            /**
-             * Enabled NoClip which allows you to travel through space and time
-             */
-            noClip: false,
         },
         /**
-         * Set whether auto respawn is enabled if player dies
+         * Set whether auto respawn is disabled if player dies
          * [IMPORTANT!] This option requires "spawnmanager" script to be activated!
          */
-        autoRespawnEnabled: false,
+        autoRespawnDisabled: true,
     },
 };
