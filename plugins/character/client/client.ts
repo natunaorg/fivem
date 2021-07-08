@@ -3,11 +3,12 @@ import config from "../configuration.json";
 class Module {
     client: Koi["Client"];
 
-    constructor(client) {
+    constructor(client, config) {
         this.client = client;
 
         this.client.addClientEventHandler("playerSpawned", () => this.client.triggerSharedEvent("character:requestPlayerData"));
         this.client.addClientEventHandler(["baseevents:onPlayerKilled", "baseevents:onPlayerDied"], this.updateCharacterLocation);
+
         this.client.addSharedEventHandler("character:playerLeft", this.updateCharacterLocation);
     }
 
@@ -16,5 +17,5 @@ class Module {
     };
 }
 
-const _handler = (client) => new Module(client);
+const _handler = (client, config) => new Module(client, config);
 export { _handler };
