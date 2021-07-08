@@ -5,27 +5,20 @@ class Command {
     config: any;
     cooldown: any;
 
-    constructor(client, name, handler, config, isClientCommand, registeredCommandLists) {
+    constructor(client, name, handler, config, isClientCommand) {
         this.client = client;
         this.name = name;
         this.handler = handler;
         this.config = this.parseConfig(config);
         this.cooldown = {};
 
-        this.registerCommand(name, handler, isClientCommand, registeredCommandLists);
-
-        if (this.config.aliases) {
-            for (const alias of this.config.aliases) {
-                this.registerCommand(alias, handler, isClientCommand, registeredCommandLists);
-            }
-        }
+        this.registerCommand(name, handler, isClientCommand);
     }
 
     parseConfig = (config) => {
         config = this.validator.isObject(config) ? config : {};
         config.requirements = this.validator.isObject(config.requirements) ? config.requirements : {};
         config.cooldownExclusions = this.validator.isObject(config.cooldownExclusions) ? config.cooldownExclusions : {};
-        config.aliases = this.validator.isArray(config.aliases) ? config.aliases : [];
         config.argsDescription = this.validator.isArray(config.argsDescription) ? config.argsDescription : [];
 
         config = Object.assign(
@@ -37,7 +30,6 @@ class Command {
                 consoleOnly: false,
                 requirements: {},
                 caseInsensitive: false,
-                aliases: [],
                 cooldownExclusions: {},
                 restricted: false,
             },
@@ -78,11 +70,7 @@ class Command {
         return true;
     };
 
-    registerCommand = (name, handler, isClientCommand = false, registeredCommandLists) => {
-        if (registeredCommandLists.find(name) !== undefined) {
-            throw new Error(`Command '${name}' has already registered!`);
-        }
-
+    registerCommand = (name, handler, isClientCommand = false) => {
         if (isClientCommand) {
             handler = (src, args, raw) => {
                 const validation = this.validateExecution(src, args, raw);

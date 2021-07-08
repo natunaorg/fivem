@@ -54,6 +54,7 @@ declare interface Database {
      * @author Rafly Maulana
      *
      * @example
+     * //* Normal Object Version. *\\
      * db('users').update({
      *      where: {
      *          name: "Don Chad"
@@ -65,7 +66,7 @@ declare interface Database {
      * })
      *
      * @example
-     * // Function Delivered Version.
+     * //* Function Delivered Version. *\\
      * db('users').update({
      *      where: {
      *          name: "Don Chad"
@@ -229,7 +230,6 @@ declare class Command {
         restricted?: boolean; // V
         description?: "No Description Available"; // V
         argsDescription?: Array<{ name: string; help: string }>; // V
-        aliases?: Array<string>;
         requirements?: {
             userIDs?: Array<number>; // V
             jobIDs?: Array<number>;
@@ -329,7 +329,7 @@ interface KoiClientInterface {
      *      }
      * });
      */
-    registerCommand: (name: string, handler: Command["handler"], config?: Command["config"]) => boolean;
+    registerCommand: (name: string | Array<string>, handler: Command["handler"], config?: Command["config"]) => boolean;
 
     /**
      * Set a description on command, this function is executed automatically after you registering a command with configuration that contain description
@@ -708,7 +708,7 @@ interface KoiServerInterface {
      *      }
      * });
      */
-    registerCommand: (name: string, handler: Command["handler"], config?: Command["config"], isClientCommand?: boolean) => boolean;
+    registerCommand: (name: string | Array<string>, handler: Command["handler"], config?: Command["config"], isClientCommand?: boolean) => boolean;
 
     /**
      * Get all set of player ID and return it on JSON format
