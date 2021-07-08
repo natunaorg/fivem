@@ -37,9 +37,7 @@ const server = {
         path: path.resolve(buildPath, "server"),
     },
     target: "node",
-    node: {
-        __dirname: false,
-    },
+    node: {},
 };
 
 const client = {
