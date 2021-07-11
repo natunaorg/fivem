@@ -1,19 +1,27 @@
-import config from "../configuration.json";
+import Client from "@client/main";
 
 class Module {
-    client: Koi["Client"];
+    client: Client;
 
     constructor(client, config) {
         this.client = client;
 
         this.client.addClientEventHandler("playerSpawned", () => this.client.triggerSharedEvent("character:requestPlayerData"));
-        this.client.addClientEventHandler(["baseevents:onPlayerKilled", "baseevents:onPlayerDied"], this.updateCharacterLocation);
+        this.client.addClientEventHandler(["baseevents:onPlayerKilled", "baseevents:onPlayerDied"], this.updateCharacterData);
 
-        this.client.addSharedEventHandler("character:playerLeft", this.updateCharacterLocation);
+        this.client.triggerSharedEvent("character:server:requestCharacterData");
+
+        setInterval(() => {
+            this.updateCharacterData();
+        }, config.savePlayerDataTemporaryInterval);
     }
 
-    updateCharacterLocation = () => {
-        this.client.triggerSharedEvent("character:updateCharacterLocation", String(this.client.game.player.getCoords(PlayerId())));
+    updateCharacterData = () => {
+        this.client.triggerSharedEvent("character:server:updateCharacterData", {
+            location: String(this.client.game.player.getCoords(PlayerId())),
+            health: GetEntityHealth(PlayerPedId()),
+            armour: GetPedArmour(PlayerPedId()),
+        });
     };
 }
 

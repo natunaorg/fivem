@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "*": ["types/*"],
+            "@server/*": ["src/server/*"],
+            "@client/*": ["src/client/*"],
+            "@plugins/*": ["plugins/*"],
+            "@/*": ["./*"],
+        },
+        "outDir": "./dist/types",
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "target": "es6",
+        "allowJs": true,
+        "lib": ["es2017"],
+        "types": [
+            "@citizenfx/client", 
+            "@citizenfx/server", 
+            "@types/node",
+            "@types/figlet",
+        ],
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "declaration": false,
+        "emitDeclarationOnly": false,
+    },
+    "include": [
+        "./src/**/*", 
+        "./plugins/**/*",
+    ],
+    "exclude": [
+        "**/node_modules", 
+        "**/__tests__/*", 
+    ],
+}

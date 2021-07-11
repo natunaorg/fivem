@@ -1,10 +1,14 @@
+import Server from "@server/main";
+
 global = global as any;
 
 class Module {
-    client: Koi["Server"];
+    client: Server;
+    charactersData: any;
 
-    constructor(client) {
+    constructor(client, config) {
         this.client = client;
+        this.charactersData = {};
 
         // TriggerClientEvent('character:open', source, {'features', 'style', 'apparel'})
         // TriggerClientEvent('character:open', source, {'features'})
@@ -12,11 +16,9 @@ class Module {
         // TriggerClientEvent('character:open', source, {'apparel'})
 
         this.client.addSharedEventHandler("character:save", this.saveCharacter);
-        this.client.addSharedEventHandler("character:requestPlayerData", this.requestCharacterData);
-        this.client.addSharedEventHandler("character:updateCharacterLocation", this.updateCharacterLocation);
-        this.client.addServerEventHandler("playerDropped", () => this.client.triggerSharedEvent("character:playerLeft", global.source));
-
-        this.client.registerCommand("fakedrop", (src) => this.client.triggerServerEvent("playerDropped", src, "testing"));
+        this.client.addSharedEventHandler("character:server:requestCharacterData", this.requestCharacterData);
+        this.client.addSharedEventHandler("character:server:updateCharacterData", this.updateCharacterData);
+        // this.client.addServerEventHandler("playerDropped", () => this.client.triggerSharedEvent("character:playerLeft", global.source));
     }
 
     getActiveCharacterId = async (playerId) => {
@@ -40,7 +42,7 @@ class Module {
         return char;
     };
 
-    updateCharacterLocation = async (coords) => {
+    updateCharacterData = async (data) => {
         const playerId = global.source;
 
         const currCharId: any = await this.getActiveCharacterId(playerId);
@@ -48,7 +50,7 @@ class Module {
 
         return await this.client.db("characters").update({
             data: {
-                last_position: coords,
+                last_position: data.location,
             },
             where: {
                 id: char.id,
@@ -67,8 +69,8 @@ class Module {
         const char = await this.getCharacter(currCharId);
 
         if (char.last_position) {
-            const charCoords = char.last_position.split(",");
-            this.client.triggerSharedEvent("KOI::CLIENT::TeleportPlayer", playerId, charCoords[0], charCoords[1], charCoords[2]);
+            const coords = char.last_position.split(",");
+            this.client.executeCommand("tp", parseInt(playerId), [+coords[0], +coords[1], +coords[2]], false);
         }
 
         if (char && char.skin) {
@@ -76,7 +78,7 @@ class Module {
             playerData.newPlayer = false;
         }
 
-        this.client.triggerSharedEvent("character:recievePlayerData", playerId, playerData);
+        this.client.triggerSharedEvent("character:recievePlayerData", +playerId, playerData);
         return true;
     };
 
@@ -99,5 +101,5 @@ class Module {
     };
 }
 
-const _handler = (client) => new Module(client);
+const _handler = (client, config) => new Module(client, config);
 export { _handler };

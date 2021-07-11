@@ -27,6 +27,7 @@
     "devDependencies": {
         "@babel/core": "^7.14.6",
         "@babel/preset-env": "^7.14.5",
+        "@types/figlet": "^1.5.4",
         "@typescript-eslint/eslint-plugin": "^3.8.0",
         "@typescript-eslint/parser": "^2.34.0",
         "babel-loader": "^8.2.2",
