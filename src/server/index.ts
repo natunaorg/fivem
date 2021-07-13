@@ -10,40 +10,14 @@ import standard from "figlet/importable-fonts/Doom";
 import * as Database from "@server/wrapper/database-wrapper";
 import * as Crypter from "@server/wrapper/crypter-wrapper";
 import * as Command from "@server/wrapper/command-wrapper";
+import * as Players from "@server/wrapper/players-wrapper";
+
+import Events from "@server/modules/events";
 
 import pkg from "@/package.json";
-const cfg: Config = require("@/koi.config");
+const cfg = (global as any).exports.koi.config();
 
-interface Config {
-    core: {
-        whitelistedSteamID: Array<string>;
-        mysql: {
-            host: string;
-            port: number;
-            user: string;
-            password: string;
-            database: string;
-        };
-        crypter: {
-            algorithm: string;
-            secretKey: string;
-        };
-        client: {
-            noDispatchService?: boolean;
-            noWantedLevel?: boolean;
-            autoRespawnDisabled?: boolean;
-        };
-    };
-    plugins: {
-        [key: string]: {
-            [key: string]: any;
-            client: any;
-            server: any;
-        };
-    };
-}
-
-class Server {
+class Server extends Events {
     /**
      * MySQL database wrapper
      */
@@ -64,113 +38,31 @@ class Server {
      */
     commands: { [key: string]: Command.Wrapper };
 
+    /**
+     * Players wrapper
+     */
+    players: Players.Wrapper;
+
     constructor() {
+        super();
         this.plugins = {};
         this.commands = {};
 
         this.db = (table: string) => new Database.Wrapper(mysql.createConnection(cfg.core.mysql), table);
         this.crypter = (algorithm: string = cfg.core.crypter.algorithm, secretKey: string = cfg.core.crypter.secretKey) => new Crypter.Wrapper(algorithm, secretKey);
+        this.players = new Players.Wrapper(this, cfg);
 
-        this.addSharedEventHandler("koi:server:requestClientSettings", this._events.requestClientSettings);
         this.addSharedEventHandler("koi:server:registerCommand", this.registerCommand);
-        this.addSharedEventHandler("koi:server:executeCommand", this.executeCommand);
 
         this.addServerEventHandler("playerConnecting", this._events.playerConnecting);
         this.addServerEventHandler("onServerResourceStart", this._events.onServerResourceStart);
         this.addServerEventHandler("onServerResourceStop", this._events.onServerResourceStop);
 
+        this.addSharedCallbackEventHandler("koi:server:requestClientSettings", this._events.requestClientSettings);
+
         // Test database connection (on startup) <-- check if connection success or not, also making an automated database creation 👍
         this.db("").utils.executeQuery(`CREATE DATABASE IF NOT EXISTS \`${cfg.core.mysql.database}\``);
     }
-
-    /**
-     * Add server only event and listen for it, only can be triggered from server
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param args Arguments to send
-     *
-     * @example
-     * addServerEventHandler("someEvent", (playerID) => console.log(playerID))
-     */
-    addServerEventHandler = (name: string | Array<string>, handler: Function) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                on(alias, handler);
-            }
-        } else if (typeof name == "string") {
-            on(name, handler);
-        } else {
-            throw new Error(`Invalid Server Event Name Properties for ${name}`);
-        }
-    };
-
-    /**
-     * Add shared event and listen from both server or client
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param args Arguments to send
-     *
-     * @example
-     * addSharedEventHandler("someEvent", (playerID) => console.log(playerID))
-     */
-    addSharedEventHandler = (name: string | Array<string>, handler: Function) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                onNet(alias, handler);
-            }
-        } else if (typeof name == "string") {
-            onNet(name, handler);
-        } else {
-            throw new Error(`Invalid Shared Event Name Properties for ${name}`);
-        }
-    };
-
-    /**
-     * Trigger a registered server event
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param args Arguments to send
-     *
-     * @example
-     * triggerServerEvent("someEvent", true)
-     */
-    triggerServerEvent = (name: string | Array<string>, ...args: any) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                emit(alias, ...args);
-            }
-        } else if (typeof name == "string") {
-            emit(name, ...args);
-        } else {
-            throw new Error(`Invalid Server Trigger Name Properties for ${name}`);
-        }
-    };
-
-    /**
-     * Trigger shared event between client and server, only event registered as shared event that can be triggered
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param target Target of the player ID (Server ID)
-     * @param args Arguments to send
-     *
-     * @example
-     * triggerSharedEvent("someEvent", 1, true)
-     */
-    triggerSharedEvent = (name: string | Array<string>, target: number, ...args: any) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                emitNet(alias, target, ...args);
-            }
-        } else if (typeof name == "string") {
-            emitNet(name, target, ...args);
-        } else {
-            throw new Error(`Invalid Shared Trigger Name Properties for ${name}`);
-        }
-    };
 
     /**
      * Use this function to hold next script below this from executing before it finish the timeout itself
@@ -192,24 +84,6 @@ class Server {
     wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     /**
-     * Execute a registrated command on Koi Framework only
-     * @author Rafly Maulana
-     *
-     * @param src Source of the player ID (Server ID)
-     * @param name The registered command name (Example: tp)
-     * @param validate Validate the command using the command configuration or not
-     * @param args Command arguments
-     *
-     * @example
-     * executeComamnd(1, 'tp', [100, 200, 300], true) // Validate the command execution
-     */
-    executeCommand = (name: string, src: number, args: Array<any>, validate: boolean = false) => {
-        if (!validate || (validate && this.commands[name].validateExecution(src, args, name) == true)) {
-            this.commands[name].handler(src, args, name);
-        }
-    };
-
-    /**
      * Registrating a command. If isClientCommand was set true, the handler would just triggering a client registered command
      * @author Rafly Maulana
      *
@@ -228,7 +102,7 @@ class Server {
      * });
      */
     registerCommand = (name: string | Array<string>, handler: Command.Handler, config: Command.Config = {}, isClientCommand: boolean = false) => {
-        const commandRegistration = (name: string) => {
+        const addCommand = (name: string) => {
             // Throws an error when same server command was registered twice
             if (this.commands[name] && !isClientCommand) throw new Error(`Command "${name}" had already been registered before!`);
 
@@ -241,10 +115,10 @@ class Server {
 
         if (Array.isArray(name)) {
             for (const alias of name) {
-                commandRegistration(alias);
+                addCommand(alias);
             }
         } else {
-            commandRegistration(name);
+            addCommand(name);
         }
 
         return true;
@@ -335,7 +209,6 @@ class Server {
 
     /**
      * List of events on server
-     * @author Various Developer
      */
     _events = {
         /**
@@ -359,7 +232,7 @@ class Server {
             }
 
             if (cfg.core.whitelistedSteamID && Array.isArray(cfg.core.whitelistedSteamID) && cfg.core.whitelistedSteamID.length > 0) {
-                if (!cfg.core.whitelistedSteamID.find(playerIds.steam)) {
+                if (!cfg.core.whitelistedSteamID.includes(playerIds.steam.toString())) {
                     return deferrals.done("[🎏 Koi] You are not whitelisted!");
                 }
             }
@@ -409,13 +282,14 @@ class Server {
          * @author Rafly Maulana
          */
         requestClientSettings: async () => {
-            const player = (global as any).source;
             const plugins = await this._getPlugins("client");
-
-            this.triggerSharedEvent("koi:client:retrieveClientSettings", player, {
+            return {
                 plugins,
-                config: cfg.core.client,
-            });
+                config: {
+                    saveDataTemporaryInterval: cfg.core.players.saveDataTemporaryInterval,
+                    ...cfg.core.client,
+                },
+            };
         },
 
         /**
@@ -476,4 +350,4 @@ const server = new Server();
 (global as any).exports("getServerProps", () => server);
 
 export default Server;
-export { Config, Server };
+export { Server };

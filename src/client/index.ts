@@ -1,21 +1,24 @@
 import * as Utils from "@client/wrapper/utils-wrapper";
 import * as Game from "@client/wrapper/game-wrapper";
 import * as Command from "@server/wrapper/command-wrapper";
-import { Config } from "@server/main";
+import * as Players from "@client/wrapper/players-wrapper";
+
+import Events from "@client/modules/events";
 
 import figlet from "figlet";
 import standard from "figlet/importable-fonts/Doom";
+import uniqid from "uniqid";
 
-class Client {
+class Client extends Events {
     /**
      * Client Configurations
      */
-    config: Config["core"]["client"];
+    config: any;
 
     /**
      * List of Client Plugins
      */
-    plugins: Config["plugins"];
+    plugins: any;
 
     /**
      * List of utility functions
@@ -27,108 +30,27 @@ class Client {
      */
     game: Game.Wrapper;
 
+    /**
+     * Client Player Wrapper
+     */
+    players: Players.Wrapper;
+
     constructor() {
+        super();
         this.config;
         this.plugins = {};
 
         this.utils = new Utils.Wrapper(this);
         this.game = new Game.Wrapper(this);
+        this.players;
 
-        this.addSharedEventHandler("koi:client:retrieveClientSettings", this._events.retrieveClientSettings);
         this.addSharedEventHandler("koi:client:setCommandDescription", this.setCommandDescription);
+
+        this.addSharedCallbackEventHandler("koi:client:getAllPlayers", () => GetActivePlayers().map((x: number) => (x = GetPlayerServerId(x))));
 
         this.addClientEventHandler("onClientResourceStart", this._events.onClientResourceStart);
         this.addClientEventHandler("onClientResourceStop", this._events.onClientResourceStop);
     }
-
-    /**
-     * Add client only event and listen for it, only can be triggered from server
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param args Arguments to send
-     *
-     * @example
-     * addClientEventHandler("someEvent", (playerID) => console.log(playerID))
-     */
-    addClientEventHandler = (name: string | Array<string>, handler: Function) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                on(alias, handler);
-            }
-        } else if (typeof name == "string") {
-            on(name, handler);
-        } else {
-            throw new Error(`Invalid Server Event Name Properties for ${name}`);
-        }
-    };
-
-    /**
-     * Add shared event and listen from both server or client
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param args Arguments to send
-     *
-     * @example
-     * addSharedEventHandler("someEvent", (playerID) => console.log(playerID))
-     */
-    addSharedEventHandler = (name: string | Array<string>, handler: Function) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                onNet(alias, handler);
-            }
-        } else if (typeof name == "string") {
-            onNet(name, handler);
-        } else {
-            throw new Error(`Invalid Shared Event Name Properties for ${name}`);
-        }
-    };
-
-    /**
-     * Trigger a registered client event
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param args Arguments to send
-     *
-     * @example
-     * triggerClientEvent("someEvent", true)
-     */
-    triggerClientEvent = (name: string | Array<string>, ...args: any) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                emit(alias, ...args);
-            }
-        } else if (typeof name == "string") {
-            emit(name, ...args);
-        } else {
-            throw new Error(`Invalid Server Trigger Name Properties for ${name}`);
-        }
-    };
-
-    /**
-     * Trigger shared event between client and server, only event registered as shared event that can be triggered
-     * @author Rafly Maulana
-     *
-     * @param name Name of the event
-     * @param target Target of the player ID (Server ID)
-     * @param args Arguments to send
-     *
-     * @example
-     * triggerSharedEvent("someEvent", 1, true)
-     */
-    triggerSharedEvent = (name: string | Array<string>, ...args: any) => {
-        if (typeof name == "object" && Array.isArray(name)) {
-            for (const alias of name) {
-                emitNet(alias, ...args);
-            }
-        } else if (typeof name == "string") {
-            emitNet(name, ...args);
-        } else {
-            throw new Error(`Invalid Shared Trigger Name Properties for ${name}`);
-        }
-    };
 
     /**
      * Use this function to hold next script below this from executing before it finish the timeout itself
@@ -150,20 +72,6 @@ class Client {
     wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     /**
-     * Execute a registrated command on Koi Framework only
-     * @author Rafly Maulana
-     *
-     * @param name The registered command name (Example: tp)
-     * @param validate Validate the command using the command configuration or not
-     *
-     * @example
-     * executeComamnd(1, 'tp', [100, 200, 300], true) // Validate the command execution
-     */
-    executeCommand = (name: string, src: number, args: Array<any>, validate = false) => {
-        this.triggerSharedEvent("koi:server:executeCommand", name, src, args, validate);
-    };
-
-    /**
      * Registrating a command. The actual command handler is registered on server to unlock the feature like permission based command or something, so it'd write a event on client and registered a handler on server to trigger the command from registered command in client.
      * @author Rafly Maulana
      * @source https://runtime.fivem.net/doc/natives/?_0x5FA79B0F
@@ -178,7 +86,7 @@ class Client {
      * });
      */
     registerCommand = (name: string | Array<string>, handler: Command.Handler, config: Command.Config = {}) => {
-        const commandRegistration = (name: string) => {
+        const addCommand = (name: string) => {
             this.addSharedEventHandler(`koi:client:requestCommand[${name}]`, (args: Array<any>, raw: string) => {
                 const src = GetPlayerServerId(PlayerId());
                 return handler(src, args, raw || name);
@@ -189,11 +97,44 @@ class Client {
 
         if (Array.isArray(name)) {
             for (const alias of name) {
-                commandRegistration(alias);
+                addCommand(alias);
             }
         } else {
-            commandRegistration(name);
+            addCommand(name);
         }
+    };
+
+    /**
+     * Set a keyboard key mapper to a function. This function also allows user to change their keybind on pause menu settings.
+     * @author Rafly Maulana
+     *
+     * @param key Keyboard key (Example: "x")
+     * @param description Description of the binding (Example: "Hands Up")
+     * @param onClick Handler that are executed after the key was clicked
+     * @param onReleased Handler that are executed after the key was released
+     *
+     * @example
+     * registerKeyControl(
+     *      'x',
+     *      'Hands up',
+     *      () => { // Executed when key clicked
+     *          handsup = true;
+     *          console.log('You are raising up your hands');
+     *      },
+     *      () => { // Executed when key released
+     *          handsup = false;
+     *          console.log('You are putting down your hands');
+     *      }
+     * )
+     */
+    registerKeyControl = (key: string, description: string, onClick: Function, onReleased?: Function) => {
+        const commandUniqueID = uniqid("keybind-");
+
+        RegisterCommand(`+${commandUniqueID}`, onClick, false);
+        RegisterCommand(`-${commandUniqueID}`, onReleased, false);
+        RegisterKeyMapping(`+${commandUniqueID}`, description, "keyboard", key);
+
+        return "~INPUT_" + this.utils.getHashString(`+${commandUniqueID}`) + "~";
     };
 
     /**
@@ -251,6 +192,8 @@ class Client {
      */
     _initConfigs = () => {
         if (this.config) {
+            this.players = new Players.Wrapper(this, this.config);
+
             if (this.config.autoRespawnDisabled) {
                 /**
                  * Requires "spawnmanager" script
@@ -262,19 +205,14 @@ class Client {
                 if (this.config.noDispatchService) this.game.setNoDispatchService();
                 if (this.config.noWantedLevel) this.game.setNoWantedLevel();
             });
+
+            if (this.config.pauseMenuTitle) {
+                AddTextEntry("FE_THDR_GTAO", this.config.pauseMenuTitle);
+            }
         }
     };
 
     _events = {
-        /**
-         * Retrive the client configuration
-         * @param settings Client Settings
-         */
-        retrieveClientSettings: (settings: { plugins: Array<{ resourceName: string; file: string; config: any }>; config: object }) => {
-            this._initPlugins(settings.plugins);
-            this.config = settings.config;
-        },
-
         /**
          * Listen when Koi Framework is starting
          * @author Rafly Maulana
@@ -307,12 +245,16 @@ class Client {
                 this.triggerClientEvent("koi:client:initializing");
                 this.triggerSharedEvent("koi:client:initializing");
 
-                this.triggerSharedEvent("koi:server:requestClientSettings");
+                this.triggerSharedEvent("koi:server:addPlayerData");
 
-                while (!this.config) {
-                    await this.wait(100);
-                }
-                this._initConfigs();
+                this.triggerSharedCallbackEvent("koi:server:requestClientSettings", (settings: any) => {
+                    this._initPlugins(settings.plugins);
+                    this.config = settings.config;
+
+                    this._initConfigs();
+                });
+
+                while (!this.config) await this.wait(100); // Wait for config before executing next script
 
                 /**
                  * Event: Ready
@@ -332,6 +274,12 @@ class Client {
          */
         onClientResourceStop: (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
+                for (const command of GetRegisteredCommands()) {
+                    if (command.name.startsWith("+keybind-") || command.name.startsWith("-keybind-")) {
+                        emit("chat:removeSuggestion", `/${command.name}`);
+                    }
+                }
+
                 this.triggerClientEvent("koi:client:stopped");
                 this.triggerSharedEvent("koi:client:stopped");
             }
