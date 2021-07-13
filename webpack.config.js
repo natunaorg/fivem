@@ -10,7 +10,7 @@ const server = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: ["ts-loader", "eslint-loader"],
+                use: ["ts-loader"],
                 exclude: /node_modules/,
             },
         ],
@@ -50,7 +50,7 @@ const client = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: ["ts-loader", "eslint-loader"],
+                use: ["ts-loader"],
                 exclude: /node_modules/,
             },
         ],
