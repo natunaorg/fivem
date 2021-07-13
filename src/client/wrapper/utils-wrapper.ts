@@ -1,4 +1,4 @@
-import Client from "@client/main";
+import Client from "@client/index";
 
 declare namespace Map {
     namespace Blip {
@@ -125,13 +125,96 @@ class Wrapper {
         return true;
     };
 
+    getHashString = (val: string) => {
+        let hash = 0;
+        let string = val.toLowerCase();
+        for (var i = 0; i < string.length; i++) {
+            let letter = (string[i] as any).charCodeAt();
+            hash = hash + letter;
+            hash += (hash << 10) >>> 0;
+            hash ^= hash >>> 6;
+            hash = hash >>> 0;
+        }
+
+        hash += hash << 3;
+        if (hash < 0) {
+            hash = hash >>> 0;
+        }
+        hash ^= hash >>> 11;
+        hash += hash << 15;
+        if (hash < 0) {
+            hash = hash >>> 0;
+        }
+        return hash.toString(16).toUpperCase();
+    };
+
+    getKeyControlId = (key: string) => {
+        switch (key.toUpperCase()) {
+            case "A":
+                return 34;
+            case "B":
+                return 29;
+            case "C":
+                return 26;
+            case "D":
+                return 30;
+            case "E":
+                return 46;
+            case "F":
+                return 49;
+            case "G":
+                return 47;
+            case "H":
+                return 74;
+            case "I":
+                return false;
+            case "J":
+                return false;
+            case "K":
+                return 311;
+            case "L":
+                return 7;
+            case "M":
+                return 244;
+            case "N":
+                return 249;
+            case "O":
+                return false;
+            case "P":
+                return 199;
+            case "Q":
+                return 44;
+            case "R":
+                return 45;
+            case "S":
+                return 33;
+            case "T":
+                return 245;
+            case "U":
+                return 303;
+            case "V":
+                return 0;
+            case "W":
+                return 32;
+            case "X":
+                return 77;
+            case "Y":
+                return 246;
+            case "Z":
+                return 20;
+            default:
+                return false;
+        }
+    };
+
     color = {
-        hexToRgb: (hex: string) =>
-            hex
+        hexToRgb: (hex: string) => {
+            return hex
                 .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => "#" + r + r + g + g + b + b)
                 .substring(1)
                 .match(/.{2}/g)
-                .map((x) => parseInt(x, 16)),
+                .map((x) => parseInt(x, 16));
+        },
     };
 
     /**

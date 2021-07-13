@@ -1,4 +1,4 @@
-import Client from "@client/main";
+import Client from "@client/index";
 
 class Module {
     client: Client;
@@ -6,11 +6,27 @@ class Module {
     constructor(client: Client) {
         this.client = client;
 
+        this.client.utils.map.blip.add({
+            title: "Test",
+            colour: 32,
+            iconId: 108,
+            location: {
+                x: -1789.56982421875,
+                y: -812.4180908203125,
+                z: 7.168194770812988,
+            },
+        });
+
+        FreezeEntityPosition(PlayerPedId(), false);
+
+        this.client.registerCommand("clear", () => this.client.triggerClientEvent("chat:clear"));
+
         this.client.registerCommand("myid", (src) => this.client.utils.notify(GetPlayerServerId(src), GetPlayerFromServerId(GetPlayerServerId(src)), GetActivePlayers()));
         this.client.registerCommand("mycoords", (src) => this.client.utils.notify("Your Coordinates is:", this.client.game.player.getCoords(src)));
 
         this.client.registerCommand("revive", (src, args) => this.client.game.player.revive(args[0] || src), {
             description: "Revive a player",
+            cooldown: 5000,
             requirements: {
                 userIDs: ["76561198290395137"],
             },

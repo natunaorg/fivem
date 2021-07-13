@@ -1,4 +1,4 @@
-import Client from "@client/main";
+import Client from "@client/index";
 
 class Wrapper {
     client: Client;
@@ -30,8 +30,8 @@ class Wrapper {
      * @example
      * game.optimizeFPS(1);
      */
-    optimizeFPS = (playerServerId: number) => {
-        const playerId = GetPlayerFromServerId(playerServerId);
+    optimizeFPS = (src: number) => {
+        const playerId = GetPlayerFromServerId(src);
         let ped = GetPlayerPed(playerId);
 
         ClearAllBrokenGlass();
@@ -96,8 +96,8 @@ class Wrapper {
          * @example
          * game.player.revive(1)
          */
-        revive: async (playerServerId: number) => {
-            let ped = GetPlayerPed(GetPlayerFromServerId(playerServerId));
+        revive: async (src: number) => {
+            let ped = GetPlayerPed(GetPlayerFromServerId(src));
             let playerPos = GetEntityCoords(ped, true);
 
             NetworkResurrectLocalPlayer(playerPos[0], playerPos[1], playerPos[2], 0, true, false);
@@ -115,8 +115,8 @@ class Wrapper {
          * @example
          * game.player.kill(1)
          */
-        kill: (playerServerId: number) => {
-            SetEntityHealth(GetPlayerPed(GetPlayerFromServerId(playerServerId)), 0);
+        kill: (src: number) => {
+            SetEntityHealth(GetPlayerPed(GetPlayerFromServerId(src)), 0);
 
             return true;
         },
@@ -129,8 +129,8 @@ class Wrapper {
          * @example
          * game.player.track(1)
          */
-        track: (playerServerId: number) => {
-            let coords = GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(playerServerId)), true);
+        track: (src: number) => {
+            let coords = GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(src)), true);
             SetNewWaypoint(coords[0], coords[1]);
 
             return true;
@@ -144,9 +144,9 @@ class Wrapper {
          * @example
          * game.player.invisible(1)
          */
-        invisible: (playerServerId: number) => {
+        invisible: (src: number) => {
             this.player.isInvisible = !this.player.isInvisible;
-            SetEntityVisible(GetPlayerPed(GetPlayerFromServerId(playerServerId)), this.player.isInvisible, false);
+            SetEntityVisible(GetPlayerPed(GetPlayerFromServerId(src)), this.player.isInvisible, false);
 
             return true;
         },
@@ -159,8 +159,8 @@ class Wrapper {
          * @example
          * game.player.godMode(1, true)
          */
-        noClip: (playerServerId: number) => {
-            let ped = GetPlayerPed(GetPlayerFromServerId(playerServerId));
+        setNoClip: (src: number) => {
+            let ped = GetPlayerPed(GetPlayerFromServerId(src));
             let entity = (IsPedInAnyVehicle(ped, false) && GetVehiclePedIsUsing(ped)) || ped;
             let currentSpeed = 2;
             let noclipEntity = (IsPedInAnyVehicle(ped, false) && GetVehiclePedIsUsing(ped)) || ped;
@@ -220,8 +220,8 @@ class Wrapper {
          * @example
          * game.player.godMode(1, true)
          */
-        godMode: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        godMode: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             this.player.isGodMode = !this.player.isGodMode;
 
             SetPlayerInvincible(playerId, this.player.isGodMode);
@@ -238,8 +238,8 @@ class Wrapper {
          * @example
          * game.player.giveFullArmour(1)
          */
-        giveFullArmour: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        giveFullArmour: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             SetPedArmour(GetPlayerPed(playerId), 100);
 
             return true;
@@ -253,10 +253,12 @@ class Wrapper {
          * @example
          * game.player.getCoords(1)
          */
-        getCoords: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
-            const [x, y, z] = GetEntityCoords(GetPlayerPed(playerId), true);
-            return { x, y, z };
+        getCoords: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
+            const ped = GetPlayerPed(playerId);
+            const [x, y, z] = GetEntityCoords(ped, true);
+            const heading = GetEntityHeading(ped);
+            return { x, y, z, heading };
         },
 
         /**
@@ -271,8 +273,8 @@ class Wrapper {
              * @example
              * game.player.teleport.marker(1)
              */
-            marker: async (playerServerId: number) => {
-                const playerId = GetPlayerFromServerId(playerServerId);
+            marker: async (src: number) => {
+                const playerId = GetPlayerFromServerId(src);
                 let waypoint = GetFirstBlipInfoId(8);
 
                 if (!DoesBlipExist(waypoint)) {
@@ -301,8 +303,8 @@ class Wrapper {
              * @example
              * game.player.teleport.coordinates(1, 10, 20, 30)
              */
-            coordinates: async (playerServerId: number, x: number, y: number, z: number) => {
-                const playerId = GetPlayerFromServerId(playerServerId);
+            coordinates: async (src: number, x: number, y: number, z: number) => {
+                const playerId = GetPlayerFromServerId(src);
                 SetPedCoordsKeepVehicle(GetPlayerPed(playerId), x, y, z);
 
                 return true;
@@ -319,8 +321,8 @@ class Wrapper {
          * @example
          * game.vehicle.spawn(1, 'zentorno');
          */
-        spawn: async (playerServerId: number, model: string = "adder") => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        spawn: async (src: number, model: string = "adder") => {
+            const playerId = GetPlayerFromServerId(src);
             let hash = GetHashKey(model);
 
             if (!IsModelInCdimage(hash) || !IsModelAVehicle(hash)) {
@@ -351,8 +353,8 @@ class Wrapper {
          * @example
          * game.vehicle.delete(1)
          */
-        delete: async (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        delete: async (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             let ped = GetPlayerPed(playerId);
 
             const DeleteGivenVehicle = async (veh: number, timeoutMax: number) => {
@@ -405,8 +407,8 @@ class Wrapper {
          * @example
          * game.vehicle.seatbelt(1, true)
          */
-        seatbelt: async (playerServerId: number, toggle: 0 | 1 | boolean) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        seatbelt: async (src: number, toggle: 0 | 1 | boolean) => {
+            const playerId = GetPlayerFromServerId(src);
             toggle = !toggle ? 0 : 1;
             SetPedCanBeKnockedOffVehicle(GetPlayerPed(playerId), toggle);
 
@@ -421,8 +423,8 @@ class Wrapper {
          * @example
          * game.vehicle.clean(1)
          */
-        clean: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        clean: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(playerId)), 1.0);
 
             return true;
@@ -436,8 +438,8 @@ class Wrapper {
          * @example
          * game.vehicle.dirty(1)
          */
-        dirty: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        dirty: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(playerId)), 15.0);
 
             return true;
@@ -451,8 +453,8 @@ class Wrapper {
          * @example
          * game.vehicle.repairEngine(1)
          */
-        repairEngine: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        repairEngine: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             let ped = GetPlayerPed(playerId);
             let vehicle = GetVehiclePedIsUsing(ped);
 
@@ -470,8 +472,8 @@ class Wrapper {
          * @example
          * game.vehicle.repairBody(1)
          */
-        repairBody: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        repairBody: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             let ped = GetPlayerPed(playerId);
             let vehicle = GetVehiclePedIsUsing(ped);
 
@@ -492,8 +494,8 @@ class Wrapper {
          * @example
          * game.vehicle.getClosestOne(1)
          */
-        getClosestOne: (playerServerId: number) => {
-            const playerId = GetPlayerFromServerId(playerServerId);
+        getClosestOne: (src: number) => {
+            const playerId = GetPlayerFromServerId(src);
             let pos = GetEntityCoords(GetPlayerPed(playerId), true);
             let flags = [0, 2, 4, 6, 7, 23, 127, 260, 2146, 2175, 12294, 16384, 16386, 20503, 32768, 67590, 67711, 98309, 100359];
 

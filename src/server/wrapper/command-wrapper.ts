@@ -1,4 +1,4 @@
-import Server from "@server/main";
+import Server from "@server/index";
 
 /**
  * A Handler to execute function when called.
@@ -40,11 +40,12 @@ type Config = {
     cooldown?: number;
     consoleOnly?: boolean;
     requirements?: {
-        userIDs: Array<string>;
+        userIDs?: Array<string>;
+        custom?: Function;
     };
     caseInsensitive?: boolean;
     cooldownExclusions?: {
-        userIDs: Array<string>;
+        userIDs?: Array<string>;
     };
     restricted?: boolean;
 };
@@ -54,12 +55,12 @@ class Wrapper {
     name: string;
     handler: Handler;
     config: Config;
-    cooldown: any;
+    cooldownList: any;
     isClientCommand: boolean;
 
     constructor(client: Server, name: string, handler: Handler, config: Config, isClientCommand: boolean) {
         this.client = client;
-        this.cooldown = {};
+        this.cooldownList = {};
 
         this.name = name;
         this.isClientCommand = isClientCommand;
@@ -87,26 +88,28 @@ class Wrapper {
         );
     }
 
-    parseConfig = (config: any) => {
+    parseConfig = (config: Config) => {
         config = this.validator.isObject(config) ? config : {};
         config.requirements = this.validator.isObject(config.requirements) ? config.requirements : {};
         config.cooldownExclusions = this.validator.isObject(config.cooldownExclusions) ? config.cooldownExclusions : {};
         config.argsDescription = this.validator.isArray(config.argsDescription) ? config.argsDescription : [];
 
-        config = Object.assign(
-            {
-                argsRequired: false,
-                description: "No Description Available",
-                argsDescription: [],
-                cooldown: false,
-                consoleOnly: false,
-                requirements: {},
-                caseInsensitive: false,
-                cooldownExclusions: {},
-                restricted: false,
+        config = {
+            argsRequired: false,
+            description: "No Description Available",
+            cooldown: 0,
+            consoleOnly: false,
+            caseInsensitive: false,
+            restricted: false,
+            ...config,
+            argsDescription: [...config.argsDescription],
+            requirements: {
+                ...config.requirements,
             },
-            config
-        );
+            cooldownExclusions: {
+                ...config.cooldownExclusions,
+            },
+        };
 
         return config;
     };
@@ -120,18 +123,28 @@ class Wrapper {
             return "This command can only be executed from console!";
         }
 
-        const userID = this.client.getPlayerIds(src).steam;
+        const userID = this.client.getPlayerIds(src).steam.toString();
 
-        // if (this.config.cooldown) {
-        //     if (this.cooldown[src] && Date.now() - this.cooldown[src] < this.config.cooldown) {
-        //         if (!this.config.cooldownExclusions || (this.config.cooldownExclusions && !this.config.cooldownExclusions.userIDs.includes(userID.toString()))) {
-        //             return "Still under cooldown.";
-        //         }
-        //     }
-        // }
+        const cooldown = this.config.cooldown;
+        const cooldownList = this.cooldownList;
+        const cooldownExclusions = this.config.cooldownExclusions;
 
-        if (this.config.requirements) {
-            if (this.config.requirements.userIDs && !this.config.requirements.userIDs.includes(userID.toString())) {
+        if (cooldown && cooldownList[src] && Date.now() - cooldownList[src] <= cooldown) {
+            if (
+                !cooldownExclusions || // Option A: If there are no cooldown exclusion
+                (cooldownExclusions.userIDs && !cooldownExclusions.userIDs.includes(userID)) // Option B: If there are userIDs configured, but player wasn't on the list
+            ) {
+                return "Still under cooldown.";
+            }
+        }
+
+        const requirements = this.config.requirements;
+
+        if (requirements) {
+            if (
+                (requirements.userIDs && !requirements.userIDs.includes(userID)) || // Option A: Not included in User IDs
+                (requirements.custom && !requirements.custom()) // Option B: Custom requirement function return false
+            ) {
                 return "You dont have enough permission!";
             }
         }
@@ -140,6 +153,7 @@ class Wrapper {
             return false;
         }
 
+        this.cooldownList[src] = Date.now();
         return true;
     };
 

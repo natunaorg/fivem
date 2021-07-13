@@ -1,29 +1,14 @@
-import Client from "@client/main";
+import Client from "@client/index";
 
 class Module {
     client: Client;
 
-    constructor(client, config) {
+    constructor(client: Client) {
         this.client = client;
-
-        this.client.addClientEventHandler("playerSpawned", () => this.client.triggerSharedEvent("character:requestPlayerData"));
-        this.client.addClientEventHandler(["baseevents:onPlayerKilled", "baseevents:onPlayerDied"], this.updateCharacterData);
-
         this.client.triggerSharedEvent("character:server:requestCharacterData");
-
-        setInterval(() => {
-            this.updateCharacterData();
-        }, config.savePlayerDataTemporaryInterval);
+        this.client.addSharedEventHandler("character:client:teleportPlayer", (x: number, y: number, z: number) => this.client.game.player.teleport.coordinates(GetPlayerServerId(PlayerId()), x, y, z));
     }
-
-    updateCharacterData = () => {
-        this.client.triggerSharedEvent("character:server:updateCharacterData", {
-            location: String(this.client.game.player.getCoords(PlayerId())),
-            health: GetEntityHealth(PlayerPedId()),
-            armour: GetPedArmour(PlayerPedId()),
-        });
-    };
 }
 
-const _handler = (client, config) => new Module(client, config);
+const _handler = (client: Client) => new Module(client);
 export { _handler };
