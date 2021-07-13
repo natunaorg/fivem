@@ -4,7 +4,7 @@
  * Module based files allows you to import this script on Client or Server but there would be a HIGH SECURITY ISSUES if you pull this files outside the core of this framework.
  */
 
-module.exports = {
+const config = {
     core: {
         /**
          * Koi Framework using persistent Steam ID instead of other dynamic ID, to whitelist a person just put the SteamID64 on the array below
@@ -15,7 +15,8 @@ module.exports = {
          *      76561112381745631
          * ]
          */
-        whitelistedSteamID: [],
+        whitelistedSteamID: ["76561198290395137"],
+
         /**
          * We used MYSQL because it provides more persistant data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
          * [IMPORTANT] If your server players was high, i'd recommend you to use a fast SQL Database like PostgreSQL, but you would need to configure some script first.
@@ -47,6 +48,7 @@ module.exports = {
              */
             database: "koifw",
         },
+
         /**
          * We provide you an encryption to encrypt some sensitive data before putting it on to the Database
          */
@@ -63,6 +65,32 @@ module.exports = {
              */
             secretKey: "vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3",
         },
+
+        /**
+         * List of players wrapper configuration
+         */
+        players: {
+            /**
+             * Saving data of every player to server variable, not to Database.
+             * We cached the player data before putting it to database, so there'd no mysql connection floodings caused by data saving.
+             * It also helpful to ensure players so that their not gonna lose their data in case if something bad like internet loss happens
+             */
+            saveDataTemporaryInterval: 1 * 1000, // 1 second (in Milisecond)
+
+            /**
+             * Saving data to database from registered cache
+             */
+            saveDataToDatabaseInterval: 10 * 1000, // 10 second
+
+            /**
+             * Set how long the temporary data would be keep when player leave the server.
+             * Set to [true] to keep the data forever (as long the server still running).
+             * Set data to [number] in Milisecond to add the timeout before data is deleted (Example: 10 * 1000 [10 Second])
+             * Set data to [false] to instantly delete the data;
+             */
+            keepDataAfterLeaving: 10 * 1000,
+        },
+
         /**
          * Koi Framework Client Options Configuration
          * If you had a custom client plugins, you might wanna store your configuration here.
@@ -71,17 +99,23 @@ module.exports = {
             /**
              * Disable Emergency Service like Police, Ambulance, Firefighters, etc.
              */
-            noDispatchService: false,
+            noDispatchService: true,
 
             /**
              * Disable Wanted Level
              */
             noWantedLevel: true,
+
             /**
              * Set whether auto respawn is disabled if player dies
              * [IMPORTANT!] This option requires "spawnmanager" script to be activated!
              */
             autoRespawnDisabled: true,
+
+            /**
+             * Set pause menu title
+             */
+            pauseMenuTitle: "~y~Koi Indonesia Roleplay ~m~| ~b~Discord~m~: ~b~kGPHBvXzGM~m~",
         },
     },
     plugins: {
@@ -100,3 +134,6 @@ module.exports = {
         },
     },
 };
+
+// module.exports = config; // Cannot use module in FiveM NodeJS
+exports("config", () => config);
