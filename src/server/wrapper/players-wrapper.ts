@@ -61,6 +61,43 @@ class Wrapper {
     };
 
     /**
+     * Update current data of a player
+     * @author Rafly Maulana
+     *
+     * @example
+     * update(1, {
+     *      character: {
+     *          last_position: {
+     *              x: 1,
+     *              y: 1,
+     *              z: 1,
+     *              heading: 1
+     *          }
+     *      }
+     * })
+     */
+    update = async (id: number | string, newData: Player) => {
+        let currentData = this.get(id);
+
+        if (currentData) this._delete(id);
+        if (!currentData) currentData = await this._add(currentData.id);
+
+        const data = {
+            ...currentData, // Copy From Origin
+            ...newData, // Overwrites any differences
+            is_dead: newData.character.health == 0 ? true : false,
+            updated_at: Date.now(),
+            character: {
+                ...currentData.character,
+                ...newData.character,
+            },
+        };
+
+        this.lists.push(JSON.stringify(data));
+        return data;
+    };
+
+    /**
      * Add a new player data when playerJoining event received.
      * [IMPORTANT] This function shouldn't be used since it was called automatically by this script
      * @author Rafly Maulana
@@ -91,43 +128,6 @@ class Wrapper {
                     z: character.last_position[2],
                     heading: character.last_position[3] || 0,
                 },
-            },
-        };
-
-        this.lists.push(JSON.stringify(data));
-        return data;
-    };
-
-    /**
-     * Update current data of a player
-     * @author Rafly Maulana
-     *
-     * @example
-     * update(1, {
-     *      character: {
-     *          last_position: {
-     *              x: 1,
-     *              y: 1,
-     *              z: 1,
-     *              heading: 1
-     *          }
-     *      }
-     * })
-     */
-    update = async (id: number | string, newData: Player) => {
-        let currentData = this.get(id);
-
-        if (currentData) this._delete(id);
-        if (!currentData) currentData = await this._add(currentData.id);
-
-        const data = {
-            ...currentData, // Copy From Origin
-            ...newData, // Overwrites any differences
-            is_dead: newData.character.health == 0 ? true : false,
-            updated_at: Date.now(),
-            character: {
-                ...currentData.character,
-                ...newData.character,
             },
         };
 
@@ -167,9 +167,14 @@ class Wrapper {
 
     _intervals = {
         dataUpdateInterval: () => {
+            let isAnyPlayerPresented = false; // Check if there's any player
+
             for (const rawData of this.lists) {
+                isAnyPlayerPresented = true;
+
                 const data = JSON.parse(rawData);
                 const char = data.character;
+
                 delete char.is_dead;
 
                 this.client.db("characters").update({
@@ -184,7 +189,7 @@ class Wrapper {
                 });
             }
 
-            this.client._logger("Saving all players data");
+            this.client._logger(isAnyPlayerPresented ? "Saving All Players Data" : "No Players Available to Save");
         },
     };
 
