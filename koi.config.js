@@ -79,8 +79,9 @@ const config = {
 
             /**
              * Saving data to database from registered cache
+             * Keep in mind, when player is leaving the server, the last cached data would be saved to database instantly, this interval is to protect in case the temporary data is corrupted
              */
-            saveDataToDatabaseInterval: 10 * 1000, // 10 second
+            saveDataToDatabaseInterval: 30 * 1000, // 30 second
 
             /**
              * Set how long the temporary data would be keep when player leave the server.
@@ -120,16 +121,13 @@ const config = {
     },
     plugins: {
         // prettier-ignore
-        "character": {
+        "raflymln-vehcontrol": {
             client: {
-                /**
-                 * Set the interval of player location updates to SERVER. The last player location saved will be the player location saved to database if player is crashing/leaving.
-                 * [IMPORTANT]
-                 * It just saved a temporary data to server as long the player still on the game,
-                 * to set the interval of saving all the temporary data to Database, check another
-                 * configuration below
-                 */
-                savePlayerDataTemporaryInterval: 1 * 1000, // 1 second (in Milisecond)
+                carWithManualTransmissions: [
+                    'sultan',
+                    'jb700',
+                    'policeb'
+                ]
             },
         },
     },

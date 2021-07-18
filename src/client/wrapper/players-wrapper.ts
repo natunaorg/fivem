@@ -48,6 +48,7 @@ class Wrapper {
         updatePlayerData: () => {
             const playerId = GetPlayerServerId(PlayerId());
             const ped = PlayerPedId();
+
             this.update(
                 playerId,
                 {
@@ -65,7 +66,7 @@ class Wrapper {
     _events = {
         baseEvents: () => {
             const playerId = GetPlayerServerId(PlayerId());
-            this.client.players.update(playerId, { character: { last_position: this.client.game.player.getCoords(playerId) } }, () => false);
+            this.client.players.update(playerId, {}, () => false);
         },
     };
 }

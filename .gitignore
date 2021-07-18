@@ -1,3 +1,8 @@
+# plugins
+plugins/
+!plugins/character
+!plugins/common
+
 # dependencies
 node_modules/
 /.pnp

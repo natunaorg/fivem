@@ -18,24 +18,27 @@ interface Character {
 
 interface Player {
     id?: string;
+    loaded?: boolean;
     updated_at?: number;
-    character: Character;
+    character?: Character;
 }
 
 class Wrapper {
-    lists: Array<string>;
+    lists: {
+        [key: string]: string;
+    };
     client: Server;
     config: any;
 
     constructor(client: Server, config: any) {
         this.client = client;
-        this.lists = [];
+        this.lists = {};
         this.config = config.core.players;
 
         this.client.addSharedCallbackEventHandler("koi:server:getPlayerData", this.get);
         this.client.addSharedCallbackEventHandler("koi:server:updatePlayerData", this.update);
 
-        this.client.addServerEventHandler("playerJoining", () => this._add((global as any).source));
+        this.client.addServerEventHandler("playerJoining", async () => await this._add((global as any).source));
         this.client.addServerEventHandler("playerDropped", this._events.playerDropped);
 
         setInterval(this._intervals.dataUpdateInterval, this.config.saveDataToDatabaseInterval);
@@ -51,13 +54,7 @@ class Wrapper {
      */
     get = (id: number | string) => {
         if (typeof id !== "string") id = this.utils.getIdentifiers(id).steam.toString();
-
-        for (const rawData of this.lists) {
-            const data = JSON.parse(rawData);
-            if (data.id === id) return data;
-        }
-
-        return false;
+        return this.lists[id] ? JSON.parse(this.lists[id]) : false;
     };
 
     /**
@@ -80,7 +77,8 @@ class Wrapper {
         let currentData = this.get(id);
 
         if (currentData) this._delete(id);
-        if (!currentData) currentData = await this._add(currentData.id);
+        if (!currentData && typeof id == "number") currentData = await this._add(id);
+        if (!currentData && typeof id !== "number") return; // If data not available and id provided was a Steam ID
 
         const data = {
             ...currentData, // Copy From Origin
@@ -93,8 +91,23 @@ class Wrapper {
             },
         };
 
-        this.lists.push(JSON.stringify(data));
+        this.lists[data.id] = JSON.stringify(data);
         return data;
+    };
+
+    saveCharacter = async (character: Character) => {
+        delete character.is_dead;
+
+        await this.client.db("characters").update({
+            data: {
+                ...character,
+                last_position: Object.values(character.last_position).join(","),
+                skin: JSON.stringify(character.skin),
+            },
+            where: {
+                id: character.id,
+            },
+        });
     };
 
     /**
@@ -109,7 +122,7 @@ class Wrapper {
         const user = await this.client.db("users").findFirst({ where: { id: identifiers.steam } });
 
         const character: Character = await this.client.db("characters").findFirst({ where: { id: user.active_character_id } });
-        character.last_position = (character.last_position as any).split(",");
+        ((character as any).last_position as Array<number>) = ((character as any).last_position as string).split(",").map((x) => parseInt(x));
 
         const data = {
             id: identifiers.steam.toString(),
@@ -131,7 +144,7 @@ class Wrapper {
             },
         };
 
-        this.lists.push(JSON.stringify(data));
+        this.lists[data.id] = JSON.stringify(data);
         return data;
     };
 
@@ -142,13 +155,7 @@ class Wrapper {
      */
     _delete = (id: number | string) => {
         if (typeof id !== "string") id = this.utils.getIdentifiers(id).steam.toString();
-
-        this.lists = this.lists.filter((rawData) => {
-            const data = JSON.parse(rawData);
-            if (data.id === id) return true;
-        });
-
-        return true;
+        return delete this.lists[id];
     };
 
     utils = {
@@ -166,46 +173,36 @@ class Wrapper {
     };
 
     _intervals = {
-        dataUpdateInterval: () => {
-            let isAnyPlayerPresented = false; // Check if there's any player
+        dataUpdateInterval: async () => {
+            const playersLength = Object.keys(this.lists).length;
+            const hasAnyPlayer = playersLength > 0 ? true : false; // Check if there's any player
 
-            for (const rawData of this.lists) {
-                isAnyPlayerPresented = true;
+            for (const key in this.lists) {
+                const data = this.get(key);
+                const character = data.character;
 
-                const data = JSON.parse(rawData);
-                const char = data.character;
-
-                delete char.is_dead;
-
-                this.client.db("characters").update({
-                    data: {
-                        ...char,
-                        last_position: Object.values(char.last_position).join(","),
-                        skin: JSON.stringify(char.skin),
-                    },
-                    where: {
-                        id: char.id,
-                    },
-                });
+                await this.saveCharacter(character);
             }
 
-            this.client._logger(isAnyPlayerPresented ? "Saving All Players Data" : "No Players Available to Save");
+            this.client._logger(hasAnyPlayer ? `Saving ${playersLength} Players Data` : "No Players Available to Save");
         },
     };
 
     _events = {
-        playerDropped: () => {
+        playerDropped: async (reason: string) => {
             const playerId = (global as any).source;
-            const data = this.get(playerId);
+            const data: Player = this.get(playerId);
 
-            if (data) this.update(playerId, data);
+            this.client._logger(`Player ${GetPlayerName(playerId)} dropped (Reason: ${reason}).`);
+
+            if (data) await this.saveCharacter(data.character);
 
             const keepDataAfterLeaving = this.config.keepDataAfterLeaving;
             if (!keepDataAfterLeaving) {
                 this._delete(playerId);
             } else if (typeof keepDataAfterLeaving == "number") {
                 setTimeout(() => {
-                    const updateCheck = this.get(playerId); // In case if player was rejoin, it'd cancel the event
+                    const updateCheck = this.get(playerId); // In case if player was rejoining, it'd cancel the event
                     if (updateCheck.updated_at == data.updated_at) {
                         this._delete(playerId);
                     }

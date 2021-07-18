@@ -130,6 +130,8 @@ class Client extends Events {
     registerKeyControl = (key: string, description: string, onClick: Function, onReleased?: Function) => {
         const commandUniqueID = uniqid("keybind-");
 
+        if (!onReleased) onReleased = () => false;
+
         RegisterCommand(`+${commandUniqueID}`, onClick, false);
         RegisterCommand(`-${commandUniqueID}`, onReleased, false);
         RegisterKeyMapping(`+${commandUniqueID}`, description, "keyboard", key);
@@ -274,12 +276,6 @@ class Client extends Events {
          */
         onClientResourceStop: (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                for (const command of GetRegisteredCommands()) {
-                    if (command.name.startsWith("+keybind-") || command.name.startsWith("-keybind-")) {
-                        emit("chat:removeSuggestion", `/${command.name}`);
-                    }
-                }
-
                 this.triggerClientEvent("koi:client:stopped");
                 this.triggerSharedEvent("koi:client:stopped");
             }
