@@ -1,7 +1,7 @@
 # plugins
-plugins/
-!plugins/character
-!plugins/common
+plugins/*
+!plugins/character/*
+!plugins/common/*
 
 # dependencies
 node_modules/
