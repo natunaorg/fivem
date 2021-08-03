@@ -1,6 +1,8 @@
+"use strict";
 import Client from "@client/index";
 
-class Wrapper {
+export default Wrapper;
+export class Wrapper {
     client: Client;
 
     constructor(client: Client) {
@@ -8,32 +10,15 @@ class Wrapper {
     }
 
     /**
-     * Basically optimizing texture and things in GTA, the function consists of:
-     * 1. ClearAllBrokenGlass()
-     * 2. ClearAllHelpMessages()
-     * 3. LeaderboardsReadClearAll()
-     * 4. ClearBrief();
-     * 5. ClearGpsFlags();
-     * 6. ClearPrints();
-     * 7. ClearSmallPrints();
-     * 8. ClearReplayStats();
-     * 9. LeaderboardsClearCacheData();
-     * 10. ClearFocus();
-     * 11. ClearHdArea();
-     * 12. ClearPedBloodDamage();
-     * 13. ClearPedWetness();
-     * 14. ClearPedEnvDirt();
-     * 15. ResetPedVisibleDamage();
-     * @author Rafly Maulana
-     * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
+     * @description
+     * Basically optimizing texture and things in GTA, such as clearing blood, wetness, dirt, etc. in ped
+     *
+     * @param ped Ped
      *
      * @example
-     * game.optimizeFPS(1);
+     * optimizeFPS(PlayerPedId());
      */
-    optimizeFPS = (src: number) => {
-        const playerId = GetPlayerFromServerId(src);
-        let ped = GetPlayerPed(playerId);
-
+    optimizeFPS = (ped: number = PlayerPedId()) => {
         ClearAllBrokenGlass();
         ClearAllHelpMessages();
         LeaderboardsReadClearAll();
@@ -52,281 +37,305 @@ class Wrapper {
     };
 
     /**
-     * Disable dispatch radio after committing a crime (Example: Police Radio)
-     * @author Rafly Maulana
-     * @source https://forum.cfx.re/t/release-disable-all-emergency-service-and-military-dispatching/23823
+     * @description
+     * Disable default game dispatch radio
+     *
+     * @example
+     * disableDispatchService();
      */
-    setNoDispatchService = () => {
-        for (let i = 0; i < 15; i++) {
+    disableDispatchService = () => {
+        for (let i = 0; i >= 20; i++) {
             EnableDispatchService(i, false);
+            Citizen.invokeNative("0xDC0F817884CDD856", i, false); // EnableDispatchService in Native
         }
     };
 
     /**
-     * Disable wanted level, so you'd not be chasen by police even after you committing a crime
-     * @author Rafly Maulana
-     * @source https://forum.cfx.re/t/release-disable-wanted-level/2855
+     * @description
+     * Reset wanted level for a player
+     *
+     * @param playerId Player Ped
+     *
+     * @example
+     * resetWantedLevel(PlayerId());
      */
-    setNoWantedLevel = () => {
-        if (GetPlayerWantedLevel(PlayerId()) != 0) {
-            SetPlayerWantedLevel(PlayerId(), 0, false);
-            SetPlayerWantedLevelNow(PlayerId(), false);
+    resetWantedLevel = (playerId: number = PlayerId()) => {
+        if (GetPlayerWantedLevel(playerId) !== 0) {
+            SetPlayerWantedLevel(playerId, 0, false);
+            SetPlayerWantedLevelNow(playerId, false);
         }
+
+        return true;
     };
 
     /**
-     * List of player related functions
+     * @readonly
+     *
+     * @description
+     * Only work on an entity (Ped, Player, Vehicle, Object, etc)
+     */
+    entity = {
+        /**
+         * @description
+         * Get coordinates of an entity
+         *
+         * @param entity Entity
+         *
+         * @example
+         * getCoords(PlayerPedId());
+         */
+        getCoords: (entity: number = PlayerPedId()) => {
+            const [x, y, z] = GetEntityCoords(entity, true);
+            const heading = GetEntityHeading(entity);
+
+            return { x, y, z, heading };
+        },
+    };
+
+    /**
+     * @readonly
+     *
+     * @description
+     * Only work for a ped (Pedestrian, Player)
+     */
+    ped = {
+        /**
+         * @description
+         * Teleport to a waypoint marker set on the map
+         *
+         * @param ped Ped
+         *
+         * @example
+         * teleportToMarker(PlayerPedId());
+         */
+        teleportToMarker: async (ped: number = PlayerPedId()) => {
+            if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
+                throw new Error("Entity given was not a ped!");
+            }
+
+            const waypoint = GetFirstBlipInfoId(8);
+
+            if (!DoesBlipExist(waypoint)) {
+                throw new Error("Blip Doesn't Exist");
+            }
+
+            const coords = GetBlipInfoIdCoord(waypoint);
+
+            for (let height = 1; height <= 1000; height++) {
+                const [, groundZ] = GetGroundZFor_3dCoord(coords[0], coords[1], height, false);
+
+                this.ped.teleportToCoordinates(ped, { x: coords[0], y: coords[1], z: height });
+
+                await this.client.wait(5);
+                if (groundZ) return true;
+            }
+
+            return false;
+        },
+
+        /**
+         * @description
+         * Teleport to a coordinates
+         *
+         * @param ped Ped
+         * @param coords Coordinate of the location
+         *
+         * @example
+         * teleportToCoordinates(PlayerPedId(), { 1000, 2000, 500 });
+         */
+        teleportToCoordinates: (ped: number = PlayerPedId(), coords: { x: string | number; y: string | number; z: string | number }) => {
+            if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
+                throw new Error("Entity given was not a ped!");
+            }
+
+            const parseCoords = (axis: string | number) => {
+                if (typeof axis === "string") {
+                    const parsedString = axis.replace(/,/g, "");
+                    axis = parseInt(parsedString);
+                }
+
+                return axis;
+            };
+
+            SetPedCoordsKeepVehicle(ped, parseCoords(coords.x), parseCoords(coords.y), parseCoords(coords.z));
+
+            return true;
+        },
+
+        /**
+         * @description
+         * Get current vehicle of a ped
+         *
+         * @param ped Ped
+         * @param isDriver If set to true, it will return false if the player is in the vehicle not as a driver.
+         *
+         * @example
+         * getCurrentVehicle(PlayerPedId(), false);
+         */
+        getCurrentVehicle: (ped: number = PlayerPedId(), isDriver: boolean = false) => {
+            if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
+                throw new Error("Entity given was not a ped!");
+            }
+
+            if (IsPedSittingInAnyVehicle(ped)) {
+                const vehicle = GetVehiclePedIsIn(ped, false);
+
+                if (!isDriver || (isDriver && GetPedInVehicleSeat(vehicle, -1) == ped)) {
+                    return vehicle;
+                }
+            }
+
+            return false;
+        },
+    };
+
+    /**
+     * @readonly
+     *
+     * @description
+     * Only work for an active player
      */
     player = {
         /**
-         * Whether the player was still invisible or not
-         */
-        isInvisible: false,
-
-        /**
-         * Whether the player was still on god mode or not
-         */
-        isGodMode: false,
-
-        /**
-         * Revive a player
-         * @author Rafly Maulana
-         * @source Modified from https://github.com/TheStonedTurtle/FiveM-RPDeath
+         * @description
+         * Set a local player to disable collision.
+         *
+         * @param playerPed Player Ped
          *
          * @example
-         * game.player.revive(1)
+         * setNoClip(PlayerPedId());
          */
-        revive: async (src: number) => {
-            let ped = GetPlayerPed(GetPlayerFromServerId(src));
-            let playerPos = GetEntityCoords(ped, true);
+        setNoClip: async (speed: number = 2) => {
+            const ped = PlayerPedId();
+            const entity = IsPedInAnyVehicle(ped, false) ? GetVehiclePedIsUsing(ped) : ped;
 
-            NetworkResurrectLocalPlayer(playerPos[0], playerPos[1], playerPos[2], 0, true, false);
-            SetPlayerInvincible(ped, false);
-            ClearPedBloodDamage(ped);
+            let camHeading = this.client.utils.getCamDirection();
+            let { x, y, z, heading } = this.entity.getCoords(entity);
 
-            return true;
-        },
-
-        /**
-         * Kill a player
-         * @author Rafly Maulana
-         * @source https://runtime.fivem.net/doc/natives/?_0x6B76DC1F3AE6E6A3
-         *
-         * @example
-         * game.player.kill(1)
-         */
-        kill: (src: number) => {
-            SetEntityHealth(GetPlayerPed(GetPlayerFromServerId(src)), 0);
-
-            return true;
-        },
-
-        /**
-         * Put a map blips on player and updates on every tick
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.player.track(1)
-         */
-        track: (src: number) => {
-            let coords = GetEntityCoords(GetPlayerPed(GetPlayerFromServerId(src)), true);
-            SetNewWaypoint(coords[0], coords[1]);
-
-            return true;
-        },
-
-        /**
-         * Set a player invisible to eyes for another players
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.player.invisible(1)
-         */
-        invisible: (src: number) => {
-            this.player.isInvisible = !this.player.isInvisible;
-            SetEntityVisible(GetPlayerPed(GetPlayerFromServerId(src)), this.player.isInvisible, false);
-
-            return true;
-        },
-
-        /**
-         * Set a player to become superhero
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.player.godMode(1, true)
-         */
-        setNoClip: (src: number) => {
-            let ped = GetPlayerPed(GetPlayerFromServerId(src));
-            let entity = (IsPedInAnyVehicle(ped, false) && GetVehiclePedIsUsing(ped)) || ped;
-            let currentSpeed = 2;
-            let noclipEntity = (IsPedInAnyVehicle(ped, false) && GetVehiclePedIsUsing(ped)) || ped;
-            let newPos = GetEntityCoords(entity, true);
-
-            this.client.utils.drawText("NOCLIP ~g~ON", 0.7, 0.9);
-
+            // INPUT_MOVE_UP_ONLY (W)
             DisableControlAction(0, 32, true);
-            DisableControlAction(0, 268, true);
+            if (IsDisabledControlPressed(0, 32)) {
+                x = x + speed * camHeading.x;
+                y = y + speed * camHeading.y;
+                z = z + speed * camHeading.z;
+            }
 
-            DisableControlAction(0, 31, true);
-
-            DisableControlAction(0, 269, true);
+            // INPUT_MOVE_DOWN_ONLY (S)
             DisableControlAction(0, 33, true);
+            if (IsDisabledControlPressed(0, 33)) {
+                x = x - speed * camHeading.x;
+                y = y - speed * camHeading.y;
+                z = z - speed * camHeading.z;
+            }
 
-            DisableControlAction(0, 266, true);
+            // INPUT_MOVE_LEFT_ONLY (A)
             DisableControlAction(0, 34, true);
+            if (IsDisabledControlPressed(0, 34)) heading += 3.0;
 
-            DisableControlAction(0, 30, true);
-
-            DisableControlAction(0, 267, true);
+            // INPUT_MOVE_RIGHT_ONLY (D)
             DisableControlAction(0, 35, true);
+            if (IsDisabledControlPressed(0, 35)) heading -= 3.0;
 
+            // INPUT_COVER (Q)
             DisableControlAction(0, 44, true);
+            if (IsDisabledControlPressed(0, 44)) z += 0.21 * (speed + 0.3);
+
+            // INPUT_MULTIPLAYER_INFO (Z)
             DisableControlAction(0, 20, true);
+            if (IsDisabledControlPressed(0, 20)) z -= 0.21 * (speed + 0.3);
 
-            var yoff = 0.0;
-            var zoff = 0.0;
+            DisableControlAction(0, 268, true);
+            DisableControlAction(0, 31, true);
+            DisableControlAction(0, 269, true);
+            DisableControlAction(0, 266, true);
+            DisableControlAction(0, 30, true);
+            DisableControlAction(0, 267, true);
 
-            if (IsDisabledControlPressed(0, 32)) yoff = 0.5;
-            if (IsDisabledControlPressed(0, 33)) yoff = -0.5;
-            if (IsDisabledControlPressed(0, 34)) SetEntityHeading(ped, GetEntityHeading(ped) + 3.0);
-            if (IsDisabledControlPressed(0, 35)) SetEntityHeading(ped, GetEntityHeading(ped) - 3.0);
-            if (IsDisabledControlPressed(0, 44)) zoff = 0.21;
-            if (IsDisabledControlPressed(0, 20)) zoff = -0.21;
+            SetEntityVelocity(entity, 0.0, 0.0, 0.0);
+            SetEntityRotation(entity, 0.0, 0.0, 0.0, 0, false);
+            SetEntityCollision(entity, false, false);
 
-            newPos = GetOffsetFromEntityInWorldCoords(noclipEntity, 0.0, yoff * (currentSpeed + 0.3), zoff * (currentSpeed + 0.3));
+            SetEntityHeading(entity, heading);
+            SetEntityCoordsNoOffset(entity, x, y, z, true, true, true);
 
-            var heading = GetEntityHeading(noclipEntity);
-            SetEntityVelocity(noclipEntity, 0.0, 0.0, 0.0);
-            SetEntityRotation(noclipEntity, 0.0, 0.0, 0.0, 0, false);
-            SetEntityHeading(noclipEntity, heading);
-
-            SetEntityCollision(noclipEntity, false, false);
-            SetEntityCoordsNoOffset(noclipEntity, newPos[0], newPos[1], newPos[2], true, true, true);
-
-            SetEntityCollision(noclipEntity, true, true);
-
-            return true;
-        },
-
-        /**
-         * Set a player to become unbeatable
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.player.godMode(1, true)
-         */
-        godMode: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            this.player.isGodMode = !this.player.isGodMode;
-
-            SetPlayerInvincible(playerId, this.player.isGodMode);
-            SetEntityInvincible(GetPlayerPed(playerId), this.player.isGodMode);
+            await this.client.utils.drawInstructionalButtons([
+                { controlType: 0, controlId: 32, message: "Move Forward" },
+                { controlType: 0, controlId: 33, message: "Move Backward" },
+                { controlType: 0, controlId: 34, message: "Rotate Left" },
+                { controlType: 0, controlId: 35, message: "Rotate Right" },
+                { controlType: 0, controlId: 44, message: "Fly Up" },
+                { controlType: 0, controlId: 20, message: "Fly Down" },
+            ]);
 
             return true;
         },
 
         /**
-         * Give a full armour to a player
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
+         * @description
+         * Get Nearest player from a coords. Returning list of player ids if found.
+         *
+         * @param coords Coordinates of the location to find the player
          *
          * @example
-         * game.player.giveFullArmour(1)
+         * getNearestOneIn({ 100, 300, 400, 5.0 });
          */
-        giveFullArmour: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            SetPedArmour(GetPlayerPed(playerId), 100);
+        getNearestOneIn: (coords: { x: number; y: number; z: number; radius?: number }) => {
+            let playerList = [];
 
-            return true;
-        },
+            for (const playerId of GetActivePlayers()) {
+                const ped = GetPlayerPed(playerId);
+                const playerCoords = this.entity.getCoords(ped);
+                const distance = GetDistanceBetweenCoords(coords.x, coords.y, coords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
 
-        /**
-         * Get coordinates of a player
-         * @author Rafly Maulana
-         * @source https://runtime.fivem.net/doc/natives/?_0x1647F1CB
-         *
-         * @example
-         * game.player.getCoords(1)
-         */
-        getCoords: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            const ped = GetPlayerPed(playerId);
-            const [x, y, z] = GetEntityCoords(ped, true);
-            const heading = GetEntityHeading(ped);
-            return { x, y, z, heading };
-        },
-
-        /**
-         * List of player teleportation functions
-         */
-        teleport: {
-            /**
-             * Teleport to a marker set on the map
-             * @author Rafly Maulana
-             * @source Modified From https://github.com/qalle-git/esx_marker
-             *
-             * @example
-             * game.player.teleport.marker(1)
-             */
-            marker: async (src: number) => {
-                const playerId = GetPlayerFromServerId(src);
-                let waypoint = GetFirstBlipInfoId(8);
-
-                if (!DoesBlipExist(waypoint)) {
-                    return "Blip Doesn't Exist";
+                if (distance <= (coords.radius || 5.0)) {
+                    playerList.push(playerId);
                 }
+            }
 
-                let coords = GetBlipInfoIdCoord(waypoint);
+            return playerList;
+        },
 
-                for (let height = 1; height <= 1000; height++) {
-                    let [, groundZ] = GetGroundZFor_3dCoord(coords[0], coords[1], height, false);
+        /**
+         * @description
+         * Get a closest player near an entity (Ped, Object, etc).
+         *
+         * @param entity Entity (Ped, Object, etc).
+         *
+         * @example
+         * getNearestOneFrom(PlayerPedId());
+         */
+        getNearestOneFrom: (entity: number, radius: number) => {
+            if (!DoesEntityExist(entity)) {
+                throw new Error("Entity does not exist");
+            }
 
-                    SetPedCoordsKeepVehicle(GetPlayerPed(playerId), coords[0], coords[1], height);
-
-                    await this.client.wait(5);
-                    if (groundZ) return true;
-                }
-
-                return false;
-            },
-
-            /**
-             * Teleport to a coordinates
-             * @author Rafly Maulana
-             * @source https://runtime.fivem.net/doc/natives/?_0x9AFEFF481A85AB2E
-             *
-             * @example
-             * game.player.teleport.coordinates(1, 10, 20, 30)
-             */
-            coordinates: async (src: number, x: number, y: number, z: number) => {
-                const playerId = GetPlayerFromServerId(src);
-                SetPedCoordsKeepVehicle(GetPlayerPed(playerId), x, y, z);
-
-                return true;
-            },
+            const { x, y, z } = this.entity.getCoords(entity);
+            return this.player.getNearestOneIn({ x, y, z, radius });
         },
     };
 
+    /**
+     * @readonly
+     *
+     * @description
+     * Only work with vehicles
+     */
     vehicle = {
         /**
+         * @description
          * Spawn a vehicle based on its model name
-         * @author Rafly Maulana
-         * @source https://docs.fivem.net/docs/scripting-manual/runtimes/javascript/
+         *
+         * @param model Vehicle Model Name
+         * @param coords Coordinate of the location to spawn
          *
          * @example
-         * game.vehicle.spawn(1, 'zentorno');
+         * spawn('zentorno', { 1000, 5000, 500, 50 })
          */
-        spawn: async (src: number, model: string = "adder") => {
-            const playerId = GetPlayerFromServerId(src);
-            let hash = GetHashKey(model);
+        spawn: async (model: string, coords: { x: number; y: number; z: number; heading?: number } = this.entity.getCoords()) => {
+            const hash = GetHashKey(model);
 
             if (!IsModelInCdimage(hash) || !IsModelAVehicle(hash)) {
-                return this.client.utils.notify("Requested Model is Not Found!");
+                throw new Error("Requested Model is Not Found!");
             }
 
             RequestModel(hash);
@@ -334,11 +343,8 @@ class Wrapper {
                 await this.client.wait(500);
             }
 
-            let ped = GetPlayerPed(playerId);
-            let coords = GetEntityCoords(ped, true);
-            let vehicle = CreateVehicle(hash, coords[0], coords[1], coords[2], GetEntityHeading(ped), true, false);
+            const vehicle = CreateVehicle(hash, coords.x, coords.y, coords.z, coords.heading || 0, true, false);
 
-            SetPedIntoVehicle(ped, vehicle, -1);
             SetEntityAsNoLongerNeeded(vehicle);
             SetModelAsNoLongerNeeded(model);
 
@@ -346,168 +352,63 @@ class Wrapper {
         },
 
         /**
-         * Delete nearest vehicle / vehicle being ridden from player
-         * @author Rafly Maulana
-         * @source Modified from https://forum.cfx.re/t/release-delete-vehicle-script-v1-1-0-updated-2020/7727/53
+         * @description
+         * Delete vehicle
+         *
+         * @param vehicleEntityOrCoords Entity of the vehicle or the coordinate
          *
          * @example
-         * game.vehicle.delete(1)
+         * delete(1024);
          */
-        delete: async (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            let ped = GetPlayerPed(playerId);
-
-            const DeleteGivenVehicle = async (veh: number, timeoutMax: number) => {
-                let timeout = 0;
-
-                SetEntityAsMissionEntity(veh, true, true);
-                DeleteVehicle(veh);
-
-                if (DoesEntityExist(veh)) {
-                    while (DoesEntityExist(veh) && timeout < timeoutMax) {
-                        DeleteVehicle(veh);
-
-                        if (!DoesEntityExist(veh)) {
-                            return "Vehicle deleted.";
-                        }
-
-                        timeout += 1;
-                        await this.client.wait(500);
-
-                        if (DoesEntityExist(veh) && timeout == timeoutMax - 1) {
-                            return `Failed to delete vehicle after ${timeoutMax} retries.`;
-                        }
-                    }
-                }
-            };
-
-            if (DoesEntityExist(ped) && !IsEntityDead(ped)) {
-                let vehicle: number;
-                if (IsPedSittingInAnyVehicle(ped)) {
-                    vehicle = GetVehiclePedIsIn(ped, false);
-
-                    if (GetPedInVehicleSeat(vehicle, -1) !== ped) {
-                        return "You must be in the driver's seat!";
-                    }
-                } else {
-                    vehicle = this.vehicle.getClosestOne(playerId);
-                }
-
-                DeleteGivenVehicle(vehicle, 0);
+        delete: (vehicle: number) => {
+            if (!DoesEntityExist(vehicle) || !IsEntityAVehicle(vehicle)) {
+                throw new Error("Vehicle does not exist!");
             }
 
-            return true;
-        },
-
-        /**
-         * Ensure the character in vehicle would not be throwed outside when crashing (Only works at car)
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.vehicle.seatbelt(1, true)
-         */
-        seatbelt: async (src: number, toggle: 0 | 1 | boolean) => {
-            const playerId = GetPlayerFromServerId(src);
-            toggle = !toggle ? 0 : 1;
-            SetPedCanBeKnockedOffVehicle(GetPlayerPed(playerId), toggle);
+            SetEntityAsMissionEntity(vehicle, true, true);
+            DeleteVehicle(vehicle);
 
             return true;
         },
 
         /**
-         * Clean a dirty vehicle
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
+         * @description
+         * Get a closest vehicle near a coordinate
+         *
+         * @param coords Coordinate of the location to find vehicle
          *
          * @example
-         * game.vehicle.clean(1)
+         * getNearestOneIn({ 1000, 5000, 300, 5.0 });
          */
-        clean: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(playerId)), 1.0);
+        getNearestOneIn: (coords: { x: number; y: number; z: number; radius?: number }) => {
+            let vehicleList = [];
+            const vehicleFlags = [0, 2, 4, 6, 7, 23, 127, 260, 2146, 2175, 12294, 16384, 16386, 20503, 32768, 67590, 67711, 98309, 100359];
 
-            return true;
-        },
+            for (const flag of vehicleFlags) {
+                const vehicle = GetClosestVehicle(coords.x, coords.y, coords.z, coords.radius || 5.0, 0, flag);
 
-        /**
-         * Set a vehicle to dirty
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.vehicle.dirty(1)
-         */
-        dirty: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            SetVehicleDirtLevel(GetVehiclePedIsUsing(GetPlayerPed(playerId)), 15.0);
-
-            return true;
-        },
-
-        /**
-         * Repair only vehicle engine (Doesn't include body kit)
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.vehicle.repairEngine(1)
-         */
-        repairEngine: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            let ped = GetPlayerPed(playerId);
-            let vehicle = GetVehiclePedIsUsing(ped);
-
-            SetVehicleEngineHealth(vehicle, 1000);
-            SetVehicleEngineOn(vehicle, true, true, true);
-
-            return true;
-        },
-
-        /**
-         * Repair the body of the vehicle
-         * @author Rafly Maulana
-         * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
-         *
-         * @example
-         * game.vehicle.repairBody(1)
-         */
-        repairBody: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            let ped = GetPlayerPed(playerId);
-            let vehicle = GetVehiclePedIsUsing(ped);
-
-            SetVehicleFixed(vehicle);
-            SetVehicleDirtLevel(vehicle, 0.0);
-            SetVehicleLights(vehicle, 0);
-            SetVehicleBurnout(vehicle, false);
-            SetVehicleUndriveable(vehicle, false);
-
-            return true;
-        },
-
-        /**
-         * Get a closest vehicle near a player
-         * @author Rafly Maulana
-         * @source https://runtime.fivem.net/doc/natives/?_0xF73EB622C4F1689B
-         *
-         * @example
-         * game.vehicle.getClosestOne(1)
-         */
-        getClosestOne: (src: number) => {
-            const playerId = GetPlayerFromServerId(src);
-            let pos = GetEntityCoords(GetPlayerPed(playerId), true);
-            let flags = [0, 2, 4, 6, 7, 23, 127, 260, 2146, 2175, 12294, 16384, 16386, 20503, 32768, 67590, 67711, 98309, 100359];
-
-            for (const flag of flags) {
-                let vehicle = GetClosestVehicle(pos[0], pos[1], pos[2], 5.001, 0, flag);
                 if (vehicle) return vehicle;
             }
 
-            return 0;
+            return false;
+        },
+
+        /**
+         * @description
+         * Get a closest vehicle near an entity (Ped, Object, etc).
+         *
+         * @param entity Entity (Ped, Object, etc).
+         *
+         * @example
+         * getNearestOneFrom(PlayerPedId());
+         */
+        getNearestOneFrom: (entity: number, radius?: number) => {
+            if (!DoesEntityExist(entity)) {
+                throw new Error("Entity does not exist");
+            }
+
+            const { x, y, z } = this.entity.getCoords(entity);
+            return this.vehicle.getNearestOneIn({ x, y, z, radius });
         },
     };
 }
-
-export default Wrapper;
-export { Wrapper };

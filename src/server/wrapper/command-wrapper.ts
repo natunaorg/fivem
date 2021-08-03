@@ -1,20 +1,20 @@
+"use strict";
 import Server from "@server/index";
 
 /**
+ * @description
  * A Handler to execute function when called.
- * @author Rafly Maulana
  *
  * @param src (Source) return the player id whose triggering it.
  * @param args (Arguments) return text after command in Array, example, if you're triggering the command like this "/hello all people", the arguments returns was ["all", "people"].
  * @param raw (Raw) return raw version of the command triggered.
  */
-type Handler = (src: number, args: any[], raw: String) => any;
+export type Handler = (src: number, args: any[], raw: String) => any;
 
 /**
+ * @description
  * Set a configuration on a command
- * @author Rafly Maulana
  *
- * @typedef {Object} ShowOptions
  * @arg description Description of a command
  * @arg argsDescription Description of every arguments required
  * @arg restricted If you want to limit your command with an ace permission automatically
@@ -33,24 +33,25 @@ type Handler = (src: number, args: any[], raw: String) => any;
  *      ]
  * }
  */
-type Config = {
+export type Config = {
     argsRequired?: boolean | number;
     description?: string;
     argsDescription?: Array<{ name: string; help: string }>;
     cooldown?: number;
     consoleOnly?: boolean;
     requirements?: {
-        userIDs?: Array<string>;
+        steamIDs?: Array<string>;
         custom?: Function;
     };
     caseInsensitive?: boolean;
     cooldownExclusions?: {
-        userIDs?: Array<string>;
+        steamIDs?: Array<string>;
     };
     restricted?: boolean;
 };
 
-class Wrapper {
+export default Wrapper;
+export class Wrapper {
     client: Server;
     name: string;
     handler: Handler;
@@ -65,13 +66,7 @@ class Wrapper {
         this.name = name;
         this.isClientCommand = isClientCommand;
         this.config = this.parseConfig(config);
-        this.handler = (src, args, raw) => {
-            if (this.isClientCommand) {
-                return this.client.triggerSharedEvent(`koi:client:requestCommand[${this.name}]`, src, args, raw);
-            } else {
-                return handler;
-            }
-        };
+        this.handler = (src, args, raw) => (this.isClientCommand ? this.client.triggerSharedEvent(`natuna:client:executeCommand`, src, this.name, args, raw) : handler);
 
         RegisterCommand(
             name,
@@ -88,6 +83,12 @@ class Wrapper {
         );
     }
 
+    /**
+     * @description
+     * Parse the command configuration and validate it.
+     *
+     * @param config Command Configuration
+     */
     parseConfig = (config: Config) => {
         config = this.validator.isObject(config) ? config : {};
         config.requirements = this.validator.isObject(config.requirements) ? config.requirements : {};
@@ -114,6 +115,14 @@ class Wrapper {
         return config;
     };
 
+    /**
+     * @description
+     * Validate an execution of the command.
+     *
+     * @param src Server ID of the player that executed the command
+     * @param args Arguments given in the command
+     * @param raw Raw command output
+     */
     validateExecution = (src: number, args: Array<any>, raw: string) => {
         if (this.config.argsRequired && args.length < this.config.argsRequired) {
             return "Not enough arguments passed.";
@@ -132,7 +141,7 @@ class Wrapper {
         if (cooldown && cooldownList[src] && Date.now() - cooldownList[src] <= cooldown) {
             if (
                 !cooldownExclusions || // Option A: If there are no cooldown exclusion
-                (cooldownExclusions.userIDs && !cooldownExclusions.userIDs.includes(userID)) // Option B: If there are userIDs configured, but player wasn't on the list
+                (cooldownExclusions.steamIDs && !cooldownExclusions.steamIDs.includes(userID)) // Option B: If there are steamIDs configured, but player wasn't on the list
             ) {
                 return "Still under cooldown.";
             }
@@ -142,7 +151,7 @@ class Wrapper {
 
         if (requirements) {
             if (
-                (requirements.userIDs && !requirements.userIDs.includes(userID)) || // Option A: Not included in User IDs
+                (requirements.steamIDs && !requirements.steamIDs.includes(userID)) || // Option A: Not included in User IDs
                 (requirements.custom && !requirements.custom()) // Option B: Custom requirement function return false
             ) {
                 return "You dont have enough permission!";
@@ -172,6 +181,3 @@ class Wrapper {
         },
     };
 }
-
-export default Wrapper;
-export { Handler, Config, Wrapper };

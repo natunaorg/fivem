@@ -1,14 +1,16 @@
+"use strict";
 import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
 
-class Wrapper {
+export default Wrapper;
+export class Wrapper {
     algorithm: string;
     secretKey: string;
     iv: any;
 
     constructor(algorithm: string, secretKey: string) {
         /**
+         * @description
          * Algorithm used for encrypting data
-         * @author Rafly Maulana
          *
          * @example
          * "aes-256-ctr"
@@ -16,8 +18,8 @@ class Wrapper {
         this.algorithm = algorithm || "aes-256-ctr";
 
         /**
+         * @description
          * Secret key used to encrypt and decrypt data
-         * @author Rafly Maulana
          *
          * @example
          * "myTotalySecretKey"
@@ -25,15 +27,15 @@ class Wrapper {
         this.secretKey = secretKey || "vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3";
 
         /**
+         * @description
          * Random Bytes
-         * @author Rafly Maulana
          */
         this.iv = randomBytes(16);
     }
 
     /**
+     * @description
      * Encrypt a data
-     * @author Rafly Maulana
      *
      * @example
      * encrypt('bacon'); // Result: "e7b75a472b65bc4a42e7b3f788..."
@@ -46,8 +48,8 @@ class Wrapper {
     };
 
     /**
+     * @description
      * Decrypt a hash/encrypted data
-     * @author Rafly Maulana
      *
      * @example
      * decrypt('e7b75a472b65bc4a42e7b3f788...') // Result: "bacon"
@@ -59,6 +61,3 @@ class Wrapper {
         return decrpyted.toString();
     };
 }
-
-export default Wrapper;
-export { Wrapper };

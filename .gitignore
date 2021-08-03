@@ -1,10 +1,13 @@
 # plugins
 plugins/*
-!plugins/character/*
-!plugins/common/*
+!plugins/example
+
+# nui
+src/ui/*
+!src/ui/nui/
 
 # dependencies
-node_modules/
+**/node_modules/*
 /.pnp
 .pnp.js
 
@@ -12,6 +15,7 @@ node_modules/
 /dist
 
 # misc
+natuna.config.js
 .DS_Store
 .yarn.installed
 *.pem

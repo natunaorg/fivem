@@ -1,62 +1,20 @@
+"use strict";
 import Client from "@client/index";
 
-declare namespace Map {
-    namespace Blip {
-        interface Create {
-            title: string;
-            colour: number;
-            iconId: number;
-            location: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            entityId?: any;
-            loaded?: boolean;
-        }
-        interface Edit {
-            title?: string;
-            colour?: number;
-            iconId?: number;
-            location?: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            entityId?: any;
-        }
-    }
-    namespace Area {
-        interface Create {
-            colour: number;
-            location: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation?: number;
-            width?: number;
-            height?: number;
-            radius?: number;
-            entityId?: any;
-        }
-        interface Edit {
-            colour?: number;
-            location?: {
-                x: number;
-                y: number;
-                z: number;
-            };
-            rotation?: number;
-            width?: number;
-            height?: number;
-            radius?: number;
-            entityId?: any;
-        }
-    }
+export interface MapBlip {
+    title?: string;
+    colour?: number;
+    iconId?: number;
+    location?: {
+        x: number;
+        y: number;
+        z: number;
+    };
+    id?: any;
 }
 
-class Wrapper {
+export default Wrapper;
+export class Wrapper {
     client: Client;
 
     constructor(client: Client) {
@@ -64,70 +22,181 @@ class Wrapper {
     }
 
     /**
+     * @description
      * Draw 3D floating text
-     * @author Rafly Maulana
-     * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
+     *
+     * ![](https://forum.cfx.re/uploads/default/original/3X/8/a/8ad0a2e8b139cb11d240fdc4bd115c42c91b9a0b.jpeg)
+     *
+     * @variation
+     * - Font list: https://gtaforums.com/topic/794014-fonts-list/
+     * - Font Size: 0.0 - 1.0
+     * - Colour: [r,g,b,a]
      *
      * @example
-     * utils.drawText3D(10, 10, 10, "WOW", 255, 255, 255)
+     * drawText3D("Press E to Pickup", {
+     *      x: 0.8,
+     *      y: 0.85,
+     *      font: 4,
+     *      size: 0.6,
+     *      colour: [255,255,255,255]
+     * })
      */
-    drawText3D = (text: string, x: number, y: number, z: number, r: number, g: number, b: number) => {
-        SetDrawOrigin(x, y, z, 0);
-        SetTextFont(0);
+    drawText3D = (text: string, config: { x: number; y: number; z: number; font?: number; size?: number; colour: [number, number, number, number] }) => {
+        SetDrawOrigin(config.x, config.y, config.z, 0);
+        SetTextFont(config.font || 4);
         SetTextProportional(false);
-        SetTextScale(0.0, 0.2);
-        SetTextColour(r, g, b, 255);
+        SetTextScale(0.0, config.size || 0.6);
+        SetTextColour(...config.colour);
         SetTextDropshadow(0, 0, 0, 0, 255);
         SetTextEdge(2, 0, 0, 0, 150);
         SetTextDropShadow();
         SetTextOutline();
-        SetTextEntry("STRING");
+        BeginTextCommandDisplayText("STRING");
         SetTextCentre(true);
-        AddTextComponentString(text);
-        DrawText(0.0, 0.0);
+        AddTextComponentSubstringPlayerName(text);
+        EndTextCommandDisplayText(0.0, 0.0);
         ClearDrawOrigin();
-        return true;
     };
 
     /**
+     * @description
      * Draw text on screen
-     * @author Rafly Maulana
-     * @source https://github.com/machinetherapist/Revolution.js/blob/master/revolution.js
+     *
+     * ![](https://forum.cfx.re/uploads/default/original/3X/2/6/26dd0f34710d145af0f6b49d3bc4b12b80e6df8e.png)
+     *
+     * @variation
+     * - Font list: https://gtaforums.com/topic/794014-fonts-list/
+     * - Percentage of the axis: 0.0f < x, y < 1.0f
      *
      * @example
-     * utils.drawText("WOW", 100, 200)
+     * drawText("Your Server ID: 1", {
+     *      x: 0.8,
+     *      y: 0.85,
+     *      font: 4,
+     *      size: 0.6
+     * });
      */
-    drawText = (text: string, x: number, y: number) => {
-        SetTextFont(1);
+    drawText = (text: string, config: { x: number; y: number; font?: number; size?: number }) => {
+        SetTextFont(config.font || 4);
         SetTextProportional(true);
-        SetTextScale(0.0, 0.6);
+        SetTextScale(0.0, config.size || 0.6);
         SetTextDropshadow(1, 0, 0, 0, 255);
         SetTextEdge(1, 0, 0, 0, 255);
         SetTextDropShadow();
         SetTextOutline();
-        SetTextEntry("STRING");
-        AddTextComponentString(text);
-        DrawText(x, y);
-        return true;
+        BeginTextCommandDisplayText("STRING");
+        AddTextComponentSubstringPlayerName(text);
+        EndTextCommandDisplayText(config.x, config.y);
     };
 
     /**
-     * Show a GTA V notification snackbar
-     * @author Rafly Maulana
+     * @description
+     * Draw a list of instructional buttons.
+     *
+     * ![](https://forum.cfx.re/uploads/default/original/3X/7/6/76ed876c492fbe1b155b1131221c8911d7d3a50b.png)
+     *
+     * @variation
+     * - Controls: https://docs.fivem.net/docs/game-references/controls/#controls
+     * @param buttonList List of buttons
      *
      * @example
-     * utils.notify("Hello World!")
+     * drawInstructionalButtons([
+     *      { controlType: 0, controlId: 32, message: "Move Forward" },
+     *      { controlType: 0, controlId: 33, message: "Move Backward" }
+     * ])
      */
-    notify = (...text: any) => {
-        SetNotificationTextEntry("STRING");
-        AddTextComponentString(text.join(" "));
-        DrawNotification(false, false);
-        return true;
+    drawInstructionalButtons = async (buttonList: Array<{ controlType: number; controlId: number; message: string }>) => {
+        const SetButton = (padIndex: number, control: number) => {
+            ScaleformMovieMethodAddParamPlayerNameString(GetControlInstructionalButton(padIndex, control, true));
+        };
+
+        const SetButtonMessage = (text: string) => {
+            BeginTextCommandScaleformString("STRING");
+            AddTextComponentScaleform(text);
+            EndTextCommandScaleformString();
+        };
+
+        const scaleform = RequestScaleformMovie("instructional_buttons");
+        while (!HasScaleformMovieLoaded(scaleform)) await this.client.wait(5);
+
+        PushScaleformMovieFunction(scaleform, "CLEAR_ALL");
+        PopScaleformMovieFunctionVoid();
+
+        PushScaleformMovieFunction(scaleform, "SET_CLEAR_SPACE");
+        PushScaleformMovieFunctionParameterInt(200);
+        PopScaleformMovieFunctionVoid();
+
+        for (const keyIndex in buttonList.reverse()) {
+            const data = buttonList[keyIndex];
+
+            PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT");
+            PushScaleformMovieFunctionParameterInt(+keyIndex);
+            SetButton(data.controlType, data.controlId);
+            SetButtonMessage(data.message);
+            PopScaleformMovieFunctionVoid();
+        }
+
+        PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS");
+        PopScaleformMovieFunctionVoid();
+
+        PushScaleformMovieFunction(scaleform, "SET_BACKGROUND_COLOUR");
+        PushScaleformMovieFunctionParameterInt(0);
+        PushScaleformMovieFunctionParameterInt(0);
+        PushScaleformMovieFunctionParameterInt(0);
+        PushScaleformMovieFunctionParameterInt(80);
+        PopScaleformMovieFunctionVoid();
+
+        DrawScaleformMovieFullscreen(scaleform, 255, 255, 255, 255, 0);
+        return scaleform;
     };
 
+    /**
+     * @description
+     * Show a GTA V feed notification
+     *
+     * ![](https://i.imgur.com/TJvqkYq.png)
+     *
+     * @variation
+     * - Background Color List: https://gyazo.com/68bd384455fceb0a85a8729e48216e15
+     *
+     * @example
+     * createFeedNotification("You Got a New Message!", {
+     *      backgroundColor: 140
+     * });
+     */
+    createFeedNotification = (text: string, config: { backgroundColor?: number } = {}) => {
+        BeginTextCommandThefeedPost("STRING");
+        ThefeedSetNextPostBackgroundColor(config.backgroundColor || 140);
+        AddTextComponentSubstringPlayerName(text);
+        EndTextCommandThefeedPostTicker(false, false);
+    };
+
+    /**
+     * @description
+     * Create help notification
+     *
+     * ![](https://forum.cfx.re/uploads/default/original/4X/b/a/9/ba9186c16bd7a6c43d4f778f00ce3ce9a76cfe2d.png)
+     *
+     * @example
+     * createHelpNotification("Press ~INPUT_MOVE_UP_ONLY~ to Walk");
+     */
+    createHelpNotification = (text: string, config: { beep?: boolean } = {}) => {
+        BeginTextCommandDisplayHelp("STRING");
+        AddTextComponentSubstringPlayerName(text);
+        EndTextCommandDisplayHelp(0, false, config.beep || false, -1);
+    };
+
+    /**
+     * @description
+     * Get hash value from the string
+     *
+     * @example
+     * getHashString('Some Value');
+     */
     getHashString = (val: string) => {
         let hash = 0;
         let string = val.toLowerCase();
+
         for (var i = 0; i < string.length; i++) {
             let letter = (string[i] as any).charCodeAt();
             hash = hash + letter;
@@ -137,270 +206,170 @@ class Wrapper {
         }
 
         hash += hash << 3;
-        if (hash < 0) {
-            hash = hash >>> 0;
-        }
+
+        if (hash < 0) hash = hash >>> 0;
+
         hash ^= hash >>> 11;
         hash += hash << 15;
-        if (hash < 0) {
-            hash = hash >>> 0;
-        }
+
+        if (hash < 0) hash = hash >>> 0;
+
         return hash.toString(16).toUpperCase();
     };
 
-    getKeyControlId = (key: string) => {
-        switch (key.toUpperCase()) {
-            case "A":
-                return 34;
-            case "B":
-                return 29;
-            case "C":
-                return 26;
-            case "D":
-                return 30;
-            case "E":
-                return 46;
-            case "F":
-                return 49;
-            case "G":
-                return 47;
-            case "H":
-                return 74;
-            case "I":
-                return false;
-            case "J":
-                return false;
-            case "K":
-                return 311;
-            case "L":
-                return 7;
-            case "M":
-                return 244;
-            case "N":
-                return 249;
-            case "O":
-                return false;
-            case "P":
-                return 199;
-            case "Q":
-                return 44;
-            case "R":
-                return 45;
-            case "S":
-                return 33;
-            case "T":
-                return 245;
-            case "U":
-                return 303;
-            case "V":
-                return 0;
-            case "W":
-                return 32;
-            case "X":
-                return 77;
-            case "Y":
-                return 246;
-            case "Z":
-                return 20;
-            default:
-                return false;
-        }
-    };
+    /**
+     * @description
+     * Get the coordinates of the reflected entity/object the camera is aiming at
+     *
+     * @example
+     * getCamTargetedCoords(6.0);
+     */
+    getCamTargetedCoords = (distance: number) => {
+        const [camRotX, , camRotZ] = GetGameplayCamRot(2);
+        const [camX, camY, camZ] = GetGameplayCamCoord();
 
-    color = {
-        hexToRgb: (hex: string) => {
-            return hex
-                .replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i, (m, r, g, b) => "#" + r + r + g + g + b + b)
-                .substring(1)
-                .match(/.{2}/g)
-                .map((x) => parseInt(x, 16));
-        },
+        const tZ = camRotZ * 0.0174532924;
+        const tX = camRotX * 0.0174532924;
+        const num = Math.abs(Math.cos(tX));
+
+        const x = camX + -Math.sin(tZ) * (num + distance);
+        const y = camY + Math.cos(tZ) * (num + distance);
+        const z = camZ + Math.sin(tX) * 8.0;
+
+        return { x, y, z };
     };
 
     /**
-     * Map utility
+     * @description
+     * Get the entity camera direction offset from axis X.
+     *
+     * @example
+     * getCamDirection();
      */
-    map = {
+    getCamDirection = () => {
+        const heading = GetGameplayCamRelativeHeading() + GetEntityHeading(GetPlayerPed(-1));
+        const pitch = GetGameplayCamRelativePitch();
+
+        let x = -Math.sin((heading * Math.PI) / 180.0);
+        let y = Math.cos((heading * Math.PI) / 180.0);
+        let z = Math.sin((pitch * Math.PI) / 180.0);
+
+        const len = Math.sqrt(x * x + y * y + z * z);
+        if (len !== 0) {
+            x = x / len;
+            y = y / len;
+            z = z / len;
+        }
+
+        return { x, y, z };
+    };
+
+    /**
+     * @description
+     * Get entity the ped aimed at
+     *
+     * @example
+     * getTargetedEntity(6.0);
+     */
+    getTargetedEntity = (distance: number) => {
+        const [camX, camY, camZ] = GetGameplayCamCoord();
+        const targetCoords = this.getCamTargetedCoords(distance);
+        const RayHandle = StartShapeTestRay(camX, camY, camZ, targetCoords.x, targetCoords.y, targetCoords.z, -1, PlayerPedId(), 0);
+        const [, , , , entityHit] = GetRaycastResult(RayHandle);
+
+        return { entityHit, ...targetCoords };
+    };
+
+    /**
+     * @description
+     * Uppercase first letter of each words
+     *
+     * @example
+     * ucwords('hello world'); // Hello World
+     */
+    ucwords = (str: string) => {
+        return str.toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+    };
+
+    /**
+     * Map Blips
+     */
+    mapBlip = {
+        lists: {},
+
         /**
-         * Map Blips
+         * @description
+         * Add a map blip (Must include all configuration below)
+         *
+         * @variation
+         * - Blip List: https://docs.fivem.net/docs/game-references/blips/
+         * - Colour List: https://runtime.fivem.net/doc/natives/?_0x03D7FB09E75D6B7E
+         *
+         * @example
+         * create({
+         *      "title": "Example",
+         *      "colour": 30,
+         *      "id": 108,
+         *      "location": {
+         *          "x": 260.130,
+         *          "y": 204.308,
+         *          "z": 109.287
+         *      }
+         * });
          */
-        blip: {
-            /**
-             * List of map blips
-             */
-            lists: {},
+        create: (config: MapBlip) => {
+            config.id = AddBlipForCoord(config.location.x, config.location.y, config.location.z);
+            SetBlipSprite(config.id, config.iconId);
+            SetBlipDisplay(config.id, 4);
+            SetBlipScale(config.id, 1.0);
+            SetBlipColour(config.id, config.colour);
+            SetBlipAsShortRange(config.id, true);
+            BeginTextCommandSetBlipName("STRING");
+            AddTextComponentString(config.title);
+            EndTextCommandSetBlipName(config.id);
 
-            /**
-             * Add a map blip
-             * @author Rafly Maulana
-             *
-             * @example
-             * utils.map.blip.add({
-             *      title: "Example",
-             *      colour: 30,
-             *      id: 108,
-             *      location: {
-             *          x: 260.130,
-             *          y: 204.308,
-             *          z: 109.287
-             *      }
-             * })
-             */
-            add: (config: Map.Blip.Create) => {
-                const blipId = Object.keys(this.map.blip.lists).length + 1;
-                const blip = (this.map.blip.lists[blipId] = config);
-
-                blip.entityId = AddBlipForCoord(blip.location.x, blip.location.y, blip.location.z);
-                SetBlipSprite(blip.entityId, blip.iconId);
-                SetBlipDisplay(blip.entityId, 4);
-                SetBlipScale(blip.entityId, 1.0);
-                SetBlipColour(blip.entityId, blip.colour);
-                SetBlipAsShortRange(blip.entityId, true);
-                BeginTextCommandSetBlipName("STRING");
-                AddTextComponentString(blip.title);
-                EndTextCommandSetBlipName(blip.entityId);
-
-                return blipId;
-            },
-
-            /**
-             * Edit a map blip
-             * @author Rafly Maulana
-             *
-             * @example
-             * utils.map.blip.edit(10, {
-             *      location: {
-             *          x: 260.130,
-             *          y: 204.308,
-             *          z: 109.287
-             *      }
-             * })
-             */
-            edit: (blipId: number, newConfig: Map.Blip.Edit) => {
-                const blip = Object.assign(this.map.blip.lists[blipId], newConfig);
-
-                this.map.blip.remove(blipId);
-                this.map.blip.add(blip);
-
-                return blipId;
-            },
-
-            /**
-             * Remove a map blip
-             * @author Rafly Maulana
-             *
-             * @example
-             * utils.map.blip.remove(10)
-             */
-            remove: (blipId: number) => {
-                RemoveBlip(this.map.blip.lists[blipId].entityId);
-                delete this.map.blip.lists[blipId];
-
-                return true;
-            },
+            return ((this.mapBlip as any).lists[config.id] = config);
         },
 
         /**
-         * Map Area
+         * @description
+         * Edit a map blip
+         *
+         * @variation
+         * - Blip List: https://docs.fivem.net/docs/game-references/blips/
+         * - Colour List: https://runtime.fivem.net/doc/natives/?_0x03D7FB09E75D6B7E
+         *
+         * @example
+         * edit({
+         *      "title": "Clothing Store"
+         * });
          */
-        area: {
-            /**
-             * List of map area
-             */
-            lists: {},
+        edit: (blipId: number, newConfig: MapBlip) => {
+            const oldConfig: MapBlip = (this.mapBlip as any).lists[blipId];
+            newConfig = {
+                ...oldConfig,
+                ...newConfig,
+                location: {
+                    ...oldConfig.location,
+                    ...newConfig.location,
+                },
+            };
 
-            /**
-             * Add a map area. If width and height property was given, the area created would be a rectangle.
-             * If you're using a rectangle area and no radius is given, the radius written will be the smallest one between height or width.
-             * @author Rafly Maulana
-             *
-             * @example
-             * utils.map.area.add({
-             *      colour: 10,
-             *      radius: 50,
-             *      location: {
-             *           x: 1,
-             *           y: 1,
-             *           z: 1
-             *      },
-             * })
-             */
-            add: (config: Map.Area.Create) => {
-                const areaId = Object.keys(this.map.area.lists).length + 1;
-                let area = (this.map.area.lists[areaId] = config);
+            this.mapBlip.remove(blipId);
+            this.mapBlip.create(newConfig);
 
-                if (config.width && config.height) {
-                    area.radius = config.radius || config.width > config.height ? config.height : config.width;
-                    area.entityId = AddBlipForArea(config.location.x, config.location.y, config.location.z, config.width, config.height);
-                    SetBlipRotation(area.entityId, config.rotation || 0);
-                } else {
-                    area.entityId = AddBlipForRadius(config.location.x, config.location.y, config.location.z, config.radius || 50);
-                }
+            return newConfig;
+        },
 
-                SetBlipColour(area.entityId, config.colour);
-                return areaId;
-            },
-
-            /**
-             * Edit a map area
-             * @author Rafly Maulana
-             *
-             * @example
-             * utils.map.area.edit(10, {
-             *      location: {
-             *          x: 260.130,
-             *          y: 204.308,
-             *          z: 109.287
-             *      }
-             * })
-             */
-            edit: (areaId: number, newConfig: Map.Area.Edit) => {
-                const area = Object.assign(this.map.area.lists[areaId], newConfig);
-
-                this.map.area.remove(areaId);
-                this.map.area.add(area);
-
-                return areaId;
-            },
-
-            /**
-             * Remove a map area
-             * @author Rafly Maulana
-             *
-             * @example
-             * utils.map.area.remove(10)
-             */
-            remove: (areaId: number) => {
-                RemoveBlip(this.map.area.lists[areaId].entityId);
-                delete this.map.area.lists[areaId];
-
-                return true;
-            },
-
-            /**
-             * Get a list of players inside area radius
-             * @author Rafly Maulana
-             *
-             * @param checkZAxis check the Z axis
-             */
-            getPlayerInside: (areaId: number, checkZAxis: boolean = true) => {
-                const activePlayersId = GetActivePlayers();
-                const area = this.map.area.lists[areaId];
-
-                let playersInside: Array<number> = [];
-
-                for (const playerId of activePlayersId) {
-                    const player = this.client.game.player.getCoords(playerId);
-                    if (GetDistanceBetweenCoords(player.x, player.y, player.z, area.location.x, area.location.y, area.location.z, checkZAxis) <= area.radius) {
-                        playersInside.push(GetPlayerServerId(playerId));
-                    }
-                }
-
-                return playersInside;
-            },
+        /**
+         * @description
+         * Remove a map blip
+         *
+         * @example
+         * remove(1);
+         */
+        remove: (blipId: number) => {
+            RemoveBlip(blipId);
         },
     };
 }
-
-export default Wrapper;
-export { Map, Wrapper };

@@ -1,6 +1,8 @@
+"use strict";
 import mysql from "mysql2";
 
-class Wrapper {
+export default Wrapper;
+export class Wrapper {
     table: string;
     connection: mysql.Connection;
 
@@ -10,8 +12,8 @@ class Wrapper {
     }
 
     /**
+     * @description
      * Write a data into database table
-     * @author Rafly Maulana
      *
      * @example
      * db('users').write({
@@ -34,8 +36,8 @@ class Wrapper {
     };
 
     /**
+     * @description
      * Find a data from database table
-     * @author Rafly Maulana
      *
      * @example
      * db('users').find({
@@ -60,8 +62,8 @@ class Wrapper {
     };
 
     /**
+     * @description
      * Find first data from database table
-     * @author Rafly Maulana
      *
      * @example
      * db('users').findFirst({
@@ -78,23 +80,21 @@ class Wrapper {
     };
 
     /**
+     * @description
      * Update a data from database table
-     * @author Rafly Maulana
      *
      * @example
-     * //* Normal Object Version. *\\
+     * // Normal Version.
      * db('users').update({
      *      where: {
      *          name: "Don Chad"
      *      },
      *      data: {
-     *          // This could be a function too! See other example below.
      *          name: "John Doe"
      *      }
      * })
      *
-     * @example
-     * //* Function Delivered Version. *\\
+     * // Function Delivered Version.
      * db('users').update({
      *      where: {
      *          name: "Don Chad"
@@ -132,8 +132,8 @@ class Wrapper {
     };
 
     /**
+     * @description
      * Delete a data from database table
-     * @author Rafly Maulana
      *
      * @example
      * db('users').delete({
@@ -154,14 +154,14 @@ class Wrapper {
 
     parser = {
         /**
+         * @description
          * Put a templated string around the key for SQL to identified it as a structure name, not a value
-         * @author Rafly Maulana
          */
         key: (key: string) => `\`${key}\``,
 
         /**
+         * @description
          * Parsing object keys and it values to SQL key and value format and mapping it into a string format
-         * @author Rafly Maulana
          */
         keyVal: (dataObj: { [key: string]: any }) =>
             Object.keys(dataObj).map((x) => {
@@ -172,8 +172,8 @@ class Wrapper {
 
     utils = {
         /**
+         * @description
          * Validating query object before starting to execute it
-         * @author Rafly Maulana
          */
         validateQueryObject: (obj: any, requiredKey: Array<string> = []) => {
             if (typeof obj !== "object" || Array.isArray(obj)) {
@@ -188,8 +188,8 @@ class Wrapper {
         },
 
         /**
+         * @description
          * Validating object data whether if it's object or not
-         * @author Rafly Maulana
          */
         validateQueryObjectData: (key: string, data: any) => {
             if (typeof data !== "undefined" && (typeof data !== "object" || Array.isArray(data))) {
@@ -200,8 +200,8 @@ class Wrapper {
         },
 
         /**
+         * @description
          * Executing database query in promise
-         * @author Rafly Maulana
          *
          * @example
          * executeQuery("SELECT * FROM `users`")
@@ -213,10 +213,7 @@ class Wrapper {
                     resolve(result);
                     this.connection.end();
                 });
-            });
+            }) as any;
         },
     };
 }
-
-export default Wrapper;
-export { Wrapper };

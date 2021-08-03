@@ -9,7 +9,7 @@
             "@/*": ["./*"],
         },
         "outDir": "./dist/types",
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "module": "commonjs",
         "target": "es6",
         "allowJs": true,
@@ -24,6 +24,7 @@
         "esModuleInterop": true,
         "declaration": false,
         "emitDeclarationOnly": false,
+        "alwaysStrict": true
     },
     "include": [
         "./src/**/*", 

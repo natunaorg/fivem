@@ -1,21 +1,64 @@
+"use strict";
 import uniqid from "uniqid";
 
-class Events {
+export default class Events {
     constructor() {}
 
-    /*
-     _____ _ _            _     _____                _   
-    /  __ \ (_)          | |   |  ___|              | |  
-    | /  \/ |_  ___ _ __ | |_  | |____   _____ _ __ | |_ 
-    | |   | | |/ _ \ '_ \| __| |  __\ \ / / _ \ '_ \| __|
-    | \__/\ | |  __/ | | | |_  | |___\ V /  __/ | | | |_ 
-     \____/_|_|\___|_| |_|\__| \____/ \_/ \___|_| |_|\__|
-                                                        
-    */
+    //  _   _ _   _ _____   _____                _
+    // | \ | | | | |_   _| |  ___|              | |
+    // |  \| | | | | | |   | |____   _____ _ __ | |_
+    // | . ` | | | | | |   |  __\ \ / / _ \ '_ \| __|
+    // | |\  | |_| |_| |_  | |___\ V /  __/ | | | |_
+    // \_| \_/\___/ \___/  \____/ \_/ \___|_| |_|\__|
 
     /**
+     * @description
+     * Add a listener for NUI callback events.
+     *
+     * @param name Name of the event
+     * @param handler Handler of the data
+     *
+     * @example
+     * addNUIEventHandler('menu:clicked', (data) => console.log(data.title))
+     */
+    addNUIEventHandler = (name: string, handler: (data: any, callback: Function) => any) => {
+        name = encodeURIComponent(name);
+
+        RegisterNuiCallbackType(name);
+        on(`__cfx_nui:${name}`, handler);
+    };
+
+    /**
+     * @description
+     * Trigger NUI event
+     *
+     * @param name Name of the event
+     * @param data Data to send to NUI
+     *
+     * @example
+     * triggerNUIEvent('menu:open', {
+     *      menuId: 1
+     * })
+     */
+    triggerNUIEvent = (name: string, data: object = {}) => {
+        SendNuiMessage(
+            JSON.stringify({
+                name,
+                data,
+            })
+        );
+    };
+
+    //  _____ _ _            _     _____                _
+    // /  __ \ (_)          | |   |  ___|              | |
+    // | /  \/ |_  ___ _ __ | |_  | |____   _____ _ __ | |_
+    // | |   | | |/ _ \ '_ \| __| |  __\ \ / / _ \ '_ \| __|
+    // | \__/\ | |  __/ | | | |_  | |___\ V /  __/ | | | |_
+    //  \____/_|_|\___|_| |_|\__| \____/ \_/ \___|_| |_|\__|
+
+    /**
+     * @description
      * Add client only event and listen for it, only can be triggered from server
-     * @author Rafly Maulana
      *
      * @param name Name of the event
      * @param args Arguments to send
@@ -36,8 +79,8 @@ class Events {
     };
 
     /**
+     * @description
      * Trigger a registered client event
-     * @author Rafly Maulana
      *
      * @param name Name of the event
      * @param args Arguments to send
@@ -57,19 +100,16 @@ class Events {
         }
     };
 
-    /*
-     _____ _ _            _     _____       _ _ _                _      _____                _   
-    /  __ \ (_)          | |   /  __ \     | | | |              | |    |  ___|              | |  
-    | /  \/ |_  ___ _ __ | |_  | /  \/ __ _| | | |__   __ _  ___| | __ | |____   _____ _ __ | |_ 
-    | |   | | |/ _ \ '_ \| __| | |    / _` | | | '_ \ / _` |/ __| |/ / |  __\ \ / / _ \ '_ \| __|
-    | \__/\ | |  __/ | | | |_  | \__/\ (_| | | | |_) | (_| | (__|   <  | |___\ V /  __/ | | | |_ 
-     \____/_|_|\___|_| |_|\__|  \____/\__,_|_|_|_.__/ \__,_|\___|_|\_\ \____/ \_/ \___|_| |_|\__|
-                                                                                                
-    */
+    //  _____ _ _            _     _____       _ _ _                _      _____                _
+    // /  __ \ (_)          | |   /  __ \     | | | |              | |    |  ___|              | |
+    // | /  \/ |_  ___ _ __ | |_  | /  \/ __ _| | | |__   __ _  ___| | __ | |____   _____ _ __ | |_
+    // | |   | | |/ _ \ '_ \| __| | |    / _` | | | '_ \ / _` |/ __| |/ / |  __\ \ / / _ \ '_ \| __|
+    // | \__/\ | |  __/ | | | |_  | \__/\ (_| | | | |_) | (_| | (__|   <  | |___\ V /  __/ | | | |_
+    //  \____/_|_|\___|_| |_|\__|  \____/\__,_|_|_|_.__/ \__,_|\___|_|\_\ \____/ \_/ \___|_| |_|\__|
 
     /**
+     * @description
      * Listen for triggerSharedCallbackEvent
-     * @author Rafly Maulana
      *
      * @param name Name of the event
      * @param handler Handler of the received arguments
@@ -84,9 +124,10 @@ class Events {
     };
 
     /**
+     * @description
      * Trigger shared event between client and server
-     * [IMPORTANT] Only can be triggered an event that has been registered with addSharedCallbackEventHandler;
-     * @author Rafly Maulana
+     *
+     * **[IMPORTANT]** Only can be triggered an event that has been registered with addSharedCallbackEventHandler;
      *
      * @param name Name of the event
      * @param callbackHandler Function to Handle Callback Data
@@ -107,19 +148,16 @@ class Events {
         this.triggerClientEvent(`cb-${name}`, temporalEventName, ...args);
     };
 
-    /*
-     _____ _                        _   _____                _   
-    /  ___| |                      | | |  ___|              | |  
-    \ `--.| |__   __ _ _ __ ___  __| | | |____   _____ _ __ | |_ 
-     `--. \ '_ \ / _` | '__/ _ \/ _` | |  __\ \ / / _ \ '_ \| __|
-    /\__/ / | | | (_| | | |  __/ (_| | | |___\ V /  __/ | | | |_ 
-    \____/|_| |_|\__,_|_|  \___|\__,_| \____/ \_/ \___|_| |_|\__|
-                                                                
-    */
+    //  _____ _                        _   _____                _
+    // /  ___| |                      | | |  ___|              | |
+    // \ `--.| |__   __ _ _ __ ___  __| | | |____   _____ _ __ | |_
+    //  `--. \ '_ \ / _` | '__/ _ \/ _` | |  __\ \ / / _ \ '_ \| __|
+    // /\__/ / | | | (_| | | |  __/ (_| | | |___\ V /  __/ | | | |_
+    // \____/|_| |_|\__,_|_|  \___|\__,_| \____/ \_/ \___|_| |_|\__|
 
     /**
+     * @description
      * Add shared event and listen from both server or client
-     * @author Rafly Maulana
      *
      * @param name Name of the event
      * @param args Arguments to send
@@ -140,8 +178,8 @@ class Events {
     };
 
     /**
+     * @description
      * Trigger shared event between client and server, only event registered as shared event that can be triggered
-     * @author Rafly Maulana
      *
      * @param name Name of the event
      * @param target Target of the player ID (Server ID)
@@ -162,19 +200,16 @@ class Events {
         }
     };
 
-    /*
-     _____ _                        _   _____       _ _ _                _      _____                _   
-    /  ___| |                      | | /  __ \     | | | |              | |    |  ___|              | |  
-    \ `--.| |__   __ _ _ __ ___  __| | | /  \/ __ _| | | |__   __ _  ___| | __ | |____   _____ _ __ | |_ 
-     `--. \ '_ \ / _` | '__/ _ \/ _` | | |    / _` | | | '_ \ / _` |/ __| |/ / |  __\ \ / / _ \ '_ \| __|
-    /\__/ / | | | (_| | | |  __/ (_| | | \__/\ (_| | | | |_) | (_| | (__|   <  | |___\ V /  __/ | | | |_ 
-    \____/|_| |_|\__,_|_|  \___|\__,_|  \____/\__,_|_|_|_.__/ \__,_|\___|_|\_\ \____/ \_/ \___|_| |_|\__|
-                                                                                                        
-    */
+    //  _____ _                        _   _____       _ _ _                _      _____                _
+    // /  ___| |                      | | /  __ \     | | | |              | |    |  ___|              | |
+    // \ `--.| |__   __ _ _ __ ___  __| | | /  \/ __ _| | | |__   __ _  ___| | __ | |____   _____ _ __ | |_
+    //  `--. \ '_ \ / _` | '__/ _ \/ _` | | |    / _` | | | '_ \ / _` |/ __| |/ / |  __\ \ / / _ \ '_ \| __|
+    // /\__/ / | | | (_| | | |  __/ (_| | | \__/\ (_| | | | |_) | (_| | (__|   <  | |___\ V /  __/ | | | |_
+    // \____/|_| |_|\__,_|_|  \___|\__,_|  \____/\__,_|_|_|_.__/ \__,_|\___|_|\_\ \____/ \_/ \___|_| |_|\__|
 
     /**
+     * @description
      * Listen for triggerSharedCallbackEvent
-     * @author Rafly Maulana
      *
      * @param name Name of the event
      * @param handler Handler of the received arguments
@@ -189,9 +224,10 @@ class Events {
     };
 
     /**
+     * @description
      * Trigger shared event between client and server
-     * [IMPORTANT] Only can be triggered an event that has been registered with addSharedCallbackEventHandler;
-     * @author Rafly Maulana
+     *
+     * **[IMPORTANT]** Only can be triggered an event that has been registered with addSharedCallbackEventHandler;
      *
      * @param name Name of the event
      * @param callbackHandler Function to Handle Callback Data
@@ -212,5 +248,3 @@ class Events {
         this.triggerSharedEvent(`cb-${name}`, temporalEventName, ...args);
     };
 }
-
-export default Events;

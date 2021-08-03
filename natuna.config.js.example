@@ -1,25 +1,29 @@
 /**
  * [IMPORTANT NOTES!]
- * This config SHOULDN'T BE imported through client script and not recommended to import it outside the core of Koi Framework.
- * Module based files allows you to import this script on Client or Server but there would be a HIGH SECURITY ISSUES if you pull this files outside the core of this framework.
+ * 1. This config SHOULDN'T BE used directly through client script and not recommended to import it outside the core of Natuna Framework.
+ * 2. Remove the ".example" from this file name before using it!
  */
 
 const config = {
+    /**
+     * @description
+     * Natuna Framework core configuration settings.
+     */
     core: {
         /**
-         * Koi Framework using persistent Steam ID instead of other dynamic ID, to whitelist a person just put the SteamID64 on the array below
-         * [IMPORTANT] KEEP IT EMPTY TO SET IT OFF
+         * @description
+         * Configure whether if the server was whitelisted or not. Configure the whitelisted user on the database table "whitelisted_list"
+         *
          * @example
-         * whitelistedSteamID: [
-         *      76345198181789231,
-         *      76561112381745631
-         * ]
+         * isWhitelisted: true
          */
-        whitelistedSteamID: ["76561198290395137"],
+        isWhitelisted: false,
 
         /**
-         * We used MYSQL because it provides more persistant data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
-         * [IMPORTANT] If your server players was high, i'd recommend you to use a fast SQL Database like PostgreSQL, but you would need to configure some script first.
+         * @description
+         * I'm used MYSQL because it provides more persistent data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
+         *
+         * **[IMPORTANT] If your server has high traffic, i'd recommend you to use a fast SQL Database like PostgreSQL, but you would need to configure some script first.**
          */
         mysql: {
             /**
@@ -44,13 +48,14 @@ const config = {
             password: "",
             /**
              * Database Name (Make sure you have already installed the database)
-             * @example koifw
+             * @example natuna
              */
-            database: "koifw",
+            database: "natuna",
         },
 
         /**
-         * We provide you an encryption to encrypt some sensitive data before putting it on to the Database
+         * @description
+         * We provide you an encryption to encrypt some sensitive data before putting it on any variable/storage
          */
         crypter: {
             /**
@@ -63,10 +68,11 @@ const config = {
              * [IMPORTANT] KEEP IT SECRET, SAVE IT, you don't wanna leak or lose this key. Once it's gone missing, you're done.
              * @example someStrongPassword123
              */
-            secretKey: "vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3",
+            secretKey: "12345abcdefg",
         },
 
         /**
+         * @description
          * List of players wrapper configuration
          */
         players: {
@@ -89,14 +95,50 @@ const config = {
              * Set data to [number] in Milisecond to add the timeout before data is deleted (Example: 10 * 1000 [10 Second])
              * Set data to [false] to instantly delete the data;
              */
-            keepDataAfterLeaving: 10 * 1000,
+            keepDataAfterLeaving: 10 * 1000, // 10 second
         },
 
         /**
-         * Koi Framework Client Options Configuration
-         * If you had a custom client plugins, you might wanna store your configuration here.
+         * @description
+         * Discord App Rich Presence Configuration
+         * - Configure your Discord app first on https://discord.com/developers/applications
+         * - You can comment or remove a button if not used. Maximum button can be used is 2
+         *
+         * @variation
+         * Available Variables:
+         *  - {{PLAYER_NAME}}
+         *  - {{TOTAL_ACTIVE_PLAYERS}}
+         *
          */
-        client: {
+        discordRPC: {
+            appId: "1234567890",
+            text: "{{TOTAL_ACTIVE_PLAYERS}} Players!",
+            largeImage: {
+                assetName: "logo",
+                hoverText: "Natuna Framework!",
+            },
+            smallImage: {
+                assetName: "logo2",
+                hoverText: "Small Logo Text",
+            },
+            // The URL to open when clicking the button. This has to start with fivem://connect/ or https://.
+            buttons: [
+                {
+                    label: "Discord Server",
+                    url: "https://discord.gg/yourdiscordlink",
+                },
+                {
+                    label: "Start Your Roleplay",
+                    url: "fivem://connect/yourserver.com",
+                },
+            ],
+        },
+
+        /**
+         * @description
+         * Game options
+         */
+        game: {
             /**
              * Disable Emergency Service like Police, Ambulance, Firefighters, etc.
              */
@@ -116,22 +158,30 @@ const config = {
             /**
              * Set pause menu title
              */
-            pauseMenuTitle: "~y~Koi Indonesia Roleplay ~m~| ~b~Discord~m~: ~b~kGPHBvXzGM~m~",
+            pauseMenuTitle: "My Map Title Name!",
         },
     },
+
+    /**
+     * @description
+     * You might wanna put your plugin configuration in here.
+     */
     plugins: {
-        // prettier-ignore
-        "raflymln-vehcontrol": {
+        // Example configuration for "example" plugin, check how to use it on the plugin file.
+        example: {
             client: {
-                carWithManualTransmissions: [
-                    'sultan',
-                    'jb700',
-                    'policeb'
-                ]
+                // Supported use: string, array, json, number, etc. (As long it's not a function or things that need to be executed).
+                someExampleClientConfig: true,
+                someExampleSecondClientConfig: [1, 2, 3, 4, 5, 6],
+                someExampleThirdClientConfig: {
+                    example: true,
+                },
+            },
+            server: {
+                someExampleServerConfig: true,
             },
         },
     },
 };
 
-// module.exports = config; // Cannot use module in FiveM NodeJS
 exports("config", () => config);

@@ -1,11 +1,14 @@
+"use strict";
 import mysql from "mysql2";
+
+import pkg from "@/package.json";
 
 import fs from "fs";
 import path from "path";
 import util from "util";
 
 import figlet from "figlet";
-import standard from "figlet/importable-fonts/Doom";
+const standard = require("figlet/importable-fonts/Doom").default();
 
 import * as Database from "@server/wrapper/database-wrapper";
 import * as Crypter from "@server/wrapper/crypter-wrapper";
@@ -13,9 +16,6 @@ import * as Command from "@server/wrapper/command-wrapper";
 import * as Players from "@server/wrapper/players-wrapper";
 
 import Events from "@server/modules/events";
-
-import pkg from "@/package.json";
-const cfg = (global as any).exports.koi.config();
 
 class Server extends Events {
     /**
@@ -29,9 +29,19 @@ class Server extends Events {
     crypter: (algorithm: string, secretKey: string) => Crypter.Wrapper;
 
     /**
+     * Client Configurations
+     */
+    config: any;
+
+    /**
+     * List of All Plugins (Client, Server, NUI)
+     */
+    plugins: { [key: string]: Array<{ name: string; file?: string; config?: any }> };
+
+    /**
      * List of Server Plugins
      */
-    plugins: { [key: string]: any };
+    serverPlugins: { [key: string]: any };
 
     /**
      * List of Registered Commands
@@ -45,29 +55,30 @@ class Server extends Events {
 
     constructor() {
         super();
+        this.config = (global as any).exports[GetCurrentResourceName()].config();
         this.plugins = {};
+        this.serverPlugins = {};
         this.commands = {};
 
-        this.db = (table: string) => new Database.Wrapper(mysql.createConnection(cfg.core.mysql), table);
-        this.crypter = (algorithm: string = cfg.core.crypter.algorithm, secretKey: string = cfg.core.crypter.secretKey) => new Crypter.Wrapper(algorithm, secretKey);
-        this.players = new Players.Wrapper(this, cfg);
+        this.db = (table: string) => new Database.Wrapper(mysql.createConnection(this.config.core.mysql), table);
+        this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new Crypter.Wrapper(algorithm, secretKey);
+        this.players = new Players.Wrapper(this, this.config);
 
-        this.addSharedEventHandler("koi:server:registerCommand", this.registerCommand);
+        this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
 
         this.addServerEventHandler("playerConnecting", this._events.playerConnecting);
         this.addServerEventHandler("onServerResourceStart", this._events.onServerResourceStart);
         this.addServerEventHandler("onServerResourceStop", this._events.onServerResourceStop);
 
-        this.addSharedCallbackEventHandler("koi:server:requestClientSettings", this._events.requestClientSettings);
+        this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
 
         // Test database connection (on startup) <-- check if connection success or not, also making an automated database creation 👍
-        this.db("").utils.executeQuery(`CREATE DATABASE IF NOT EXISTS \`${cfg.core.mysql.database}\``);
+        this.db("").utils.executeQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.mysql.database}\``);
     }
 
     /**
+     * @description
      * Use this function to hold next script below this from executing before it finish the timeout itself
-     * @author Rafly Maulana
-     * @source https://docs.fivem.net/docs/scripting-manual/introduction/creating-your-first-script-javascript/
      *
      * @param ms Milisecond to wait
      *
@@ -81,11 +92,11 @@ class Server extends Events {
      *      two(); // Executed after 5 second after wait before
      * });
      */
-    wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    wait = (ms: number) => new Promise((res) => setTimeout(res, ms, 0));
 
     /**
+     * @description
      * Registrating a command. If isClientCommand was set true, the handler would just triggering a client registered command
-     * @author Rafly Maulana
      *
      * @param name Name of the command
      * @param handler Function to executed
@@ -106,7 +117,7 @@ class Server extends Events {
             // Throws an error when same server command was registered twice
             if (this.commands[name] && !isClientCommand) throw new Error(`Command "${name}" had already been registered before!`);
 
-            emitNet("koi:client:setCommandDescription", -1, name, config);
+            emitNet("natuna:client:setCommandDescription", -1, name, config);
 
             // Return if client command was already registered before
             if (this.commands[name] && isClientCommand) return;
@@ -125,8 +136,8 @@ class Server extends Events {
     };
 
     /**
+     * @description
      * Get all set of player ID and return it on JSON format
-     * @author Rafly Maulana
      *
      * @param src Server ID of the Player
      *
@@ -134,72 +145,112 @@ class Server extends Events {
      * const steamID: getPlayerIds(1).steam;
      * console.log(steamID)
      */
-    getPlayerIds = (src: any) => {
-        const playerIds: any = {};
+    getPlayerIds = (playerServerId: number) => {
+        const identifiers: { [key: string]: number | string | boolean } = {};
 
-        for (let i = 0; i < GetNumPlayerIdentifiers(src); i++) {
-            const id = GetPlayerIdentifier(src, i).split(":");
-            playerIds[id[0]] = id[1];
+        for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
+            const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
+            identifiers[id[0]] = id[1];
         }
 
-        playerIds.steam = !playerIds.steam || typeof playerIds.steam == "undefined" ? false : BigInt(`0x${playerIds.steam}`);
-        return playerIds;
+        // prettier-ignore
+        identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? false : BigInt(`0x${identifiers.steam}`).toString();
+
+        return identifiers;
     };
 
     /**
+     * @readonly
+     *
+     * @description
      * Logger to Console
-     * @author Rafly Maulana
      *
      * @param text Text to logs
      */
     _logger = (...text: any) => {
-        console.log("\x1b[33m%s\x1b[0m", "[🎏 Koi Framework]", ...text);
+        return console.log("\x1b[33m%s\x1b[0m", "[🏝 Natuna Framework]", "[SERVER]", ...text);
     };
 
     /**
+     * @readonly
+     *
+     * @description
      * Loops through folder and retrieve every plugins file
-     * @author Rafly Maulana
      *
      * @param type Type of the plugin (Client or Server)
      */
     _getPlugins = async (type: string) => {
-        let resourceList: Array<{ resourceName: string; file: string; config: any }> = [];
+        const getPlugins = async (type: string) => {
+            let activePluginLists: Array<{ name: string; file?: string; config?: any }> = [];
 
-        const readDirAsync = util.promisify(fs.readdir);
-        const pluginsPath = path.join(GetResourcePath(GetCurrentResourceName()), "plugins");
+            const readDirAsync = util.promisify(fs.readdir);
+            const pluginsFolderPath = path.join(GetResourcePath(GetCurrentResourceName()), "plugins");
+            const pluginLists = await readDirAsync(pluginsFolderPath);
 
-        const resources = await readDirAsync(pluginsPath);
+            while (!this.config) await this.wait(1000);
 
-        for (const resourceName of resources) {
-            try {
-                const files = await readDirAsync(path.join(pluginsPath, resourceName, type));
-                const config = cfg.plugins[resourceName] && cfg.plugins[resourceName][type] ? cfg.plugins[resourceName][type] : {};
+            for (const pluginName of pluginLists) {
+                try {
+                    let manifest: any;
 
-                for (const file of files) {
-                    resourceList.push({ resourceName, file, config });
+                    try {
+                        manifest = require(`../../plugins/${pluginName}/manifest.ts`).default();
+                    } catch (error) {
+                        manifest = require(`../../plugins/${pluginName}/manifest.json`);
+                    }
+
+                    if (manifest && manifest.active) {
+                        switch (type.toUpperCase()) {
+                            case "CLIENT":
+                            case "SERVER":
+                                const config = this.config.plugins[pluginName] && this.config.plugins[pluginName][type] ? this.config.plugins[pluginName][type] : {};
+
+                                if (manifest.plugins && manifest.plugins[type]) {
+                                    for (const file of manifest.plugins[type]) {
+                                        activePluginLists.push({ name: pluginName, file, config });
+                                    }
+                                }
+
+                                break;
+
+                            case "NUI":
+                                const resourcePath = path.join(pluginsFolderPath, pluginName);
+                                const resourceTypes = await readDirAsync(resourcePath);
+
+                                if (resourceTypes.includes("ui")) {
+                                    activePluginLists.push({ name: pluginName });
+                                }
+
+                                break;
+                        }
+                    }
+                } catch (error) {
+                    // Keep it empty to make sure the file finding process is still working on
                 }
-            } catch (error) {
-                // Keep it empty to make sure the file finding process is still working on
             }
-        }
 
-        return resourceList;
+            return activePluginLists;
+        };
+
+        return this.plugins[type] || (this.plugins[type] = await getPlugins(type));
     };
 
     /**
+     * @readonly
+     *
+     * @description
      * This function is to init a plugin, differs from the client ones, it's triggered whenever the script was ready
-     * @author Rafly Maulana
      */
-    _initPlugins = async () => {
+    _initServerPlugins = async () => {
         this._logger(`Intializing Server Plugins`);
         const plugins = await this._getPlugins("server");
 
         let count = 1; // Start from 1
         for (const plugin of plugins) {
-            this._logger(`Ensuring Plugins: ${count}. ${plugin.resourceName}`);
+            this._logger(`Ensuring Plugins: ${count}. ${plugin.name}`);
 
-            this.plugins[plugin.resourceName] = require(`../../plugins/${plugin.resourceName}/server/${plugin.file}`);
-            this.plugins[plugin.resourceName]._handler(this, plugin.config);
+            this.serverPlugins[plugin.name] = require(`../../plugins/${plugin.name}/server/${plugin.file}`);
+            this.serverPlugins[plugin.name]._handler(this, plugin.config);
 
             count += 1;
         }
@@ -208,40 +259,67 @@ class Server extends Events {
     };
 
     /**
+     * @readonly
+     *
+     * @description
      * List of events on server
      */
     _events = {
         /**
+         * @description
          * Listen on whenever a player joining a session also validating that player before joining the session
-         * @author Rafly Maulana
          *
          * @param name The display name of the player connecting
          * @param setKickReason A function used to set a reason message for when the event is canceled.
          * @param deferrals An object to control deferrals.
          */
         playerConnecting: async (name: string, setKickReason: (reason: string) => void, deferrals: { defer: any; done: any; handover: any; presentCard: any; update: any }) => {
+            /**
+             * @description
+             * Getting player
+             */
             deferrals.defer();
             const player = (global as any).source;
 
-            deferrals.update(`[🎏 Koi] Hello ${name}! Please wait until we verify your account.`);
+            /**
+             * @description
+             * Checking Steam
+             */
+            deferrals.update(`[🏝 Natuna] Hello ${name}! Please wait until we verify your account.`);
 
             const playerIds = this.getPlayerIds(player);
 
             if (!playerIds.steam || typeof playerIds.steam == "undefined") {
-                return deferrals.done("[🎏 Koi] You are not connected to Steam!");
+                return deferrals.done("[🏝 Natuna] You are not connected to Steam!");
             }
 
-            if (cfg.core.whitelistedSteamID && Array.isArray(cfg.core.whitelistedSteamID) && cfg.core.whitelistedSteamID.length > 0) {
-                if (!cfg.core.whitelistedSteamID.includes(playerIds.steam.toString())) {
-                    return deferrals.done("[🎏 Koi] You are not whitelisted!");
+            this._logger(`Player ${name} Joining the server. (Steam ID: ${playerIds.steam})`);
+
+            /**
+             * @description
+             * Checking Whitelist Status
+             */
+            if (this.config.core.isWhitelisted) {
+                const whitelistCheck = await this.db("whitelist_lists").findFirst({
+                    where: {
+                        identifier: playerIds.steam,
+                    },
+                });
+
+                if (!whitelistCheck) {
+                    return deferrals.done("[🏝 Natuna] You are not whitelisted!");
                 }
             }
 
-            deferrals.update(`[🎏 Koi] Finding your account in our database.`);
+            /**
+             * @description
+             * Checking Account
+             */
+            deferrals.update(`[🏝 Natuna] Finding your account in our database.`);
 
             const user = await this.db("users").findFirst({
                 where: {
-                    id: playerIds.steam,
+                    steam_id: playerIds.steam,
                 },
             });
 
@@ -251,17 +329,24 @@ class Server extends Events {
                 last_login: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }).toString(),
             };
 
-            // Help saving two times query execution for a new player
+            /**
+             * @description
+             * Handling when account does not exist
+             */
             if (!user) {
                 userCheck = await this.db("users").write({
                     data: {
-                        id: playerIds.steam,
+                        steam_id: playerIds.steam,
                         ...newCheckpointData,
                     },
                 });
             } else {
+                /**
+                 * @description
+                 * Checking if account exists
+                 */
                 if (user.banned) {
-                    return deferrals.done(`[🎏 Koi] ⛔ You are banned from the server, Reason: ${user.banned_reason}`);
+                    return deferrals.done(`[🏝 Natuna] ⛔ You are banned from the server, Reason: ${user.banned_reason}`);
                 }
 
                 userCheck = await this.db("users").update({
@@ -269,85 +354,79 @@ class Server extends Events {
                         ...newCheckpointData,
                     },
                     where: {
-                        id: playerIds.steam,
+                        steam_id: playerIds.steam,
                     },
                 });
             }
 
-            if (userCheck) return deferrals.done();
+            if (userCheck) {
+                return deferrals.done();
+            }
         },
 
         /**
+         * @description
          * Listen on whenever a player requested plugins to be setup on their client
-         * @author Rafly Maulana
          */
         requestClientSettings: async () => {
-            const plugins = await this._getPlugins("client");
+            const pluginLists = await this._getPlugins("client");
+            const nuiLists = await this._getPlugins("nui");
+
             return {
-                plugins,
+                pluginLists,
+                nuiLists,
+                discordRPC: this.config.core.discordRPC,
                 config: {
-                    saveDataTemporaryInterval: cfg.core.players.saveDataTemporaryInterval,
-                    ...cfg.core.client,
+                    saveDataTemporaryInterval: this.config.core.players.saveDataTemporaryInterval,
+                },
+                game: {
+                    ...this.config.core.game,
                 },
             };
         },
 
         /**
-         * Listen when Koi Framework is starting
-         * @author Rafly Maulana
-         *
-         * @param resourceName Name of the resource that's starting
+         * @description
+         * Listen when Natuna Framework is starting
          */
-        onServerResourceStart: (resourceName: string) => {
+        onServerResourceStart: async (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
                 /**
                  * Event: Starting Process
                  */
                 figlet.parseFont("Standard", standard);
-                figlet.text(
-                    "KOI Framework",
-                    {
-                        font: "Standard",
-                    },
-                    (err, data) => {
-                        console.log(data);
-                    }
-                );
+                figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
+
                 this._logger(`Welcome! You are using version ${pkg.version}.`);
-                this.triggerServerEvent("koi:server:starting");
+                this.triggerServerEvent("natuna:server:starting");
 
                 /**
                  * Event: Initializing
                  */
                 this._logger("Starting Server...");
-                this.triggerServerEvent("koi:server:initializing");
+                this.triggerServerEvent("natuna:server:initializing");
 
-                this._initPlugins();
+                await this._initServerPlugins();
 
                 /**
                  * Event: Ready
                  */
                 this._logger("Server Ready!");
-                this.triggerServerEvent("koi:server:ready");
+                this.triggerServerEvent("natuna:server:ready");
             }
         },
 
         /**
-         * Listen when Koi Framework is stopping
-         * @author Rafly Maulana
-         *
-         * @param resourceName Name of the resource that's stopping
+         * @description
+         * Listen when Natuna Framework is stopping
          */
         onServerResourceStop: (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                this.triggerServerEvent("koi:server:stopped");
+                this.triggerServerEvent("natuna:server:stopped");
             }
         },
     };
 }
 
-const server = new Server();
-(global as any).exports("getServerProps", () => server);
-
+export const ServerDeclared = new Server();
 export default Server;
-export { Server };

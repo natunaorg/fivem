@@ -1,11 +1,13 @@
-const webpack = require("webpack");
 const path = require("path");
-const RemovePlugin = require("remove-files-webpack-plugin");
+const { DefinePlugin, IgnorePlugin } = require("webpack");
+const RemoveFilesPlugin = require("remove-files-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const buildPath = path.resolve(__dirname, "dist");
 
 const server = {
     entry: "./src/server/index.ts",
+    cache: false,
     module: {
         rules: [
             {
@@ -16,8 +18,8 @@ const server = {
         ],
     },
     plugins: [
-        new webpack.DefinePlugin({ "global.GENTLY": false }),
-        new RemovePlugin({
+        new DefinePlugin({ "global.GENTLY": false }),
+        new RemoveFilesPlugin({
             before: {
                 include: [path.resolve(buildPath, "server")],
             },
@@ -25,9 +27,14 @@ const server = {
                 include: [path.resolve(buildPath, "server")],
             },
         }),
+        new IgnorePlugin({
+            resourceRegExp: /^cardinal$/,
+            contextRegExp: /./,
+        }),
     ],
     optimization: {
         minimize: true,
+        minimizer: [new TerserPlugin()],
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
@@ -41,11 +48,18 @@ const server = {
         path: path.resolve(buildPath, "server"),
     },
     target: "node",
-    node: {},
+    node: {
+        __dirname: true,
+    },
+    watchOptions: {
+        poll: true,
+        ignored: ["**/node_modules", "**/ui"],
+    },
 };
 
 const client = {
     entry: "./src/client/index.ts",
+    cache: false,
     module: {
         rules: [
             {
@@ -56,7 +70,7 @@ const client = {
         ],
     },
     plugins: [
-        new RemovePlugin({
+        new RemoveFilesPlugin({
             before: {
                 include: [path.resolve(buildPath, "client")],
             },
@@ -67,6 +81,7 @@ const client = {
     ],
     optimization: {
         minimize: true,
+        minimizer: [new TerserPlugin()],
     },
     resolve: {
         extensions: [".tsx", ".ts", ".js"],
@@ -77,6 +92,10 @@ const client = {
     output: {
         filename: "[contenthash].client.js",
         path: path.resolve(buildPath, "client"),
+    },
+    watchOptions: {
+        poll: true,
+        ignored: ["**/node_modules", "**/ui"],
     },
 };
 

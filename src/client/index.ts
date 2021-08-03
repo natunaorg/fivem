@@ -1,3 +1,4 @@
+"use strict";
 import * as Utils from "@client/wrapper/utils-wrapper";
 import * as Game from "@client/wrapper/game-wrapper";
 import * as Command from "@server/wrapper/command-wrapper";
@@ -6,8 +7,7 @@ import * as Players from "@client/wrapper/players-wrapper";
 import Events from "@client/modules/events";
 
 import figlet from "figlet";
-import standard from "figlet/importable-fonts/Doom";
-import uniqid from "uniqid";
+const standard = require("figlet/importable-fonts/Doom").default();
 
 class Client extends Events {
     /**
@@ -18,7 +18,7 @@ class Client extends Events {
     /**
      * List of Client Plugins
      */
-    plugins: any;
+    clientPlugins: any;
 
     /**
      * List of utility functions
@@ -35,46 +35,56 @@ class Client extends Events {
      */
     players: Players.Wrapper;
 
+    /**
+     * List of client commands
+     */
+    commands: {
+        [key: string]: Command.Handler;
+    };
+
     constructor() {
         super();
         this.config;
-        this.plugins = {};
+        this.clientPlugins = {};
+        this.commands = {};
 
         this.utils = new Utils.Wrapper(this);
         this.game = new Game.Wrapper(this);
         this.players;
 
-        this.addSharedEventHandler("koi:client:setCommandDescription", this.setCommandDescription);
+        this.addSharedEventHandler("natuna:client:setCommandDescription", this.setCommandDescription);
+        this.addSharedEventHandler(`natuna:client:executeCommand`, (name: string, args: Array<any>, raw: string) => {
+            const src = GetPlayerServerId(PlayerId());
+            return this.commands[name](src, args, raw || name);
+        });
 
-        this.addSharedCallbackEventHandler("koi:client:getAllPlayers", () => GetActivePlayers().map((x: number) => (x = GetPlayerServerId(x))));
+        this.addNUIEventHandler("natuna:nui:trace", this._handleNUITrace);
 
         this.addClientEventHandler("onClientResourceStart", this._events.onClientResourceStart);
         this.addClientEventHandler("onClientResourceStop", this._events.onClientResourceStop);
     }
 
     /**
+     * @description
      * Use this function to hold next script below this from executing before it finish the timeout itself
-     * @author Rafly Maulana
-     * @source https://docs.fivem.net/docs/scripting-manual/introduction/creating-your-first-script-javascript/
-     *
-     * @param ms Milisecond to wait
      *
      * @example
-     * const one = () => true; // Always use ES6 for better practice
-     * const two = () => true;
+     * const isActive = false;
+     * const logger = (status) => console.log(status);
      *
-     * setTimeout(async() => { // Always do it on async
-     *      one();
-     *      await wait(5000); // Wait 5s (5000ms) before executing next function, always await it
-     *      two(); // Executed after 5 second after wait before
-     * });
+     * setTimeout(() => isActive = true, 3000)
+     *
+     * (async() => { // Always do it on async
+     *      logger(isActive); // false
+     *      while(!isActive) await wait(5000);
+     *      logger(isActive); // true
+     * })();
      */
-    wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
+    wait = (ms: number) => new Promise((res) => setTimeout(res, ms, 0));
 
     /**
+     * @description
      * Registrating a command. The actual command handler is registered on server to unlock the feature like permission based command or something, so it'd write a event on client and registered a handler on server to trigger the command from registered command in client.
-     * @author Rafly Maulana
-     * @source https://runtime.fivem.net/doc/natives/?_0x5FA79B0F
      *
      * @example
      * registerCommand(
@@ -87,100 +97,159 @@ class Client extends Events {
      */
     registerCommand = (name: string | Array<string>, handler: Command.Handler, config: Command.Config = {}) => {
         const addCommand = (name: string) => {
-            this.addSharedEventHandler(`koi:client:requestCommand[${name}]`, (args: Array<any>, raw: string) => {
-                const src = GetPlayerServerId(PlayerId());
-                return handler(src, args, raw || name);
-            });
-
-            this.triggerSharedEvent("koi:server:registerCommand", name, () => {}, config, true);
+            this.commands[name] = handler;
+            this.triggerSharedEvent("natuna:server:registerCommand", name, () => {}, config, true);
         };
 
         if (Array.isArray(name)) {
-            for (const alias of name) {
-                addCommand(alias);
-            }
+            for (const alias of name) addCommand(alias);
         } else {
             addCommand(name);
         }
     };
 
     /**
+     * @description
      * Set a keyboard key mapper to a function. This function also allows user to change their keybind on pause menu settings.
-     * @author Rafly Maulana
      *
-     * @param key Keyboard key (Example: "x")
-     * @param description Description of the binding (Example: "Hands Up")
-     * @param onClick Handler that are executed after the key was clicked
-     * @param onReleased Handler that are executed after the key was released
-     *
-     * @example
-     * registerKeyControl(
-     *      'x',
-     *      'Hands up',
-     *      () => { // Executed when key clicked
-     *          handsup = true;
-     *          console.log('You are raising up your hands');
-     *      },
-     *      () => { // Executed when key released
-     *          handsup = false;
-     *          console.log('You are putting down your hands');
-     *      }
-     * )
+     * ![](https://i.cfx.re/rage/fwuiComplexObjectDirectImpl/Contains/1836.png)
      */
-    registerKeyControl = (key: string, description: string, onClick: Function, onReleased?: Function) => {
-        const commandUniqueID = uniqid("keybind-");
+    registerKeyControl = (key: string, description: string, onClick: () => any, onReleased: () => any = () => false) => {
+        const controlID = this.utils.getHashString(onClick.toString());
+        const controlIDHash = "~INPUT_" + this.utils.getHashString(`+${controlID}`) + "~";
 
-        if (!onReleased) onReleased = () => false;
+        RegisterCommand(`+${controlID}`, onClick, false);
+        RegisterCommand(`-${controlID}`, onReleased, false);
+        RegisterKeyMapping(`+${controlID}`, description, "keyboard", key);
 
-        RegisterCommand(`+${commandUniqueID}`, onClick, false);
-        RegisterCommand(`-${commandUniqueID}`, onReleased, false);
-        RegisterKeyMapping(`+${commandUniqueID}`, description, "keyboard", key);
-
-        return "~INPUT_" + this.utils.getHashString(`+${commandUniqueID}`) + "~";
+        return controlIDHash;
     };
 
     /**
-     * Set a description on command, this function is executed automatically after you registering a command with configuration that contain description
-     * @author Rafly Maulana
-     * @source https://docs.fivem.net/docs/resources/chat/events/chat-addSuggestion/
+     * @description
+     * Set a description on command, this function is executed automatically after you registering a command with configuration that contain description.
      *
-     * @example
-     * setCommandDescription(
-     *      'hello',
-     *      {
-     *          description: "Say Hello"
-     *      }
-     * )
+     * https://docs.fivem.net/docs/resources/chat/events/chat-addSuggestion/
      */
-    setCommandDescription = (name: string, config: Command.Config) => {
+    setCommandDescription = (name: string, config: { description: string; argsDescription?: Array<{ name: string; help: string }> }) => {
         setImmediate(() => this.triggerClientEvent("chat:addSuggestion", `/${name}`, config.description || "No Description is Set", config.argsDescription || []));
 
         return true;
     };
 
     /**
+     * @readonly
+     *
+     * @description
      * Logger to Console
-     * @author Rafly Maulana
+     *
+     * @param data Text to logs
+     */
+    _handleNUITrace = (data: { [key: string]: any }, cb: Function) => {
+        this._logger("[NUI]", data.log);
+        cb({ ok: true });
+    };
+
+    /**
+     * @readonly
+     *
+     * @description
+     * Logger to Console
      *
      * @param text Text to logs
      */
     _logger = (...text: any) => {
-        console.log("[🎏 Koi Framework]", ...text);
+        return console.log("[🏝 Natuna Framework]", "[CLIENT]", ...text);
     };
 
     /**
-     * This function is to init a plugin, differs from the client ones, it's triggered whenever the script was ready
-     * @author Rafly Maulana
+     * @readonly
+     *
+     * @description
+     * Handle client initializer
+     *
+     * @param settings Client settings
      */
-    _initPlugins = async (plugins: Array<{ resourceName: string; file: string; config: any }>) => {
+    _initClientSettings = (settings: any) => {
+        if (settings.pluginLists) {
+            this._initClientPlugins(settings.pluginLists);
+        }
+
+        if (settings.nuiLists) {
+            for (const nui of settings.nuiLists) {
+                this.triggerNUIEvent("natuna:nui:retrievePluginList", { name: nui.name });
+            }
+        }
+
+        if (settings.config) {
+            this.config = settings.config;
+            this.players = new Players.Wrapper(this, this.config);
+        }
+
+        if (settings.game) {
+            if (settings.game.autoRespawnDisabled) {
+                // Requires "spawnmanager" script
+                (global as any).exports.spawnmanager.setAutoSpawn(false);
+            }
+
+            setTick(() => {
+                if (settings.game.noDispatchService) {
+                    this.game.disableDispatchService();
+                }
+
+                if (settings.game.noWantedLevel) {
+                    this.game.resetWantedLevel();
+                }
+            });
+
+            if (settings.game.pauseMenuTitle) {
+                AddTextEntry("FE_THDR_GTAO", this.config.pauseMenuTitle);
+            }
+        }
+
+        if (settings.discordRPC) {
+            const rpc = settings.discordRPC;
+            const RPCStringParser = (string: string) => {
+                // prettier-ignore
+                return string
+                    .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId()))
+                    .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, GetActivePlayers().length);
+            };
+
+            SetDiscordAppId(rpc.appId);
+            SetRichPresence(RPCStringParser(rpc.text));
+
+            SetDiscordRichPresenceAsset(rpc.largeImage.assetName);
+            SetDiscordRichPresenceAssetText(RPCStringParser(rpc.largeImage.hoverText));
+
+            SetDiscordRichPresenceAssetSmall(rpc.smallImage.assetName);
+            SetDiscordRichPresenceAssetSmallText(RPCStringParser(rpc.smallImage.hoverText));
+
+            if (rpc.buttons[0]) {
+                SetDiscordRichPresenceAction(0, rpc.buttons[0].label, rpc.buttons[0].url);
+            }
+
+            if (rpc.buttons[1]) {
+                SetDiscordRichPresenceAction(1, rpc.buttons[1].label, rpc.buttons[1].url);
+            }
+        }
+    };
+
+    /**
+     * @readonly
+     *
+     * @description
+     * This function is to init a plugin, differs from the server ones, it's triggered when the client was joined the server
+     */
+    _initClientPlugins = async (plugins: Array<{ name: string; file: string; config: any }>) => {
         this._logger(`Intializing Client Plugins`);
 
         let count = 1; // Start from 1
         for (const plugin of plugins) {
-            this._logger(`Ensuring Plugins: ${count}. ${plugin.resourceName}`);
+            this._logger(`Ensuring Plugins: ${count}. ${plugin.name}`);
 
-            this.plugins[plugin.resourceName] = await import(`../../plugins/${plugin.resourceName}/client/${plugin.file}`);
-            this.plugins[plugin.resourceName]._handler(this, plugin.config);
+            this.clientPlugins[plugin.name] = await import(`../../plugins/${plugin.name}/client/${plugin.file}`);
+            this.clientPlugins[plugin.name]._handler(this, plugin.config);
 
             count += 1;
         }
@@ -188,103 +257,52 @@ class Client extends Events {
         this._logger("Client Plugins Ready!");
     };
 
-    /**
-     * This function is to init a config
-     * @author Rafly Maulana
-     */
-    _initConfigs = () => {
-        if (this.config) {
-            this.players = new Players.Wrapper(this, this.config);
-
-            if (this.config.autoRespawnDisabled) {
-                /**
-                 * Requires "spawnmanager" script
-                 */
-                (global as any).exports.spawnmanager.setAutoSpawn(false);
-            }
-
-            setTick(() => {
-                if (this.config.noDispatchService) this.game.setNoDispatchService();
-                if (this.config.noWantedLevel) this.game.setNoWantedLevel();
-            });
-
-            if (this.config.pauseMenuTitle) {
-                AddTextEntry("FE_THDR_GTAO", this.config.pauseMenuTitle);
-            }
-        }
-    };
-
     _events = {
         /**
-         * Listen when Koi Framework is starting
-         * @author Rafly Maulana
-         *
-         * @param resourceName Name of the resource that's starting
+         * @description
+         * Listen when Natuna Framework is starting
          */
         onClientResourceStart: async (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                /**
-                 * Event: Starting Process
-                 */
+                // Event: Starting Process
                 figlet.parseFont("Standard", standard);
-                figlet.text(
-                    "KOI Framework",
-                    {
-                        font: "Standard",
-                    },
-                    (err, data) => {
-                        console.log(data);
-                    }
-                );
-                this.triggerClientEvent("koi:client:starting");
-                this.triggerSharedEvent("koi:client:starting");
+                figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
 
-                /**
-                 * Event: Initializing
-                 */
+                this.triggerClientEvent("natuna:client:starting");
+                this.triggerSharedEvent("natuna:client:starting");
+
+                // Event: Initializing
                 this._logger("Starting Client...");
 
-                this.triggerClientEvent("koi:client:initializing");
-                this.triggerSharedEvent("koi:client:initializing");
+                this.triggerClientEvent("natuna:client:initializing");
+                this.triggerSharedEvent("natuna:client:initializing");
+                this.triggerSharedEvent("natuna:server:addPlayerData");
 
-                this.triggerSharedEvent("koi:server:addPlayerData");
-
-                this.triggerSharedCallbackEvent("koi:server:requestClientSettings", (settings: any) => {
-                    this._initPlugins(settings.plugins);
-                    this.config = settings.config;
-
-                    this._initConfigs();
-                });
+                this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", this._initClientSettings);
 
                 while (!this.config) await this.wait(100); // Wait for config before executing next script
 
-                /**
-                 * Event: Ready
-                 */
+                // Event: Ready
                 this._logger("Client Ready!");
 
-                this.triggerClientEvent("koi:client:ready");
-                this.triggerSharedEvent("koi:client:ready");
+                this.triggerClientEvent("natuna:client:ready");
+                this.triggerSharedEvent("natuna:client:ready");
             }
         },
 
         /**
-         * Listen when Koi Framework is stopping
-         * @author Rafly Maulana
-         *
-         * @param resourceName Name of the resource that's starting
+         * @description
+         * Listen when Natuna Framework is stopping
          */
         onClientResourceStop: (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                this.triggerClientEvent("koi:client:stopped");
-                this.triggerSharedEvent("koi:client:stopped");
+                // Event: Stopping
+                this.triggerClientEvent("natuna:client:stopped");
+                this.triggerSharedEvent("natuna:client:stopped");
             }
         },
     };
 }
 
-const client = new Client();
-(global as any).exports("getClientProps", () => client);
-
+export const ClientDeclared = new Client();
 export default Client;
-export { Client };
