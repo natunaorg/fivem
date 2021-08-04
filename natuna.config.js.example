@@ -21,11 +21,11 @@ const config = {
 
         /**
          * @description
-         * I'm used MYSQL because it provides more persistent data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
+         * I'm using MYSQL because it provides more persistent data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
          *
          * **[IMPORTANT] If your server has high traffic, i'd recommend you to use a fast SQL Database like PostgreSQL, but you would need to configure some script first.**
          */
-        mysql: {
+        db: {
             /**
              * Hostname of the SQL Server
              * @example 127.0.0.1

@@ -60,7 +60,7 @@ class Server extends Events {
         this.serverPlugins = {};
         this.commands = {};
 
-        this.db = (table: string) => new Database.Wrapper(mysql.createConnection(this.config.core.mysql), table);
+        this.db = (table: string) => new Database.Wrapper(mysql.createConnection(this.config.core.db), table);
         this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new Crypter.Wrapper(algorithm, secretKey);
         this.players = new Players.Wrapper(this, this.config);
 
@@ -72,8 +72,8 @@ class Server extends Events {
 
         this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
 
-        // Test database connection (on startup) <-- check if connection success or not, also making an automated database creation 👍
-        this.db("").utils.executeQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.mysql.database}\``);
+        // Test database connection (on startup) <-- check if connection success or not, also executing default SQL 👍
+        this.db("").utils.executeQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db.database}\``);
     }
 
     /**
