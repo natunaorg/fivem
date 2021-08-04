@@ -7,7 +7,7 @@ import * as Players from "@client/wrapper/players-wrapper";
 import Events from "@client/modules/events";
 
 import figlet from "figlet";
-const standard = require("figlet/importable-fonts/Doom").default();
+import Doom from "figlet/importable-fonts/Doom";
 
 class Client extends Events {
     /**
@@ -58,8 +58,6 @@ class Client extends Events {
             return this.commands[name](src, args, raw || name);
         });
 
-        this.addNUIEventHandler("natuna:nui:trace", this._handleNUITrace);
-
         this.addClientEventHandler("onClientResourceStart", this._events.onClientResourceStart);
         this.addClientEventHandler("onClientResourceStop", this._events.onClientResourceStop);
     }
@@ -80,7 +78,7 @@ class Client extends Events {
      *      logger(isActive); // true
      * })();
      */
-    wait = (ms: number) => new Promise((res) => setTimeout(res, ms, 0));
+    wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     /**
      * @description
@@ -143,19 +141,6 @@ class Client extends Events {
      * @description
      * Logger to Console
      *
-     * @param data Text to logs
-     */
-    _handleNUITrace = (data: { [key: string]: any }, cb: Function) => {
-        this._logger("[NUI]", data.log);
-        cb({ ok: true });
-    };
-
-    /**
-     * @readonly
-     *
-     * @description
-     * Logger to Console
-     *
      * @param text Text to logs
      */
     _logger = (...text: any) => {
@@ -203,7 +188,7 @@ class Client extends Events {
             });
 
             if (settings.game.pauseMenuTitle) {
-                AddTextEntry("FE_THDR_GTAO", this.config.pauseMenuTitle);
+                AddTextEntry("FE_THDR_GTAO", settings.game.pauseMenuTitle);
             }
         }
 
@@ -265,7 +250,7 @@ class Client extends Events {
         onClientResourceStart: async (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
                 // Event: Starting Process
-                figlet.parseFont("Standard", standard);
+                figlet.parseFont("Standard", Doom);
                 figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
 
                 this.triggerClientEvent("natuna:client:starting");

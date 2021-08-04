@@ -8,7 +8,7 @@ import path from "path";
 import util from "util";
 
 import figlet from "figlet";
-const standard = require("figlet/importable-fonts/Doom").default();
+import Doom from "figlet/importable-fonts/Doom";
 
 import * as Database from "@server/wrapper/database-wrapper";
 import * as Crypter from "@server/wrapper/crypter-wrapper";
@@ -92,7 +92,7 @@ class Server extends Events {
      *      two(); // Executed after 5 second after wait before
      * });
      */
-    wait = (ms: number) => new Promise((res) => setTimeout(res, ms, 0));
+    wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
     /**
      * @description
@@ -376,11 +376,9 @@ class Server extends Events {
                 pluginLists,
                 nuiLists,
                 discordRPC: this.config.core.discordRPC,
+                game: this.config.core.game,
                 config: {
                     saveDataTemporaryInterval: this.config.core.players.saveDataTemporaryInterval,
-                },
-                game: {
-                    ...this.config.core.game,
                 },
             };
         },
@@ -394,7 +392,7 @@ class Server extends Events {
                 /**
                  * Event: Starting Process
                  */
-                figlet.parseFont("Standard", standard);
+                figlet.parseFont("Standard", Doom);
                 figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
 
                 this._logger(`Welcome! You are using version ${pkg.version}.`);
