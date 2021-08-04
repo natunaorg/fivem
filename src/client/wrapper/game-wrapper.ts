@@ -1,7 +1,6 @@
 "use strict";
 import Client from "@client/index";
 
-export default Wrapper;
 export class Wrapper {
     client: Client;
 
@@ -412,3 +411,5 @@ export class Wrapper {
         },
     };
 }
+
+export default Wrapper;

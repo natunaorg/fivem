@@ -2,7 +2,6 @@
 import Client from "@client/index";
 import { Player } from "@server/wrapper/players-wrapper";
 
-export default Wrapper;
 export class Wrapper {
     client: Client;
 
@@ -85,3 +84,5 @@ export class Wrapper {
         );
     };
 }
+
+export default Wrapper;

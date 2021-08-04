@@ -1,7 +1,6 @@
 "use strict";
 import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
 
-export default Wrapper;
 export class Wrapper {
     algorithm: string;
     secretKey: string;
@@ -61,3 +60,5 @@ export class Wrapper {
         return decrpyted.toString();
     };
 }
+
+export default Wrapper;

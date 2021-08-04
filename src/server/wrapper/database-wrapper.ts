@@ -1,7 +1,6 @@
 "use strict";
 import mysql from "mysql2";
 
-export default Wrapper;
 export class Wrapper {
     table: string;
     connection: mysql.Connection;
@@ -217,3 +216,5 @@ export class Wrapper {
         },
     };
 }
+
+export default Wrapper;

@@ -29,7 +29,6 @@ export interface Player {
     [key: string]: any;
 }
 
-export default Wrapper;
 export class Wrapper {
     client: Server;
     config: any;
@@ -282,3 +281,5 @@ export class Wrapper {
         },
     };
 }
+
+export default Wrapper;

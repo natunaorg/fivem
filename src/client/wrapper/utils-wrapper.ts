@@ -13,7 +13,6 @@ export interface MapBlip {
     id?: any;
 }
 
-export default Wrapper;
 export class Wrapper {
     client: Client;
 
@@ -373,3 +372,5 @@ export class Wrapper {
         },
     };
 }
+
+export default Wrapper;

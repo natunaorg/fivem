@@ -50,7 +50,6 @@ export type Config = {
     restricted?: boolean;
 };
 
-export default Wrapper;
 export class Wrapper {
     client: Server;
     name: string;
@@ -181,3 +180,5 @@ export class Wrapper {
         },
     };
 }
+
+export default Wrapper;
