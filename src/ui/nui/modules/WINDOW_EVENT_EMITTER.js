@@ -47,13 +47,3 @@ const sendData = (window.sendData = (name, data = {}) => {
     name = encodeURIComponent(name);
     $.post(`https://${GetParentResourceName()}/${name}`, JSON.stringify(data));
 });
-
-/**
- * @description
- * Used to log something on client console.log. Good for checking any errors.
- */
-const trace = (window.trace = (...text) => {
-    sendData("natuna:nui:trace", {
-        log: text.join(" "),
-    });
-});
