@@ -65,7 +65,6 @@ class Server extends Events {
         this.players = new Players.Wrapper(this, this.config);
 
         this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
-
         this.addServerEventHandler("playerConnecting", this._events.playerConnecting);
         this.addServerEventHandler("onServerResourceStart", this._events.onServerResourceStart);
         this.addServerEventHandler("onServerResourceStop", this._events.onServerResourceStop);
@@ -146,7 +145,7 @@ class Server extends Events {
      * console.log(steamID)
      */
     getPlayerIds = (playerServerId: number) => {
-        const identifiers: { [key: string]: number | string | boolean } = {};
+        const identifiers: { [key: string]: any } = {};
 
         for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
             const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
@@ -378,7 +377,7 @@ class Server extends Events {
                 discordRPC: this.config.core.discordRPC,
                 game: this.config.core.game,
                 config: {
-                    saveDataTemporaryInterval: this.config.core.players.saveDataTemporaryInterval,
+                    locationUpdateInterval: this.config.core.players.locationUpdateInterval,
                 },
             };
         },
