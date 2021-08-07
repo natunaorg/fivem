@@ -26,9 +26,9 @@ export class Wrapper {
      * List all players
      *
      * @example
-     * await listAll();
+     * await list();
      */
-    listAll = async () => {
+    list = async () => {
         const data = () => {
             return new Promise((resolve, reject) => {
                 this.client.triggerSharedCallbackEvent("natuna:server:getPlayerList", (data: { [key: string]: string }) => {

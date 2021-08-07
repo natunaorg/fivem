@@ -31,18 +31,18 @@ export declare namespace Config {
 export class Wrapper {
     client: Server;
     config: any;
-    lists: {
+    playerList: {
         [key: string]: string;
     };
 
     constructor(client: Server, config: any) {
         this.client = client;
-        this.lists = {};
+        this.playerList = {};
         this.config = config.core.players;
 
         this.client.addSharedCallbackEventHandler("natuna:server:getPlayerData", this.get);
         this.client.addSharedCallbackEventHandler("natuna:server:updatePlayerData", this.update);
-        this.client.addSharedCallbackEventHandler("natuna:server:getPlayerList", () => this.lists);
+        this.client.addSharedCallbackEventHandler("natuna:server:getPlayerList", () => this.playerList);
 
         this.client.addServerEventHandler("playerJoining", async () => {
             return await this._add({
@@ -68,12 +68,12 @@ export class Wrapper {
      * @param callbackHandler Handler for the data retrieved
      *
      * @example
-     * listAll();
+     * list();
      */
-    listAll = () => {
+    list = () => {
         let playerList: Array<Config.Player> = [];
 
-        for (const player of Object.values(this.lists)) {
+        for (const player of Object.values(this.playerList)) {
             playerList.push(JSON.parse(player));
         }
 
@@ -98,8 +98,8 @@ export class Wrapper {
 
         if (steamId) {
             // prettier-ignore
-            return this.lists[steamId] 
-                ? JSON.parse(this.lists[steamId])
+            return this.playerList[steamId] 
+                ? JSON.parse(this.playerList[steamId])
                 : false;
         }
 
@@ -145,7 +145,7 @@ export class Wrapper {
             updated_at: Date.now(),
         };
 
-        this.lists[data.steam_id] = JSON.stringify(data);
+        this.playerList[data.steam_id] = JSON.stringify(data);
         return data;
     };
 
@@ -181,7 +181,7 @@ export class Wrapper {
                 updated_at: Date.now(),
             };
 
-            this.lists[steamId] = JSON.stringify(data);
+            this.playerList[steamId] = JSON.stringify(data);
 
             return data;
         }
@@ -199,7 +199,7 @@ export class Wrapper {
      */
     _delete = (obj: { where: Config.Where }) => {
         const steamId = this.utils.parseId(obj);
-        return steamId ? delete this.lists[steamId] : false;
+        return steamId ? delete this.playerList[steamId] : false;
     };
 
     utils = {
@@ -232,7 +232,7 @@ export class Wrapper {
                     return obj.where.steam_id;
 
                 case typeof obj.where.user_id !== "undefined":
-                    for (const rawData of Object.values(this.lists)) {
+                    for (const rawData of Object.values(this.playerList)) {
                         const data: Config.Player = JSON.parse(rawData);
 
                         if (data.user_id === obj.where.user_id) {
