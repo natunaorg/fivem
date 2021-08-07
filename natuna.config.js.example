@@ -77,25 +77,9 @@ const config = {
          */
         players: {
             /**
-             * Saving data of every player to server variable, not to Database.
-             * We cached the player data before putting it to database, so there'd no mysql connection floodings caused by data saving.
-             * It also helpful to ensure players so that their not gonna lose their data in case if something bad like internet loss happens
+             * Set how long the delay between location update of the player to sync with the server
              */
-            saveDataTemporaryInterval: 1 * 1000, // 1 second (in Milisecond)
-
-            /**
-             * Saving data to database from registered cache
-             * Keep in mind, when player is leaving the server, the last cached data would be saved to database instantly, this interval is to protect in case the temporary data is corrupted
-             */
-            saveDataToDatabaseInterval: 30 * 1000, // 30 second
-
-            /**
-             * Set how long the temporary data would be keep when player leave the server.
-             * Set to [true] to keep the data forever (as long the server still running).
-             * Set data to [number] in Milisecond to add the timeout before data is deleted (Example: 10 * 1000 [10 Second])
-             * Set data to [false] to instantly delete the data;
-             */
-            keepDataAfterLeaving: 10 * 1000, // 10 second
+            locationUpdateInterval: 1 * 1000, // 1 second (in Milisecond)
         },
 
         /**
