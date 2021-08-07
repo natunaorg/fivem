@@ -1,6 +1,6 @@
 {
     "name": "@raflymln/fivem-koijs",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "description": "Typescript/Javascript Bundled FiveM Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.",
     "main": "index.js",
     "repository": "https://github.com/raflymln",
