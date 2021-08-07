@@ -96,6 +96,7 @@ const config = {
          */
         discordRPC: {
             appId: "1234567890",
+            refreshInterval: 30 * 1000, // Determine the time distance between new data
             text: "{{TOTAL_ACTIVE_PLAYERS}} Players!",
             largeImage: {
                 assetName: "logo",

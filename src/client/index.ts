@@ -193,31 +193,37 @@ class Client extends Events {
         }
 
         if (settings.discordRPC) {
-            const players = await this.players.listAll();
+            const players = await this.players.list();
             const rpc = settings.discordRPC;
-            const RPCStringParser = (string: string) => {
+
+            const parseRPCString = (string: string) => {
                 // prettier-ignore
                 return string
                     .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId()))
                     .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(players.length));
             };
 
+            const setRPC = () => {
+                SetRichPresence(parseRPCString(rpc.text));
+
+                SetDiscordRichPresenceAsset(rpc.largeImage.assetName);
+                SetDiscordRichPresenceAssetText(parseRPCString(rpc.largeImage.hoverText));
+
+                SetDiscordRichPresenceAssetSmall(rpc.smallImage.assetName);
+                SetDiscordRichPresenceAssetSmallText(parseRPCString(rpc.smallImage.hoverText));
+
+                if (rpc.buttons[0]) {
+                    SetDiscordRichPresenceAction(0, rpc.buttons[0].label, rpc.buttons[0].url);
+                }
+
+                if (rpc.buttons[1]) {
+                    SetDiscordRichPresenceAction(1, rpc.buttons[1].label, rpc.buttons[1].url);
+                }
+            };
+
             SetDiscordAppId(rpc.appId);
-            SetRichPresence(RPCStringParser(rpc.text));
-
-            SetDiscordRichPresenceAsset(rpc.largeImage.assetName);
-            SetDiscordRichPresenceAssetText(RPCStringParser(rpc.largeImage.hoverText));
-
-            SetDiscordRichPresenceAssetSmall(rpc.smallImage.assetName);
-            SetDiscordRichPresenceAssetSmallText(RPCStringParser(rpc.smallImage.hoverText));
-
-            if (rpc.buttons[0]) {
-                SetDiscordRichPresenceAction(0, rpc.buttons[0].label, rpc.buttons[0].url);
-            }
-
-            if (rpc.buttons[1]) {
-                SetDiscordRichPresenceAction(1, rpc.buttons[1].label, rpc.buttons[1].url);
-            }
+            setRPC();
+            setInterval(setRPC, rpc.refreshInterval);
         }
     };
 

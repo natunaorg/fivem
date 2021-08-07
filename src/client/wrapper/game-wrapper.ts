@@ -279,7 +279,7 @@ export class Wrapper {
          * getNearestOneIn({ 100, 300, 400, 5.0 });
          */
         getNearestOneIn: async (coords: { x: number; y: number; z: number; radius?: number }) => {
-            const players = await this.client.players.listAll();
+            const players = await this.client.players.list();
             let playerList = [];
 
             for (const player of players) {
