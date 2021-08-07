@@ -1,40 +1,36 @@
 "use strict";
 import Server from "@server/index";
 
-export interface Character {
-    id?: number;
-    first_name?: string;
-    last_name?: string;
-    last_position?: {
-        x: number;
-        y: number;
-        z: number;
-        heading: number;
-    };
-    skin?: {
-        [key: string]: any;
-    };
-    health?: number;
-    armour?: number;
-    [key: string]: any;
-}
+export declare namespace Config {
+    interface Where {
+        user_id?: number;
+        server_id?: number;
+        steam_id?: string;
+    }
 
-export interface Player {
-    id?: string;
-    steam_id?: string;
-    last_ip?: string;
-    last_login?: string;
-    updated_at?: number;
-    character?: Character;
-    [key: string]: any;
+    interface Player {
+        user_id?: number;
+        server_id?: number;
+        steam_id?: string;
+        updated_at?: number;
+        last_position?: {
+            x: number;
+            y: number;
+            z: number;
+            heading: number;
+        };
+        [key: string]: any;
+    }
+
+    interface Default {
+        data: Player;
+        where: Where;
+    }
 }
 
 export class Wrapper {
     client: Server;
     config: any;
-    userIdMapping: {
-        [key: number]: string;
-    };
     lists: {
         [key: string]: string;
     };
@@ -42,94 +38,115 @@ export class Wrapper {
     constructor(client: Server, config: any) {
         this.client = client;
         this.lists = {};
-        this.userIdMapping = {};
         this.config = config.core.players;
 
         this.client.addSharedCallbackEventHandler("natuna:server:getPlayerData", this.get);
         this.client.addSharedCallbackEventHandler("natuna:server:updatePlayerData", this.update);
+        this.client.addSharedCallbackEventHandler("natuna:server:getPlayerList", () => this.lists);
 
-        this.client.addServerEventHandler("playerJoining", async () => await this._add((global as any).source));
-        this.client.addServerEventHandler("playerDropped", this._handlePlayerDropped);
+        this.client.addServerEventHandler("playerJoining", async () => {
+            return await this._add({
+                where: {
+                    server_id: (global as any).source,
+                },
+            });
+        });
 
-        setInterval(this._handleAutoSaveData, this.config.saveDataToDatabaseInterval);
+        this.client.addServerEventHandler("playerDropped", () => {
+            return this._delete({
+                where: {
+                    server_id: (global as any).source,
+                },
+            });
+        });
     }
+
+    /**
+     * @description
+     * List all players
+     *
+     * @param callbackHandler Handler for the data retrieved
+     *
+     * @example
+     * listAll();
+     */
+    listAll = () => {
+        let playerList: Array<Config.Player> = [];
+
+        for (const player of Object.values(this.lists)) {
+            playerList.push(JSON.parse(player));
+        }
+
+        return playerList;
+    };
 
     /**
      * @description
      * Received current data of a player
      *
-     * @param id Id of the player, has 3 different types, check example.
+     * @param obj Data object to input
      *
      * @example
-     * get(1); // Server ID
-     * get("SteamID:76561198290395137"); // Steam ID
-     * get("UserID:1"); // Database User ID
+     * get({
+     *      where: {
+     *          steam_id: "76561198290395137"
+     *      }
+     * });
      */
-    get = (id: number | string) => {
-        id = this.utils.parseId(id);
-        return this.lists[id] ? JSON.parse(this.lists[id]) : false;
+    get = (obj: { where: Config.Where }) => {
+        const steamId = this.utils.parseId(obj);
+
+        if (steamId) {
+            // prettier-ignore
+            return this.lists[steamId] 
+                ? JSON.parse(this.lists[steamId])
+                : false;
+        }
+
+        return false;
     };
 
     /**
      * @description
      * Update current data of a player
      *
-     * @param id Id of the player, has 3 different types, check example.
-     * @param newData New data to update
+     * @param obj Data object to input
      *
      * @example
-     * const newData = {
-     *      character: {
-     *          active: {
-     *          last_position: {
-     *              x: 1,
-     *               y: 1,
-     *              z: 1,
-     *              heading: 1
-     *          }
+     * update({
+     *      data: {
+     *          someNestedThings: true
+     *      },
+     *      where: {
+     *          steam_id: "76561198290395137"
      *      }
-     * }
-     *
-     * update(1, newData); // Using Server ID
-     * update("SteamID:76561198290395137", newData); // Using Steam ID
-     * update("UserID:1", newData); // Using Database User ID
+     * });
      */
-    update = async (id: number | string, newData: Player) => {
-        let currentData: Player = this.get(id);
+    update = async (obj: Config.Default) => {
+        let currentData: Config.Player = this.get(obj);
 
         if (!currentData) {
-            if (typeof id === "number") {
-                currentData = await this._add(id);
-            } else if (typeof id === "string") {
-                throw new Error("No Data Available"); // If it's not a server id
+            if (typeof obj.where.server_id === "number" || typeof obj.where.steam_id === "string") {
+                const newData = await this._add(obj as any);
+
+                if (newData) {
+                    currentData = newData;
+                } else {
+                    throw new Error("No Data Available");
+                }
+            } else {
+                throw new Error("No Data Available");
             }
         }
 
-        const data: Player = {
+        const data: Config.Player = {
             ...currentData, // Copy From Origin
-            ...newData, // Overwrites any differences
-            character: {
-                ...currentData.character,
-                ...newData.character,
-            },
+            ...obj.data, // Overwrites any differences
             updated_at: Date.now(),
         };
 
-        this.lists[data.id] = JSON.stringify(data);
+        this.lists[data.steam_id] = JSON.stringify(data);
         return data;
-    };
-
-    saveCharacter = async (character: Character) => {
-        await this.client.db("characters").update({
-            data: {
-                ...character,
-                last_position: Object.values(character.last_position).join(","),
-                skin: JSON.stringify(character.skin),
-            },
-            where: {
-                id: character.id,
-            },
-        });
     };
 
     /**
@@ -137,24 +154,39 @@ export class Wrapper {
      *
      * @description
      * Add a new player data when playerJoining event received.
+     *
+     * @param obj Data object to input
      */
-    _add = async (playerServerId: number) => {
-        if (this.get(playerServerId)) return;
+    _add = async (obj: { where: { server_id?: number; steam_id?: string } }) => {
+        if (this.get(obj)) return;
 
-        const identifiers = this.client.getPlayerIds(playerServerId);
-        const user = await this.client.db("users").findFirst({ where: { steam_id: identifiers.steam } });
-        const character: Character = await this.client.db("characters").findFirst({ where: { id: user.active_character_id } });
+        let steamId;
 
-        const data: Player = {
-            ...user,
-            updated_at: Date.now(),
-            character: this.utils.parseCharacter(character),
-        };
+        if (obj.where.steam_id) {
+            steamId = obj.where.steam_id;
+        } else if (obj.where.server_id) {
+            const identifiers = this.client.getPlayerIds(obj.where.server_id);
+            if (identifiers.steam) {
+                steamId = identifiers.steam;
+            }
+        }
 
-        this.lists[data.id] = JSON.stringify(data);
-        this.userIdMapping[user.id] = user.steam_id;
+        if (steamId) {
+            const user = await this.client.db("users").findFirst({ where: { steam_id: steamId } });
 
-        return data;
+            const data: Config.Player = {
+                user_id: user.id,
+                steam_id: user.steam_id,
+                server_id: obj.where.server_id,
+                updated_at: Date.now(),
+            };
+
+            this.lists[steamId] = JSON.stringify(data);
+
+            return data;
+        }
+
+        return false;
     };
 
     /**
@@ -162,91 +194,15 @@ export class Wrapper {
      *
      * @description
      * Delete a data of player.
-     */
-    _delete = (id: number | string) => {
-        id = this.utils.parseId(id);
-
-        return delete this.lists[id];
-    };
-
-    /**
-     * @readonly
      *
-     * @description
-     * Handle an interval to autosave all cached data.
+     * @param obj Data object to input
      */
-    _handleAutoSaveData = async () => {
-        const playersLength = Object.keys(this.lists).length;
-        const hasAnyPlayer = playersLength > 0 ? true : false; // Check if there's any player
-
-        this.client._logger(hasAnyPlayer ? `Saving ${playersLength} Players Data` : "No Players Available to Save");
-
-        for (const key in this.lists) {
-            const data = this.get(key);
-            const character = data.character;
-
-            await this.saveCharacter(character);
-        }
-    };
-
-    /**
-     * @readonly
-     *
-     * @description
-     * Handle data when player leaving the server.
-     *
-     * @param reason Reason of leaving the server
-     */
-    _handlePlayerDropped = async (reason: string) => {
-        const playerId = (global as any).source;
-        const data: Player = this.get(playerId);
-        const keepDataAfterLeaving = this.config.keepDataAfterLeaving;
-
-        this.client._logger(`Player ${GetPlayerName(playerId)} dropped (Reason: ${reason}).`);
-
-        if (data) {
-            await this.saveCharacter(data.character);
-        }
-
-        if (!keepDataAfterLeaving) {
-            return this._delete(playerId);
-        } else if (typeof keepDataAfterLeaving === "number") {
-            return setTimeout(() => {
-                const updateCheck = this.get(playerId); // In case if player was rejoining, it'd cancel the event
-
-                if (updateCheck.updated_at === data.updated_at) {
-                    return this._delete(playerId);
-                }
-            }, keepDataAfterLeaving);
-        }
+    _delete = (obj: { where: Config.Where }) => {
+        const steamId = this.utils.parseId(obj);
+        return steamId ? delete this.lists[steamId] : false;
     };
 
     utils = {
-        /**
-         * @description
-         * Parse character data from database
-         *
-         * @param character Character Data
-         *
-         * @example
-         * parseCharacter({
-         *      location: "120.998,-86.33221,403.3322,50.0"
-         * })
-         */
-        parseCharacter: (character: any) => {
-            const characterPos = character.last_position.split(",").map((x: string) => parseInt(x.trim()));
-
-            character.skin = JSON.parse(character.skin);
-            character.last_position = {
-                x: characterPos[0],
-                y: characterPos[1],
-                z: characterPos[2],
-                heading: characterPos[3] || 0,
-            };
-
-            return character;
-        },
-
         /**
          * @description
          * Parse a given id to return Steam ID
@@ -256,28 +212,36 @@ export class Wrapper {
          * @example
          * parseId('SteamID:1234567890'); // return "1234567890"
          */
-        parseId: (id: string | number) => {
-            let playerSteamId: string;
+        parseId: (obj: { where: Config.Where }) => {
+            const keysLength = Object.keys(obj.where).length;
 
-            // Example: 1
-            if (typeof id === "number") {
-                const identifiers = this.client.getPlayerIds(id);
-                playerSteamId = String(identifiers.steam);
-            } else if (typeof id === "string") {
-                // Example: "SteamID:76561198290395137"
-                if (id.toLowerCase().startsWith("steamid:")) {
-                    const steamId = id.replace("steamid:", "").trim();
-                    playerSteamId = steamId;
-                }
-
-                // Example: "UserID:1"
-                else if (id.toLowerCase().startsWith("userid:")) {
-                    const userId = parseInt(id.replace("userid:", "").trim());
-                    playerSteamId = this.userIdMapping[userId];
-                }
+            if (keysLength === 0) {
+                throw new Error("No 'where' option available");
             }
 
-            return playerSteamId;
+            if (keysLength > 1) {
+                throw new Error("'where' option on the configuration can only contains 1 key");
+            }
+
+            switch (true) {
+                case typeof obj.where.server_id !== "undefined":
+                    const identifiers = this.client.getPlayerIds(obj.where.server_id);
+                    return String(identifiers.steam);
+
+                case typeof obj.where.steam_id !== "undefined":
+                    return obj.where.steam_id;
+
+                case typeof obj.where.user_id !== "undefined":
+                    for (const rawData of Object.values(this.lists)) {
+                        const data: Config.Player = JSON.parse(rawData);
+
+                        if (data.user_id === obj.where.user_id) {
+                            return data.steam_id;
+                        }
+                    }
+            }
+
+            return false;
         },
     };
 }
