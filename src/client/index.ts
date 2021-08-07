@@ -155,7 +155,7 @@ class Client extends Events {
      *
      * @param settings Client settings
      */
-    _initClientSettings = (settings: any) => {
+    _initClientSettings = async (settings: any) => {
         if (settings.pluginLists) {
             this._initClientPlugins(settings.pluginLists);
         }
@@ -193,12 +193,13 @@ class Client extends Events {
         }
 
         if (settings.discordRPC) {
+            const players = await this.players.listAll();
             const rpc = settings.discordRPC;
             const RPCStringParser = (string: string) => {
                 // prettier-ignore
                 return string
                     .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId()))
-                    .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, GetActivePlayers().length);
+                    .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(players.length));
             };
 
             SetDiscordAppId(rpc.appId);
