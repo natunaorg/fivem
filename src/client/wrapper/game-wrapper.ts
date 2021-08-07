@@ -278,16 +278,18 @@ export class Wrapper {
          * @example
          * getNearestOneIn({ 100, 300, 400, 5.0 });
          */
-        getNearestOneIn: (coords: { x: number; y: number; z: number; radius?: number }) => {
+        getNearestOneIn: async (coords: { x: number; y: number; z: number; radius?: number }) => {
+            const players = await this.client.players.listAll();
             let playerList = [];
 
-            for (const playerId of GetActivePlayers()) {
+            for (const player of players) {
+                const playerId = GetPlayerFromServerId(player.server_id);
                 const ped = GetPlayerPed(playerId);
                 const playerCoords = this.entity.getCoords(ped);
                 const distance = GetDistanceBetweenCoords(coords.x, coords.y, coords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
 
                 if (distance <= (coords.radius || 5.0)) {
-                    playerList.push(playerId);
+                    playerList.push(player.server_id);
                 }
             }
 
