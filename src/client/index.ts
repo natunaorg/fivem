@@ -9,7 +9,7 @@ import Events from "@client/modules/events";
 import figlet from "figlet";
 import Doom from "figlet/importable-fonts/Doom";
 
-class Client extends Events {
+export default class Client extends Events {
     /**
      * Client Configurations
      */
@@ -296,4 +296,4 @@ class Client extends Events {
     };
 }
 
-export default new Client();
+new Client();

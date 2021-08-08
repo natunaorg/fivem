@@ -17,7 +17,7 @@ import * as Players from "@server/wrapper/players-wrapper";
 
 import Events from "@server/modules/events";
 
-class Server extends Events {
+export default class Server extends Events {
     /**
      * MySQL database wrapper
      */
@@ -425,4 +425,4 @@ class Server extends Events {
     };
 }
 
-export default new Server();
+new Server();
