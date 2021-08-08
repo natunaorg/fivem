@@ -1,32 +1,8 @@
 /* CUSTOM CSS STYLING HERE
-ex: fonts
 ====================*/
 
-@font-face {
-    font-family: "Circular";
-    src: url("./assets/fonts/Circular-Bold.ttf");
-    font-weight: bold;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: "Circular";
-    src: url("./assets/fonts/Circular-Book.ttf");
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: Renner;
-    src: url(./assets/fonts/renner-book.otf);
-    font-weight: normal;
-}
-
-@font-face {
-    font-family: Renner;
-    src: url(./assets/fonts/renner-bold.otf);
-    font-weight: bold;
-}
+/* NUI GENERAL
+====================*/
 
 html,
 body {
