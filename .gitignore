@@ -1,13 +1,3 @@
-# plugins
-plugins/*
-!plugins/example
-
-# nui
-src/ui/*
-!src/ui/nui/
-src/ui/nui/assets/*
-!src/ui/nui/assets/.PLACEHOLDER (REMOVE IT)
-
 # dependencies
 **/node_modules/*
 /.pnp
