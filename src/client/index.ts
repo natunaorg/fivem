@@ -296,5 +296,4 @@ class Client extends Events {
     };
 }
 
-export const ClientDeclared = new Client();
-export default Client;
+export default new Client();

@@ -2,7 +2,7 @@ class NUILoader {
     constructor(pluginName) {
         $.get(`../../../plugins/${pluginName}/ui/index.html`, (html) => {
             const CSSParser = this.CSSParser;
-            const nuiWrapperId = `__natunaNuiWrapper-${pluginName}__`;
+            const nuiWrapperId = `nui\\:${pluginName}`;
 
             /**
              * Append the Parsed HTML
