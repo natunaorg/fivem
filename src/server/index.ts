@@ -425,5 +425,4 @@ class Server extends Events {
     };
 }
 
-export const ServerDeclared = new Server();
-export default Server;
+export default new Server();
