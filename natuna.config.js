@@ -68,7 +68,7 @@ const config = {
              * [IMPORTANT] KEEP IT SECRET, SAVE IT, you don't wanna leak or lose this key. Once it's gone missing, you're done.
              * @example someStrongPassword123
              */
-            secretKey: "12345abcdefg",
+            secretKey: "vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3",
         },
 
         /**
@@ -95,26 +95,26 @@ const config = {
          *
          */
         discordRPC: {
-            appId: "1234567890",
+            appId: "866690121485910017",
             refreshInterval: 30 * 1000, // Determine the time distance between new data
-            text: "{{TOTAL_ACTIVE_PLAYERS}} Players!",
+            text: "Join other {{TOTAL_ACTIVE_PLAYERS}} players now!",
             largeImage: {
                 assetName: "logo",
-                hoverText: "Natuna Framework!",
+                hoverText: "Natuna Indonesia",
             },
             smallImage: {
-                assetName: "logo2",
-                hoverText: "Small Logo Text",
+                assetName: "indonesia",
+                hoverText: "Made with ❤ in Indonesia.",
             },
             // The URL to open when clicking the button. This has to start with fivem://connect/ or https://.
             buttons: [
                 {
                     label: "Discord Server",
-                    url: "https://discord.gg/yourdiscordlink",
+                    url: "https://discord.gg/kGPHBvXzGM",
                 },
                 {
-                    label: "Start Your Roleplay",
-                    url: "fivem://connect/yourserver.com",
+                    label: "Buat Ceritamu Sekarang!",
+                    url: "https://discord.gg/kGPHBvXzGM",
                 },
             ],
         },
@@ -143,7 +143,7 @@ const config = {
             /**
              * Set pause menu title
              */
-            pauseMenuTitle: "My Map Title Name!",
+            pauseMenuTitle: "Natuna Indonesia | discord.gg/kGPHBvXzGM",
         },
     },
 
@@ -152,18 +152,14 @@ const config = {
      * You might wanna put your plugin configuration in here.
      */
     plugins: {
-        // Example configuration for "example" plugin, check how to use it on the plugin file.
-        example: {
+        "raflymln-vehicletransmission": {
             client: {
-                // Supported use: string, array, json, number, etc. (As long it's not a function or things that need to be executed).
-                someExampleClientConfig: true,
-                someExampleSecondClientConfig: [1, 2, 3, 4, 5, 6],
-                someExampleThirdClientConfig: {
-                    example: true,
-                },
+                carWithManualTransmissions: ["lynx", "jb700", "dominator"],
             },
-            server: {
-                someExampleServerConfig: true,
+        },
+        "raflymln-entitymenu": {
+            client: {
+                usedObjects: ["prop_bin_01a"],
             },
         },
     },
