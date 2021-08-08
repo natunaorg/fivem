@@ -7,7 +7,6 @@
 /dist
 
 # misc
-natuna.config.js
 .DS_Store
 .yarn.installed
 *.pem
