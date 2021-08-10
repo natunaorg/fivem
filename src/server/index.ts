@@ -135,30 +135,6 @@ export default class Server extends Events {
     };
 
     /**
-     * @description
-     * Get all set of player ID and return it on JSON format
-     *
-     * @param src Server ID of the Player
-     *
-     * @example
-     * const steamID: getPlayerIds(1).steam;
-     * console.log(steamID)
-     */
-    getPlayerIds = (playerServerId: number) => {
-        const identifiers: { [key: string]: any } = {};
-
-        for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
-            const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
-            identifiers[id[0]] = id[1];
-        }
-
-        // prettier-ignore
-        identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? false : BigInt(`0x${identifiers.steam}`).toString();
-
-        return identifiers;
-    };
-
-    /**
      * @readonly
      *
      * @description
@@ -286,7 +262,7 @@ export default class Server extends Events {
              */
             deferrals.update(`[🏝 Natuna] Hello ${name}! Please wait until we verify your account.`);
 
-            const playerIds = this.getPlayerIds(player);
+            const playerIds = this.players.utils.getPlayerIds(player);
 
             if (!playerIds.steam || typeof playerIds.steam == "undefined") {
                 return deferrals.done("[🏝 Natuna] You are not connected to Steam!");
