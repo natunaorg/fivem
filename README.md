@@ -32,13 +32,13 @@ This framework is still far from perfect, so if you you could help me developing
 
 ---
 
-### Features
+## Features
 Instead of the same thing all over and over again. We give you something a lot of different on this framework, such as:
 
-##### 1 | **Plugin System (Single Resources Module)**
+### 1 | **Plugin System (Single Resources Module)**
 What does this means? It means that this framework have it own plugins system, so instead using a lot of resources on your server, with the plugin system on this framework, you could just use a multi plugins on a single resources.
 
-##### 2 | **MYSQL Database Wrapper**
+### 2 | **MYSQL Database Wrapper**
 If you tired of using a boring old SQL query such as something like
 ```
 INSERT INTO table_name(column_1,column_2,column_3) VALUES (value_1,value_2,value_3); 
@@ -54,22 +54,23 @@ db(tableName).write({
 })
 ```
 
-##### 3 | **IntelliSense Ready**
+### 3 | **IntelliSense Ready**
 If you are using Visual Studio Code as your IDE/Code Editor, then it'd be a great news for you! Since this framework is built using Typescript, so everytime you type something, there would show some content assist, learn more about [VSCode IntelliSense on Here](https://code.visualstudio.com/docs/editor/intellisense).
 
 ![IntelliSense Example](https://code.visualstudio.com/assets/docs/editor/intellisense/intellisense_icons.png)
+
 *This image is an example, provided from https://code.visualstudio.com/docs/editor/intellisense*
 
-##### 4 | **JSDOC Documentation Ready**
+### 4 | **JSDOC Documentation Ready**
 I also have provided all necessary documentation for every usable function on the framework script so you don't even need to go to the documentation page to see what is the function about, and the example of how to use it.
 
 ![JSDOC Documentation Example](https://i.im.ge/2021/08/08/0szfm.png)
 ![JSDOC Documentation Example 2](https://i.im.ge/2021/08/08/0aOQ6.png)
 
-##### 5 | **Safety Checks**
+### 5 | **Safety Checks**
 You should read [Why Should We Use TypeScript?](https://dev.to/mistval/type-safe-typescript-4a6f) to know why using Typescript is more better and safe
 
-##### 6 | **Command Wrapper**
+### 6 | **Command Wrapper**
 You may registering command using `RegisterCommand` FiveM native, but for me that is boring. So instead using that, i had created way more advance and safe command system, why more safe? because all of the commands are registered and validated on server instead of client.
 
 **You might wanna see more detailed about this on the documentation.**
@@ -110,12 +111,12 @@ Example list of the configuration
 }
 ```
 
-##### 7 | **Multi NUI Wrapper**
+### 7 | **Multi NUI Wrapper**
 Wanted to use multi NUI system? NOT A PROBLEM! This framework also contain it own built in NUI system so you don't need to create like 100+ resources for 100 NUI, instead, using 1 resources, this framework, would be enough to handle all of that.
 
 **Of course this system is new and still on development, so there will be a lot of limitations, make sure you already ready the documentation for this system**
 
-##### 8 | **Structured Folder**
+### 8 | **Structured Folder**
 Hate to see unstructured files? same. See how the structure of this framework below
 
 ```
@@ -136,10 +137,11 @@ Hate to see unstructured files? same. See how the structure of this framework be
 +-- (Other files...)
 ```
 
-##### 9 | **Event Wrapper**
+
+### 9 | **Event Wrapper**
 If `on`, `onNet`, `emit`, and `emitNet` is not enough for you or too complicated to understand, then we create a nice wrapper for you, even for NUI too. See all the available event function below:
 
-- **Client Event Function**
+> **Client Event Function**
 ```ts
 addNUIEventHandler: (name: string, handler: (data: any, callback: Function) => any) => void;
 triggerNUIEvent: (name: string, data?: object) => void;
@@ -157,7 +159,7 @@ addSharedCallbackEventHandler: (name: string, handler: Function) => void;
 triggerSharedCallbackEvent: (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
 ```
 
-- **Server Event Functions**
+> **Server Event Functions**
 ```ts
 addServerEventHandler: (name: string | Array<string>, handler: Function) => void;
 triggerServerEvent: (name: string | Array<string>, ...args: any) => void;
@@ -171,19 +173,57 @@ triggerSharedEvent: (name: string | Array<string>, ...args: any) => void;
 addSharedCallbackEventHandler: (name: string, handler: Function) => void;
 triggerSharedCallbackEvent: (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
 ```
-- **NUI Event Functions**
+> **NUI Event Functions**
 ```ts
 // Array of event list
 window.events: any[]
 
 // Trigger an event to another NUI
-window.emit: (name: any, data?: {}) => void;
+window.emit: (name: string, data?: {}) => void;
 
 // Listen events from other NUI `window.emit` or from client `triggerNUIEvent`
-window.on: (name: any, handler: any) => number; // Return the event index
+window.on: (name: string, handler: (data) => any) => number; // Return the event index
 
 // Remove an event listener
-window.removeListener: (name: any, eventIndex: any) => void;
+window.removeListener: (name: string, eventIndex: number) => void;
 
 // Emit an event to client. Listen the event on client with `addNUIEventHandler`
-window.sendData: (name: any, data?: {}) => void;
+window.sendData: (name: string, data?: {}) => void;
+```
+
+### 10 | **And Many Other Features In the Future!**
+Expect more from us in the future! We would give you something different and something more great above your expectation.
+
+---
+
+## Interested with this framework?
+Buckle up! Let's go to [Natuna Framework Wiki](https://github.com/natuna-framework/natuna/wiki) to setup this framework on your server.
+
+\
+**We're Fully Open Sourced!**
+
+You can be a part of our big journey in the future, please create and develop this framework by doing Fork and Pull Requests on this repository.
+
+You can also contribute even if only by providing suggestions or reporting problems with this framework in the Issues section of this repository or in the support link listed in the help section.
+
+[See Our Contributing Guide]()
+
+\
+**Need Help?**
+
+If you have tried your best in overcoming every problem but to no avail, don't hesitate to discuss with us at the link below:
+
+- [Discord Server](https://discord.gg/kGPHBvXzGM)
+
+\
+**Feeling Generous?**
+
+This project is 100% free to use. Either you just wanted to use it or modified it, it's up to yourself. You don't even need license key, subscription or whatsoever that related to money.
+
+If you want to help us, the core developers, in finance, or help the infrastructure of this project to cover monthly expenses and so on, you can become our donor via the link below:
+
+- [Ko-fi](https://ko-fi.com/raflymln)
+- [Paypal](https://www.paypal.com/paypalme/mraflymaulana)
+
+Please understand that sponsors will receive special content from us as a token of our gratitude, however, we will continue to run this project as an open source project without any mandatory fees.
+

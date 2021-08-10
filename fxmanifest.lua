@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game {'gta5'}
 
 author 'Rafly Maulana'
-description 'Typescript/Javascript Bundled FiveM Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.'
+description 'FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.'
 version '1.0.0'
 
 ui_page 'src/ui/nui/nui.html'
