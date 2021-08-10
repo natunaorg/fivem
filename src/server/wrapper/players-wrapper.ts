@@ -165,7 +165,7 @@ export class Wrapper {
         if (obj.where.steam_id) {
             steamId = obj.where.steam_id;
         } else if (obj.where.server_id) {
-            const identifiers = this.client.getPlayerIds(obj.where.server_id);
+            const identifiers = this.utils.getPlayerIds(obj.where.server_id);
             if (identifiers.steam) {
                 steamId = identifiers.steam;
             }
@@ -225,7 +225,7 @@ export class Wrapper {
 
             switch (true) {
                 case typeof obj.where.server_id !== "undefined":
-                    const identifiers = this.client.getPlayerIds(obj.where.server_id);
+                    const identifiers = this.utils.getPlayerIds(obj.where.server_id);
                     return String(identifiers.steam);
 
                 case typeof obj.where.steam_id !== "undefined":
@@ -243,6 +243,32 @@ export class Wrapper {
 
             return false;
         },
+
+        
+
+    /**
+     * @description
+     * Get all set of player ID and return it on JSON format
+     *
+     * @param src Server ID of the Player
+     *
+     * @example
+     * const steamID: getPlayerIds(1).steam;
+     * console.log(steamID)
+     */
+    getPlayerIds : (playerServerId: number) => {
+        const identifiers: { [key: string]: any } = {};
+
+        for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
+            const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
+            identifiers[id[0]] = id[1];
+        }
+
+        // prettier-ignore
+        identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? false : BigInt(`0x${identifiers.steam}`).toString();
+
+        return identifiers;
+    }
     };
 }
 

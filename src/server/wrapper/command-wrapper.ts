@@ -131,7 +131,7 @@ export class Wrapper {
             return "This command can only be executed from console!";
         }
 
-        const userID = this.client.getPlayerIds(src).steam.toString();
+        const userID = this.client.players.utils.getPlayerIds(src).steam.toString();
 
         const cooldown = this.config.cooldown;
         const cooldownList = this.cooldownList;
