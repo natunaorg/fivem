@@ -1,8 +1,14 @@
+/**
+ * @module Client
+ * @category Client
+ */
+
 "use strict";
-import * as Utils from "@client/wrapper/utils-wrapper";
-import * as Game from "@client/wrapper/game-wrapper";
+
+import UtilsWrapper from "@client/wrapper/utils-wrapper";
+import GameWrapper from "@client/wrapper/game-wrapper";
+import PlayersWrapper from "@client/wrapper/players-wrapper";
 import * as Command from "@server/wrapper/command-wrapper";
-import * as Players from "@client/wrapper/players-wrapper";
 
 import Events from "@client/modules/events";
 
@@ -11,11 +17,13 @@ import Doom from "figlet/importable-fonts/Doom";
 
 export default class Client extends Events {
     /**
+     * @hidden
      * Client Configurations
      */
     config: any;
 
     /**
+     * @hidden
      * List of Client Plugins
      */
     clientPlugins: any;
@@ -23,33 +31,37 @@ export default class Client extends Events {
     /**
      * List of utility functions
      */
-    utils: Utils.Wrapper;
+    utils: UtilsWrapper;
 
     /**
      * Collection of Game Functions
      */
-    game: Game.Wrapper;
+    game: GameWrapper;
 
     /**
      * Client Player Wrapper
      */
-    players: Players.Wrapper;
+    players: PlayersWrapper;
 
     /**
+     * @hidden
      * List of client commands
      */
     commands: {
         [key: string]: Command.Handler;
     };
 
+    /**
+     * @hidden
+     */
     constructor() {
         super();
         this.config;
         this.clientPlugins = {};
         this.commands = {};
 
-        this.utils = new Utils.Wrapper(this);
-        this.game = new Game.Wrapper(this);
+        this.utils = new UtilsWrapper(this);
+        this.game = new GameWrapper(this);
         this.players;
 
         this.addSharedEventHandler("natuna:client:setCommandDescription", this.setCommandDescription);
@@ -67,6 +79,7 @@ export default class Client extends Events {
      * Use this function to hold next script below this from executing before it finish the timeout itself
      *
      * @example
+     * ```ts
      * const isActive = false;
      * const logger = (status) => console.log(status);
      *
@@ -77,6 +90,7 @@ export default class Client extends Events {
      *      while(!isActive) await wait(5000);
      *      logger(isActive); // true
      * })();
+     * ```
      */
     wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -85,6 +99,7 @@ export default class Client extends Events {
      * Registrating a command. The actual command handler is registered on server to unlock the feature like permission based command or something, so it'd write a event on client and registered a handler on server to trigger the command from registered command in client.
      *
      * @example
+     * ```ts
      * registerCommand(
      *      'hello',
      *      (src, args) => console.log('Hello!'),
@@ -92,6 +107,7 @@ export default class Client extends Events {
      *          description: "Say Hello"
      *      }
      * });
+     * ```
      */
     registerCommand = (name: string | Array<string>, handler: Command.Handler, config: Command.Config = {}) => {
         const addCommand = (name: string) => {
@@ -136,6 +152,7 @@ export default class Client extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description
@@ -148,6 +165,7 @@ export default class Client extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description
@@ -168,7 +186,7 @@ export default class Client extends Events {
 
         if (settings.config) {
             this.config = settings.config;
-            this.players = new Players.Wrapper(this, this.config);
+            this.players = new PlayersWrapper(this, this.config);
         }
 
         if (settings.game) {
@@ -228,6 +246,7 @@ export default class Client extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description
@@ -249,6 +268,13 @@ export default class Client extends Events {
         this._logger("Client Plugins Ready!");
     };
 
+    /**
+     * @hidden
+     * @readonly
+     *
+     * @description
+     * List of events on client
+     */
     _events = {
         /**
          * @description

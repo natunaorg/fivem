@@ -1,9 +1,20 @@
+/**
+ * @module Client - Game
+ * @category Client
+ */
+
 "use strict";
 import Client from "@client/index";
 
-export class Wrapper {
+export default class Wrapper {
+    /**
+     * @hidden
+     */
     client: Client;
 
+    /**
+     * @hidden
+     */
     constructor(client: Client) {
         this.client = client;
     }
@@ -15,7 +26,9 @@ export class Wrapper {
      * @param ped Ped
      *
      * @example
+     * ```ts
      * optimizeFPS(PlayerPedId());
+     * ```
      */
     optimizeFPS = (ped: number = PlayerPedId()) => {
         ClearAllBrokenGlass();
@@ -40,7 +53,9 @@ export class Wrapper {
      * Disable default game dispatch radio
      *
      * @example
+     * ```ts
      * disableDispatchService();
+     * ```
      */
     disableDispatchService = () => {
         for (let i = 0; i >= 20; i++) {
@@ -56,7 +71,9 @@ export class Wrapper {
      * @param playerId Player Ped
      *
      * @example
+     * ```ts
      * resetWantedLevel(PlayerId());
+     * ```
      */
     resetWantedLevel = (playerId: number = PlayerId()) => {
         if (GetPlayerWantedLevel(playerId) !== 0) {
@@ -68,8 +85,6 @@ export class Wrapper {
     };
 
     /**
-     * @readonly
-     *
      * @description
      * Only work on an entity (Ped, Player, Vehicle, Object, etc)
      */
@@ -81,7 +96,9 @@ export class Wrapper {
          * @param entity Entity
          *
          * @example
+         * ```ts
          * getCoords(PlayerPedId());
+         * ```
          */
         getCoords: (entity: number = PlayerPedId()) => {
             const [x, y, z] = GetEntityCoords(entity, true);
@@ -92,8 +109,6 @@ export class Wrapper {
     };
 
     /**
-     * @readonly
-     *
      * @description
      * Only work for a ped (Pedestrian, Player)
      */
@@ -105,7 +120,9 @@ export class Wrapper {
          * @param ped Ped
          *
          * @example
+         * ```ts
          * teleportToMarker(PlayerPedId());
+         * ```
          */
         teleportToMarker: async (ped: number = PlayerPedId()) => {
             if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
@@ -140,7 +157,9 @@ export class Wrapper {
          * @param coords Coordinate of the location
          *
          * @example
+         * ```ts
          * teleportToCoordinates(PlayerPedId(), { 1000, 2000, 500 });
+         * ```
          */
         teleportToCoordinates: (ped: number = PlayerPedId(), coords: { x: string | number; y: string | number; z: string | number }) => {
             if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
@@ -169,7 +188,9 @@ export class Wrapper {
          * @param isDriver If set to true, it will return false if the player is in the vehicle not as a driver.
          *
          * @example
+         * ```ts
          * getCurrentVehicle(PlayerPedId(), false);
+         * ```
          */
         getCurrentVehicle: (ped: number = PlayerPedId(), isDriver: boolean = false) => {
             if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
@@ -189,8 +210,6 @@ export class Wrapper {
     };
 
     /**
-     * @readonly
-     *
      * @description
      * Only work for an active player
      */
@@ -202,7 +221,9 @@ export class Wrapper {
          * @param playerPed Player Ped
          *
          * @example
+         * ```ts
          * setNoClip(PlayerPedId());
+         * ```
          */
         setNoClip: async (speed: number = 2) => {
             const ped = PlayerPedId();
@@ -276,7 +297,9 @@ export class Wrapper {
          * @param coords Coordinates of the location to find the player
          *
          * @example
+         * ```ts
          * getNearestOneIn({ 100, 300, 400, 5.0 });
+         * ```
          */
         getNearestOneIn: async (coords: { x: number; y: number; z: number; radius?: number }) => {
             const players = await this.client.players.list();
@@ -303,7 +326,9 @@ export class Wrapper {
          * @param entity Entity (Ped, Object, etc).
          *
          * @example
+         * ```ts
          * getNearestOneFrom(PlayerPedId());
+         * ```
          */
         getNearestOneFrom: (entity: number, radius: number) => {
             if (!DoesEntityExist(entity)) {
@@ -316,8 +341,6 @@ export class Wrapper {
     };
 
     /**
-     * @readonly
-     *
      * @description
      * Only work with vehicles
      */
@@ -330,7 +353,9 @@ export class Wrapper {
          * @param coords Coordinate of the location to spawn
          *
          * @example
+         * ```ts
          * spawn('zentorno', { 1000, 5000, 500, 50 })
+         * ```
          */
         spawn: async (model: string, coords: { x: number; y: number; z: number; heading?: number } = this.entity.getCoords()) => {
             const hash = GetHashKey(model);
@@ -359,7 +384,9 @@ export class Wrapper {
          * @param vehicleEntityOrCoords Entity of the vehicle or the coordinate
          *
          * @example
+         * ```ts
          * delete(1024);
+         * ```
          */
         delete: (vehicle: number) => {
             if (!DoesEntityExist(vehicle) || !IsEntityAVehicle(vehicle)) {
@@ -379,7 +406,9 @@ export class Wrapper {
          * @param coords Coordinate of the location to find vehicle
          *
          * @example
+         * ```ts
          * getNearestOneIn({ 1000, 5000, 300, 5.0 });
+         * ```
          */
         getNearestOneIn: (coords: { x: number; y: number; z: number; radius?: number }) => {
             let vehicleList = [];
@@ -401,7 +430,9 @@ export class Wrapper {
          * @param entity Entity (Ped, Object, etc).
          *
          * @example
+         * ```ts
          * getNearestOneFrom(PlayerPedId());
+         * ```
          */
         getNearestOneFrom: (entity: number, radius?: number) => {
             if (!DoesEntityExist(entity)) {
@@ -413,5 +444,3 @@ export class Wrapper {
         },
     };
 }
-
-export default Wrapper;

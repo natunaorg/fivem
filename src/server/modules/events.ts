@@ -19,7 +19,9 @@ export default class Events {
      * @param args Arguments to send
      *
      * @example
+     * ```ts
      * addServerEventHandler("someEvent", (playerID) => console.log(playerID))
+     * ```
      */
     addServerEventHandler = (name: string | Array<string>, handler: Function) => {
         if (typeof name == "object" && Array.isArray(name)) {
@@ -41,7 +43,9 @@ export default class Events {
      * @param args Arguments to send
      *
      * @example
+     * ```ts
      * triggerServerEvent("someEvent", true)
+     * ```
      */
     triggerServerEvent = (name: string | Array<string>, ...args: any) => {
         if (typeof name == "object" && Array.isArray(name)) {
@@ -70,7 +74,9 @@ export default class Events {
      * @param handler Handler of the received arguments
      *
      * @example
+     * ```ts
      * addServerCallbackEventHandler('getPlayerName', (id) => getName(id));
+     * ```
      */
     addServerCallbackEventHandler = (name: string, handler: Function) => {
         this.addServerEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
@@ -89,7 +95,9 @@ export default class Events {
      * @param args Arguments to send
      *
      * @example
+     * ```ts
      * triggerSharedCallbackEvent('getPlayerName', (name) => console.log(name), 1);
+     * ```
      */
     triggerServerCallbackEvent = (name: string, callbackHandler: Function, ...args: any) => {
         const temporalEventName = uniqid("cbtemp-");
@@ -118,7 +126,9 @@ export default class Events {
      * @param args Arguments to send
      *
      * @example
+     * ```ts
      * addSharedEventHandler("someEvent", (playerID) => console.log(playerID))
+     * ```
      */
     addSharedEventHandler = (name: string | Array<string>, handler: Function) => {
         if (typeof name == "object" && Array.isArray(name)) {
@@ -141,7 +151,9 @@ export default class Events {
      * @param args Arguments to send
      *
      * @example
+     * ```ts
      * triggerSharedEvent("someEvent", 1, true)
+     * ```
      */
     triggerSharedEvent = (name: string | Array<string>, target: number, ...args: any) => {
         if (typeof name == "object" && Array.isArray(name)) {
@@ -170,7 +182,9 @@ export default class Events {
      * @param handler Handler of the received arguments
      *
      * @example
+     * ```ts
      * addSharedCallbackEventHandler('getPlayerName', (id) => getName(id));
+     * ```
      */
     addSharedCallbackEventHandler = (name: string, handler: Function) => {
         this.addSharedEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
@@ -189,7 +203,9 @@ export default class Events {
      * @param args Arguments to send
      *
      * @example
+     * ```ts
      * triggerSharedCallbackEvent('getPlayerName', (name) => console.log(name), 1);
+     * ```
      */
     triggerSharedCallbackEvent = (name: string, target: number, callbackHandler: Function, ...args: any) => {
         const temporalEventName = uniqid("cbtemp-");
