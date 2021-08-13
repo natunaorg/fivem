@@ -1,3 +1,8 @@
+/**
+ * @module Server - Commands
+ * @category Server
+ */
+
 "use strict";
 import Server from "@server/index";
 
@@ -25,6 +30,7 @@ export type Handler = (src: number, args: any[], raw: String) => any;
  * @arg cooldownExclusions Set the cooldown bypass for some users or groups
  *
  * @example
+ * ```ts
  * {
  *      description: "Set Weather Status",
  *      argsDescription: [
@@ -32,6 +38,7 @@ export type Handler = (src: number, args: any[], raw: String) => any;
  *          // Argument 2, 3, ...
  *      ]
  * }
+ * ```
  */
 export type Config = {
     argsRequired?: boolean | number;
@@ -50,14 +57,34 @@ export type Config = {
     restricted?: boolean;
 };
 
-export class Wrapper {
+/**
+ * This class is included when registering a command on server with `registerCommand` function.
+ *
+ * Use it if you know what you're doing.
+ */
+export default class Wrapper {
+    /**
+     * @hidden
+     */
     client: Server;
+
+    /**
+     * @hidden
+     */
+    cooldownList: any;
+
+    /**
+     * @hidden
+     */
+    isClientCommand: boolean;
+
     name: string;
     handler: Handler;
     config: Config;
-    cooldownList: any;
-    isClientCommand: boolean;
 
+    /**
+     * @hidden
+     */
     constructor(client: Server, name: string, handler: Handler, config: Config, isClientCommand: boolean) {
         this.client = client;
         this.cooldownList = {};
@@ -180,5 +207,3 @@ export class Wrapper {
         },
     };
 }
-
-export default Wrapper;

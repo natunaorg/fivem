@@ -1,10 +1,25 @@
+/**
+ * @module Server - Database
+ * @category Server
+ */
+
 "use strict";
 import mysql from "mysql2";
 
-export class Wrapper {
+export default class Wrapper {
+    /**
+     * @hidden
+     */
     table: string;
+
+    /**
+     * @hidden
+     */
     connection: mysql.Connection;
 
+    /**
+     * @hidden
+     */
     constructor(connection: mysql.Connection, table: string) {
         this.table = table;
         this.connection = connection;
@@ -15,11 +30,13 @@ export class Wrapper {
      * Write a data into database table
      *
      * @example
+     * ```ts
      * db('users').write({
      *      data: {
      *          name: "Don Chad"
      *      }
      * })
+     * ```
      */
     write = (obj: { data: { [key: string]: any } }) => {
         if (this.utils.validateQueryObject(obj, ["data"])) {
@@ -39,11 +56,13 @@ export class Wrapper {
      * Find a data from database table
      *
      * @example
+     * ```ts
      * db('users').find({
      *      where: {
      *          name: "Don Chad"
      *      }
      * })
+     * ```
      */
     find = (obj: { where: { [key: string]: any } }) => {
         if (this.utils.validateQueryObject(obj, ["where"])) {
@@ -65,11 +84,13 @@ export class Wrapper {
      * Find first data from database table
      *
      * @example
+     * ```ts
      * db('users').findFirst({
      *      where: {
      *          name: "Don Chad"
      *      }
      * })
+     * ```
      */
     findFirst = async (obj: { where: { [key: string]: any } }) => {
         if (this.utils.validateQueryObject(obj, ["where"])) {
@@ -83,6 +104,7 @@ export class Wrapper {
      * Update a data from database table
      *
      * @example
+     * ```ts
      * // Normal Version.
      * db('users').update({
      *      where: {
@@ -105,6 +127,7 @@ export class Wrapper {
      *          }
      *      }
      * })
+     * ```
      */
     update = (obj: { data: { [key: string]: any }; where: { [key: string]: any } }) => {
         if (this.utils.validateQueryObject(obj, ["data", "where"])) {
@@ -135,11 +158,13 @@ export class Wrapper {
      * Delete a data from database table
      *
      * @example
+     * ```ts
      * db('users').delete({
      *      where: {
      *          name: "Don Chad"
      *      }
      * })
+     * ```
      */
     delete = (obj: { where: { [key: string]: any } }) => {
         if (this.utils.validateQueryObject(obj, ["where"])) {
@@ -203,7 +228,9 @@ export class Wrapper {
          * Executing database query in promise
          *
          * @example
+         * ```ts
          * executeQuery("SELECT * FROM `users`")
+         * ```
          */
         executeQuery: async (query: string) => {
             return new Promise((resolve, reject) => {
@@ -216,5 +243,3 @@ export class Wrapper {
         },
     };
 }
-
-export default Wrapper;

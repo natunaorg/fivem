@@ -1,40 +1,52 @@
+/**
+ * @module Server - Players
+ * @category Server
+ */
+
 "use strict";
 import Server from "@server/index";
 
-export declare namespace Config {
-    interface Where {
-        user_id?: number;
-        server_id?: number;
-        steam_id?: string;
-    }
+export type Requirements = {
+    user_id?: number;
+    server_id?: number;
+    steam_id?: string;
+};
 
-    interface Player {
-        user_id?: number;
-        server_id?: number;
-        steam_id?: string;
-        updated_at?: number;
-        last_position?: {
-            x: number;
-            y: number;
-            z: number;
-            heading: number;
-        };
-        [key: string]: any;
-    }
+export type Data = {
+    user_id?: number;
+    server_id?: number;
+    steam_id?: string;
+    updated_at?: number;
+    last_position?: {
+        x: number;
+        y: number;
+        z: number;
+        heading: number;
+    };
+    [key: string]: any;
+};
 
-    interface Default {
-        data: Player;
-        where: Where;
-    }
-}
-
-export class Wrapper {
+export default class Wrapper {
+    /**
+     * @hidden
+     */
     client: Server;
+
+    /**
+     * @hidden
+     */
     config: any;
+
+    /**
+     * @hidden
+     */
     playerList: {
         [key: string]: string;
     };
 
+    /**
+     * @hidden
+     */
     constructor(client: Server, config: any) {
         this.client = client;
         this.playerList = {};
@@ -68,10 +80,12 @@ export class Wrapper {
      * @param callbackHandler Handler for the data retrieved
      *
      * @example
+     * ```ts
      * list();
+     * ```
      */
     list = () => {
-        let playerList: Array<Config.Player> = [];
+        let playerList: Array<Data> = [];
 
         for (const player of Object.values(this.playerList)) {
             playerList.push(JSON.parse(player));
@@ -87,13 +101,15 @@ export class Wrapper {
      * @param obj Data object to input
      *
      * @example
+     * ```ts
      * get({
      *      where: {
      *          steam_id: "76561198290395137"
      *      }
      * });
+     * ```
      */
-    get = (obj: { where: Config.Where }) => {
+    get = (obj: { where: Requirements }) => {
         const steamId = this.utils.parseId(obj);
 
         if (steamId) {
@@ -113,6 +129,7 @@ export class Wrapper {
      * @param obj Data object to input
      *
      * @example
+     * ```ts
      * update({
      *      data: {
      *          someNestedThings: true
@@ -121,9 +138,10 @@ export class Wrapper {
      *          steam_id: "76561198290395137"
      *      }
      * });
+     * ```
      */
-    update = async (obj: Config.Default) => {
-        let currentData: Config.Player = this.get(obj);
+    update = async (obj: { data: Data; where: Requirements }) => {
+        let currentData: Data = this.get(obj);
 
         if (!currentData) {
             if (typeof obj.where.server_id === "number" || typeof obj.where.steam_id === "string") {
@@ -139,7 +157,7 @@ export class Wrapper {
             }
         }
 
-        const data: Config.Player = {
+        const data: Data = {
             ...currentData, // Copy From Origin
             ...obj.data, // Overwrites any differences
             updated_at: Date.now(),
@@ -174,7 +192,7 @@ export class Wrapper {
         if (steamId) {
             const user = await this.client.db("users").findFirst({ where: { steam_id: steamId } });
 
-            const data: Config.Player = {
+            const data: Data = {
                 user_id: user.id,
                 steam_id: user.steam_id,
                 server_id: obj.where.server_id,
@@ -197,7 +215,7 @@ export class Wrapper {
      *
      * @param obj Data object to input
      */
-    _delete = (obj: { where: Config.Where }) => {
+    _delete = (obj: { where: Requirements }) => {
         const steamId = this.utils.parseId(obj);
         return steamId ? delete this.playerList[steamId] : false;
     };
@@ -210,9 +228,11 @@ export class Wrapper {
          * @param id Id of the player
          *
          * @example
+         * ```ts
          * parseId('SteamID:1234567890'); // return "1234567890"
+         * ```
          */
-        parseId: (obj: { where: Config.Where }) => {
+        parseId: (obj: { where: Requirements }) => {
             const keysLength = Object.keys(obj.where).length;
 
             if (keysLength === 0) {
@@ -233,7 +253,7 @@ export class Wrapper {
 
                 case typeof obj.where.user_id !== "undefined":
                     for (const rawData of Object.values(this.playerList)) {
-                        const data: Config.Player = JSON.parse(rawData);
+                        const data: Data = JSON.parse(rawData);
 
                         if (data.user_id === obj.where.user_id) {
                             return data.steam_id;
@@ -244,32 +264,30 @@ export class Wrapper {
             return false;
         },
 
-        
+        /**
+         * @description
+         * Get all set of player ID and return it on JSON format
+         *
+         * @param src Server ID of the Player
+         *
+         * @example
+         * ```ts
+         * const steamID: getPlayerIds(1).steam;
+         * console.log(steamID)
+         * ```
+         */
+        getPlayerIds: (playerServerId: number) => {
+            const identifiers: { [key: string]: any } = {};
 
-    /**
-     * @description
-     * Get all set of player ID and return it on JSON format
-     *
-     * @param src Server ID of the Player
-     *
-     * @example
-     * const steamID: getPlayerIds(1).steam;
-     * console.log(steamID)
-     */
-    getPlayerIds : (playerServerId: number) => {
-        const identifiers: { [key: string]: any } = {};
+            for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
+                const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
+                identifiers[id[0]] = id[1];
+            }
 
-        for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
-            const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
-            identifiers[id[0]] = id[1];
-        }
+            // prettier-ignore
+            identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? false : BigInt(`0x${identifiers.steam}`).toString();
 
-        // prettier-ignore
-        identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? false : BigInt(`0x${identifiers.steam}`).toString();
-
-        return identifiers;
-    }
+            return identifiers;
+        },
     };
 }
-
-export default Wrapper;

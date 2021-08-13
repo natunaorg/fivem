@@ -1,58 +1,69 @@
+/**
+ * @module Server
+ * @category Server
+ */
+
 "use strict";
-import mysql from "mysql2";
 
 import pkg from "@/package.json";
-
 import fs from "fs";
 import path from "path";
 import util from "util";
 
+import mysql from "mysql2";
 import figlet from "figlet";
 import Doom from "figlet/importable-fonts/Doom";
 
-import * as Database from "@server/wrapper/database-wrapper";
-import * as Crypter from "@server/wrapper/crypter-wrapper";
-import * as Command from "@server/wrapper/command-wrapper";
-import * as Players from "@server/wrapper/players-wrapper";
+import DatabaseWrapper from "@server/wrapper/database-wrapper";
+import CrypterWrapper from "@server/wrapper/crypter-wrapper";
+import PlayersWrapper from "@server/wrapper/players-wrapper";
+import CommandWrapper, * as Command from "@server/wrapper/command-wrapper";
 
 import Events from "@server/modules/events";
 
 export default class Server extends Events {
     /**
-     * MySQL database wrapper
+     * Database wrapper
      */
-    db: (table: string) => Database.Wrapper;
+    db: (table: string) => DatabaseWrapper;
 
     /**
      * Crypter to Encrypt or Decrypt your secret data
      */
-    crypter: (algorithm: string, secretKey: string) => Crypter.Wrapper;
+    crypter: (algorithm: string, secretKey: string) => CrypterWrapper;
 
     /**
-     * Client Configurations
+     * @hidden
+     * Configurations
      */
     config: any;
 
     /**
+     * @hidden
      * List of All Plugins (Client, Server, NUI)
      */
     plugins: { [key: string]: Array<{ name: string; file?: string; config?: any }> };
 
     /**
+     * @hidden
      * List of Server Plugins
      */
     serverPlugins: { [key: string]: any };
 
     /**
+     * @hidden
      * List of Registered Commands
      */
-    commands: { [key: string]: Command.Wrapper };
+    commands: { [key: string]: Command.default };
 
     /**
      * Players wrapper
      */
-    players: Players.Wrapper;
+    players: PlayersWrapper;
 
+    /**
+     * @hidden
+     */
     constructor() {
         super();
         this.config = (global as any).exports[GetCurrentResourceName()].config();
@@ -60,9 +71,9 @@ export default class Server extends Events {
         this.serverPlugins = {};
         this.commands = {};
 
-        this.db = (table: string) => new Database.Wrapper(mysql.createConnection(this.config.core.db), table);
-        this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new Crypter.Wrapper(algorithm, secretKey);
-        this.players = new Players.Wrapper(this, this.config);
+        this.db = (table: string) => new DatabaseWrapper(mysql.createConnection(this.config.core.db), table);
+        this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new CrypterWrapper(algorithm, secretKey);
+        this.players = new PlayersWrapper(this, this.config);
 
         this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
         this.addServerEventHandler("playerConnecting", this._events.playerConnecting);
@@ -82,6 +93,7 @@ export default class Server extends Events {
      * @param ms Milisecond to wait
      *
      * @example
+     * ```ts
      * const one = () => true; // Always use ES6 for better practice
      * const two = () => true;
      *
@@ -90,6 +102,7 @@ export default class Server extends Events {
      *      await wait(5000); // Wait 5s (5000ms) before executing next function, always await it
      *      two(); // Executed after 5 second after wait before
      * });
+     * ```
      */
     wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
@@ -103,6 +116,7 @@ export default class Server extends Events {
      * @param isClientCommand Whether if the command was sent from client or not
      *
      * @example
+     * ```ts
      * registerCommand(
      *      'hello',
      *      (src, args) => console.log('Hello!'),
@@ -110,6 +124,7 @@ export default class Server extends Events {
      *          description: "Say Hello"
      *      }
      * });
+     * ```
      */
     registerCommand = (name: string | Array<string>, handler: Command.Handler, config: Command.Config = {}, isClientCommand: boolean = false) => {
         const addCommand = (name: string) => {
@@ -120,7 +135,7 @@ export default class Server extends Events {
 
             // Return if client command was already registered before
             if (this.commands[name] && isClientCommand) return;
-            this.commands[name] = new Command.Wrapper(this, name, handler, config, isClientCommand);
+            this.commands[name] = new CommandWrapper(this, name, handler, config, isClientCommand);
         };
 
         if (Array.isArray(name)) {
@@ -135,6 +150,7 @@ export default class Server extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description
@@ -147,6 +163,7 @@ export default class Server extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description
@@ -211,6 +228,7 @@ export default class Server extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description
@@ -234,6 +252,7 @@ export default class Server extends Events {
     };
 
     /**
+     * @hidden
      * @readonly
      *
      * @description

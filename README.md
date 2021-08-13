@@ -44,7 +44,7 @@ If you tired of using a boring old SQL query such as something like
 INSERT INTO table_name(column_1,column_2,column_3) VALUES (value_1,value_2,value_3); 
 ```
 Well you could try using our built in wrapper so you can insert data to database like
-```js
+```ts
 db(tableName).write({
     data: {
         column_1: value_1,
@@ -59,7 +59,7 @@ If you are using Visual Studio Code as your IDE/Code Editor, then it'd be a grea
 
 ![IntelliSense Example](https://code.visualstudio.com/assets/docs/editor/intellisense/intellisense_icons.png)
 
-*This image is an example, provided from https://code.visualstudio.com/docs/editor/intellisense*
+*This image is an example, provided from [VSCode](https://code.visualstudio.com/docs/editor/intellisense*)
 
 ### 4 | **JSDOC Documentation Ready**
 I also have provided all necessary documentation for every usable function on the framework script so you don't even need to go to the documentation page to see what is the function about, and the example of how to use it.
@@ -76,7 +76,7 @@ You may registering command using `RegisterCommand` FiveM native, but for me tha
 **You might wanna see more detailed about this on the documentation.**
 
 Check the example below
-```js
+```ts
 registerCommand(
     // Command Name
     'hello',
@@ -143,52 +143,52 @@ If `on`, `onNet`, `emit`, and `emitNet` is not enough for you or too complicated
 
 > **Client Event Function**
 ```ts
-addNUIEventHandler: (name: string, handler: (data: any, callback: Function) => any) => void;
-triggerNUIEvent: (name: string, data?: object) => void;
+addNUIEventHandler = (name: string, handler: (data: any, callback: Function) => any) => void;
+triggerNUIEvent = (name: string, data?: object) => void;
 
-addClientEventHandler: (name: string | Array<string>, handler: Function) => void;
-triggerClientEvent: (name: string | Array<string>, ...args: any) => void;
+addClientEventHandler =  (name: string | Array<string>, handler: Function) => void;
+triggerClientEvent = (name: string | Array<string>, ...args: any) => void;
 
-addClientCallbackEventHandler: (name: string, handler: Function) => void;
-triggerClientCallbackEvent: (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
+addClientCallbackEventHandler = (name: string, handler: Function) => void;
+triggerClientCallbackEvent = (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
 
-addSharedEventHandler: (name: string | Array<string>, handler: Function) => void;
-triggerSharedEvent: (name: string | Array<string>, ...args: any) => void;
+addSharedEventHandler = (name: string | Array<string>, handler: Function) => void;
+triggerSharedEvent = (name: string | Array<string>, ...args: any) => void;
 
-addSharedCallbackEventHandler: (name: string, handler: Function) => void;
-triggerSharedCallbackEvent: (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
+addSharedCallbackEventHandler = (name: string, handler: Function) => void;
+triggerSharedCallbackEvent = (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
 ```
 
 > **Server Event Functions**
 ```ts
-addServerEventHandler: (name: string | Array<string>, handler: Function) => void;
-triggerServerEvent: (name: string | Array<string>, ...args: any) => void;
+addServerEventHandler = (name: string | Array<string>, handler: Function) => void;
+triggerServerEvent = (name: string | Array<string>, ...args: any) => void;
 
-addServerCallbackEventHandler: (name: string, handler: Function) => void;
-triggerServerCallbackEvent: (name: string, callbackHandler: Function, ...args: any) => void;
+addServerCallbackEventHandler = (name: string, handler: Function) => void;
+triggerServerCallbackEvent = (name: string, callbackHandler: Function, ...args: any) => void;
 
-addSharedEventHandler: (name: string | Array<string>, handler: Function) => void;
-triggerSharedEvent: (name: string | Array<string>, ...args: any) => void;
+addSharedEventHandler = (name: string | Array<string>, handler: Function) => void;
+triggerSharedEvent = (name: string | Array<string>, ...args: any) => void;
 
-addSharedCallbackEventHandler: (name: string, handler: Function) => void;
-triggerSharedCallbackEvent: (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
+addSharedCallbackEventHandler = (name: string, handler: Function) => void;
+triggerSharedCallbackEvent = (name: string, callbackHandler: (data: any) => any, ...args: any) => void;
 ```
 > **NUI Event Functions**
 ```ts
 // Array of event list
-window.events: any[]
+window.events = any[]
 
 // Trigger an event to another NUI
-window.emit: (name: string, data?: {}) => void;
+window.emit = (name: string, data?: {}) => void;
 
 // Listen events from other NUI `window.emit` or from client `triggerNUIEvent`
-window.on: (name: string, handler: (data) => any) => number; // Return the event index
+window.on = (name: string, handler: (data) => any) => number; // Return the event index
 
 // Remove an event listener
-window.removeListener: (name: string, eventIndex: number) => void;
+window.removeListener = (name: string, eventIndex: number) => void;
 
 // Emit an event to client. Listen the event on client with `addNUIEventHandler`
-window.sendData: (name: string, data?: {}) => void;
+window.sendData = (name: string, data?: {}) => void;
 ```
 
 ### 10 | **And Many Other Features In the Future!**

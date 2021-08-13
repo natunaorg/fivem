@@ -1,10 +1,21 @@
+/**
+ * @module Client - Players
+ * @category Client
+ */
+
 "use strict";
 import Client from "@client/index";
-import { Config } from "@server/wrapper/players-wrapper";
+import { Data, Requirements } from "@server/wrapper/players-wrapper";
 
-export class Wrapper {
+export default class Wrapper {
+    /**
+     * @hidden
+     */
     client: Client;
 
+    /**
+     * @hidden
+     */
     constructor(client: Client, config: any) {
         this.client = client;
 
@@ -25,14 +36,18 @@ export class Wrapper {
      * @description
      * List all players
      *
+     * **[IMPORTANT]** Don't use this function on Tick/Interval!
+     *
      * @example
+     * ```ts
      * await list();
+     * ```
      */
     list = async () => {
         const data = () => {
             return new Promise((resolve, reject) => {
                 this.client.triggerSharedCallbackEvent("natuna:server:getPlayerList", (data: { [key: string]: string }) => {
-                    let playerList: Array<Config.Player> = [];
+                    let playerList: Array<Data> = [];
 
                     for (const player of Object.values(data)) {
                         playerList.push(JSON.parse(player));
@@ -43,39 +58,46 @@ export class Wrapper {
             });
         };
 
-        return (await data()) as Array<Config.Player>;
+        return (await data()) as Array<Data>;
     };
 
     /**
      * @description
      * Received current data of a player
      *
+     * **[IMPORTANT]** Don't use this function on Tick/Interval!
+     *
      * @param obj Data object to input
      *
      * @example
+     * ```ts
      * await get({
      *      where: {
      *          steam_id: "76561198290395137"
      *      }
      * });
+     * ```
      */
-    get = async (obj: { where: Config.Where }) => {
+    get = async (obj: { where: Requirements }) => {
         const data = () => {
             return new Promise((resolve, reject) => {
                 this.client.triggerSharedCallbackEvent("natuna:server:getPlayerData", (data) => resolve(data), obj);
             });
         };
 
-        return (await data()) as Config.Player;
+        return (await data()) as Data;
     };
 
     /**
      * @description
      * Update current data of a player
      *
+     * **[IMPORTANT]** Don't use this function on Tick/Interval!
+     *
      * @param obj Data object to input
      *
      * @example
+     * ```ts
      * await update({
      *      data: {
      *          someNestedThings: true
@@ -84,16 +106,15 @@ export class Wrapper {
      *          steam_id: "76561198290395137"
      *      }
      * });
+     * ```
      */
-    update = async (obj: Config.Default) => {
+    update = async (obj: { data: Data; where: Requirements }) => {
         const data = () => {
             return new Promise((resolve, reject) => {
                 this.client.triggerSharedCallbackEvent("natuna:server:updatePlayerData", (data) => resolve(data), obj);
             });
         };
 
-        return (await data()) as Config.Player;
+        return (await data()) as Data;
     };
 }
-
-export default Wrapper;

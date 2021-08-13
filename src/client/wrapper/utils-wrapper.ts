@@ -1,7 +1,12 @@
+/**
+ * @module Client - Utility
+ * @category Client
+ */
+
 "use strict";
 import Client from "@client/index";
 
-export interface MapBlip {
+export type MapBlip = {
     title?: string;
     colour?: number;
     iconId?: number;
@@ -11,11 +16,17 @@ export interface MapBlip {
         z: number;
     };
     id?: any;
-}
+};
 
-export class Wrapper {
+export default class Wrapper {
+    /**
+     * @hidden
+     */
     client: Client;
 
+    /**
+     * @hidden
+     */
     constructor(client: Client) {
         this.client = client;
     }
@@ -32,6 +43,7 @@ export class Wrapper {
      * - Colour: [r,g,b,a]
      *
      * @example
+     * ```ts
      * drawText3D("Press E to Pickup", {
      *      x: 0.8,
      *      y: 0.85,
@@ -39,6 +51,7 @@ export class Wrapper {
      *      size: 0.6,
      *      colour: [255,255,255,255]
      * })
+     * ```
      */
     drawText3D = (text: string, config: { x: number; y: number; z: number; font?: number; size?: number; colour: [number, number, number, number] }) => {
         SetDrawOrigin(config.x, config.y, config.z, 0);
@@ -68,12 +81,14 @@ export class Wrapper {
      * - Percentage of the axis: 0.0f < x, y < 1.0f
      *
      * @example
+     * ```ts
      * drawText("Your Server ID: 1", {
      *      x: 0.8,
      *      y: 0.85,
      *      font: 4,
      *      size: 0.6
      * });
+     * ```
      */
     drawText = (text: string, config: { x: number; y: number; font?: number; size?: number }) => {
         SetTextFont(config.font || 4);
@@ -99,10 +114,12 @@ export class Wrapper {
      * @param buttonList List of buttons
      *
      * @example
+     * ```ts
      * drawInstructionalButtons([
      *      { controlType: 0, controlId: 32, message: "Move Forward" },
      *      { controlType: 0, controlId: 33, message: "Move Backward" }
      * ])
+     * ```
      */
     drawInstructionalButtons = async (buttonList: Array<{ controlType: number; controlId: number; message: string }>) => {
         const SetButton = (padIndex: number, control: number) => {
@@ -159,9 +176,11 @@ export class Wrapper {
      * - Background Color List: https://gyazo.com/68bd384455fceb0a85a8729e48216e15
      *
      * @example
+     * ```ts
      * createFeedNotification("You Got a New Message!", {
      *      backgroundColor: 140
      * });
+     * ```
      */
     createFeedNotification = (text: string, config: { backgroundColor?: number } = {}) => {
         BeginTextCommandThefeedPost("STRING");
@@ -177,7 +196,9 @@ export class Wrapper {
      * ![](https://forum.cfx.re/uploads/default/original/4X/b/a/9/ba9186c16bd7a6c43d4f778f00ce3ce9a76cfe2d.png)
      *
      * @example
+     * ```ts
      * createHelpNotification("Press ~INPUT_MOVE_UP_ONLY~ to Walk");
+     * ```
      */
     createHelpNotification = (text: string, config: { beep?: boolean } = {}) => {
         BeginTextCommandDisplayHelp("STRING");
@@ -190,7 +211,9 @@ export class Wrapper {
      * Get hash value from the string
      *
      * @example
+     * ```ts
      * getHashString('Some Value');
+     * ```
      */
     getHashString = (val: string) => {
         let hash = 0;
@@ -221,7 +244,9 @@ export class Wrapper {
      * Get the coordinates of the reflected entity/object the camera is aiming at
      *
      * @example
+     * ```ts
      * getCamTargetedCoords(6.0);
+     * ```
      */
     getCamTargetedCoords = (distance: number) => {
         const [camRotX, , camRotZ] = GetGameplayCamRot(2);
@@ -243,7 +268,9 @@ export class Wrapper {
      * Get the entity camera direction offset from axis X.
      *
      * @example
+     * ```ts
      * getCamDirection();
+     * ```
      */
     getCamDirection = () => {
         const heading = GetGameplayCamRelativeHeading() + GetEntityHeading(GetPlayerPed(-1));
@@ -268,7 +295,9 @@ export class Wrapper {
      * Get entity the ped aimed at
      *
      * @example
+     * ```ts
      * getTargetedEntity(6.0);
+     * ```
      */
     getTargetedEntity = (distance: number) => {
         const [camX, camY, camZ] = GetGameplayCamCoord();
@@ -284,16 +313,22 @@ export class Wrapper {
      * Uppercase first letter of each words
      *
      * @example
+     * ```ts
      * ucwords('hello world'); // Hello World
+     * ```
      */
     ucwords = (str: string) => {
         return str.toLowerCase().replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
     };
 
     /**
-     * Map Blips
+     * @description
+     * Map Blip Functions
      */
     mapBlip = {
+        /**
+         * @hidden
+         */
         lists: {},
 
         /**
@@ -305,6 +340,7 @@ export class Wrapper {
          * - Colour List: https://runtime.fivem.net/doc/natives/?_0x03D7FB09E75D6B7E
          *
          * @example
+         * ```ts
          * create({
          *      "title": "Example",
          *      "colour": 30,
@@ -315,6 +351,7 @@ export class Wrapper {
          *          "z": 109.287
          *      }
          * });
+         * ```
          */
         create: (config: MapBlip) => {
             config.id = AddBlipForCoord(config.location.x, config.location.y, config.location.z);
@@ -339,9 +376,11 @@ export class Wrapper {
          * - Colour List: https://runtime.fivem.net/doc/natives/?_0x03D7FB09E75D6B7E
          *
          * @example
+         * ```ts
          * edit({
          *      "title": "Clothing Store"
          * });
+         * ```
          */
         edit: (blipId: number, newConfig: MapBlip) => {
             const oldConfig: MapBlip = (this.mapBlip as any).lists[blipId];
@@ -365,12 +404,12 @@ export class Wrapper {
          * Remove a map blip
          *
          * @example
+         * ```ts
          * remove(1);
+         * ```
          */
         remove: (blipId: number) => {
             RemoveBlip(blipId);
         },
     };
 }
-
-export default Wrapper;
