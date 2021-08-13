@@ -1,9 +1,9 @@
 {
-    "name": "@raflymln/fivem-koijs",
-    "version": "1.1.4-1",
+    "name": "@natuna-framework/natuna",
+    "version": "1.2.1-1",
     "description": "FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.",
-    "main": "index.js",
-    "repository": "https://github.com/raflymln",
+    "main": "src/",
+    "repository": "https://github.com/natuna-framework/natuna",
     "author": "Rafly Maulana",
     "scripts": {
         "build": "webpack --mode=production --progress",
@@ -21,6 +21,7 @@
         "@types/uniqid": "^5.3.1",
         "figlet": "^1.5.0",
         "mysql2": "^2.2.5",
+        "typedoc": "^0.21.5",
         "uniqid": "^5.3.0"
     },
     "devDependencies": {
