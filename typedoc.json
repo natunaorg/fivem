@@ -1,0 +1,10 @@
+{
+    "includes": "src/ui/nui",
+    "entryPoints": ["src/client/index.ts", "src/client/wrapper/", "src/server/index.ts", "src/server/wrapper/", "src/ui/nui/types.d.ts"],
+    "out": "docs",
+    "name": "Natuna Framework",
+    "theme": "./node_modules/@natuna-framework/typedoc-theme",
+    "highlightTheme": "nord",
+    "categoryOrder": ["Client", "Server", "NUI", "*"],
+    "includeVersion": true
+}
