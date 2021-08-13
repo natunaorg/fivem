@@ -6,6 +6,9 @@
 # production
 /dist
 
+# documentations
+/docs
+
 # misc
 .DS_Store
 .yarn.installed
