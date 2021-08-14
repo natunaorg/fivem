@@ -11,6 +11,7 @@ import path from "path";
 import util from "util";
 
 import mysql from "mysql2";
+import fetch from "node-fetch";
 import figlet from "figlet";
 import Doom from "figlet/importable-fonts/Doom";
 
@@ -23,43 +24,67 @@ import Events from "@server/modules/events";
 
 export default class Server extends Events {
     /**
+     * @description
      * Database wrapper
      */
     db: (table: string) => DatabaseWrapper;
 
     /**
+     * @description
+     * Database function to execute classic SQL query
+     *
+     * @param query SQL query string to execute
+     *
+     * @example
+     * ```ts
+     * dbQuery('CREATE DATABASE IF NOT EXISTS databaseName');
+     * ```
+     */
+    dbQuery: DatabaseWrapper["utils"]["executeQuery"];
+
+    /**
+     * @description
      * Crypter to Encrypt or Decrypt your secret data
      */
     crypter: (algorithm: string, secretKey: string) => CrypterWrapper;
 
     /**
+     * @description
+     * Players wrapper
+     */
+    players: PlayersWrapper;
+
+    /**
      * @hidden
+     *
+     * @description
      * Configurations
      */
     config: any;
 
     /**
      * @hidden
+     *
+     * @description
      * List of All Plugins (Client, Server, NUI)
      */
     plugins: { [key: string]: Array<{ name: string; file?: string; config?: any }> };
 
     /**
      * @hidden
+     *
+     * @description
      * List of Server Plugins
      */
     serverPlugins: { [key: string]: any };
 
     /**
      * @hidden
+     *
+     * @description
      * List of Registered Commands
      */
     commands: { [key: string]: Command.default };
-
-    /**
-     * Players wrapper
-     */
-    players: PlayersWrapper;
 
     /**
      * @hidden
@@ -72,6 +97,7 @@ export default class Server extends Events {
         this.commands = {};
 
         this.db = (table: string) => new DatabaseWrapper(mysql.createConnection(this.config.core.db), table);
+        this.dbQuery = this.db("").utils.executeQuery;
         this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new CrypterWrapper(algorithm, secretKey);
         this.players = new PlayersWrapper(this, this.config);
 
@@ -83,7 +109,7 @@ export default class Server extends Events {
         this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
 
         // Test database connection (on startup) <-- check if connection success or not, also executing default SQL 👍
-        this.db("").utils.executeQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db.database}\``);
+        this.dbQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db.database}\``);
     }
 
     /**
@@ -159,7 +185,7 @@ export default class Server extends Events {
      * @param text Text to logs
      */
     _logger = (...text: any) => {
-        return console.log("\x1b[33m%s\x1b[0m", "[🏝 Natuna Framework]", "[SERVER]", ...text);
+        return console.log("\x1b[33m%s\x1b[0m", "[🏝️ Natuna Framework]", "[SERVER]", ...text);
     };
 
     /**
@@ -249,6 +275,44 @@ export default class Server extends Events {
         }
 
         this._logger("Server Plugins Ready!");
+    };
+
+    /**
+     * @hidden
+     * @readonly
+     *
+     * @description
+     * Check package version and compare it to remote repository.
+     */
+    _checkPackageVersion = () => {
+        return new Promise(async (resolve, reject) => {
+            let rpkg: typeof pkg;
+
+            this._logger(`Welcome! Checking your version...`);
+            this._logger(`You are currently using version ${pkg.version}.`);
+
+            // Can't use async await, idk why :(
+            fetch("http://cdn.jsdelivr.net/gh/natuna-framework/fivem/package.json")
+                .then((res) => res.text())
+                .then((data) => {
+                    rpkg = JSON.parse(data);
+                });
+
+            while (!rpkg) await this.wait(500);
+
+            const currentVersion = parseInt(pkg.version.replace(/\./g, ""));
+            const remoteVersion = parseInt(rpkg.version.replace(/\./g, ""));
+
+            if (currentVersion < remoteVersion) {
+                this._logger(`\x1b[31mYou are not using the latest version of Natuna Framework (${rpkg.version}), please update it!`);
+            } else if (currentVersion > remoteVersion) {
+                this._logger(`\x1b[31mYou are not using a valid version version of Natuna Framework!`);
+            } else if (currentVersion === remoteVersion) {
+                this._logger("\x1b[32mYou are using a latest version of Natuna Framework!");
+            }
+
+            return resolve(true);
+        });
     };
 
     /**
@@ -383,26 +447,20 @@ export default class Server extends Events {
          */
         onServerResourceStart: async (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                /**
-                 * Event: Starting Process
-                 */
+                // Starting
                 figlet.parseFont("Standard", Doom);
                 figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
+                await this._checkPackageVersion();
 
-                this._logger(`Welcome! You are using version ${pkg.version}.`);
                 this.triggerServerEvent("natuna:server:starting");
 
-                /**
-                 * Event: Initializing
-                 */
+                // Initializing
                 this._logger("Starting Server...");
                 this.triggerServerEvent("natuna:server:initializing");
 
                 await this._initServerPlugins();
 
-                /**
-                 * Event: Ready
-                 */
+                // Ready
                 this._logger("Server Ready!");
                 this.triggerServerEvent("natuna:server:ready");
             }
@@ -414,6 +472,7 @@ export default class Server extends Events {
          */
         onServerResourceStop: (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
+                // Stopping
                 this.triggerServerEvent("natuna:server:stopped");
             }
         },
