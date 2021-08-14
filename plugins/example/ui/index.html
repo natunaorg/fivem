@@ -1,0 +1,95 @@
+<!-- 
+    This was an example of the NUI system on a plugin.
+    ---
+
+    Notes:
+
+    1. The NUI would automatically used if the plugin folder contains 'nui' folder.
+    2. NUI starting point is 'index.html', so make sure have the main file with the name of 'index.html'.
+    3. You don't need to use <html>, <head> or <body> tag, just put all the content inside it.
+    4. If you wanted to use <head> or <body> tag, that's okay, but at the end it would not be rendered, only the content inside it that would be rendered.
+    5. Jquery is set Globally, you could use Jquery on here without need to importing it.
+    6. If you're referencing a files make sure to use ./ or @/ at the links in the front.
+
+    Conclusion:
+
+    What actually happens on here is that all nui files would be merged as 1 things
+
+    Let's learn and see more example below
+ -->
+
+<html>
+    <head>
+        <!-- (OPTIONAL) Use this meta to adjust the index of the NUI between other plugin NUI, if this one is not available, the default value would be 1 -->
+        <meta name="nuiIndex" content="1" />
+
+        <!-- 
+            1. Stylesheet MUST be imported / MUST be an external stylesheet, this stylesheet would ONLY APPLY ON THIS PLUGIN 
+            2. You MUST use ./ or @/ in the links in the front
+        -->
+        <link rel="stylesheet" href="./style.css" />
+        <link rel="stylesheet" href="@/someOtherStyle.css" />
+
+        <!-- If you are using css inside this HTML, then the css would apply GLOBALLY, be careful -->
+        <style>
+            .someCSSDiv {
+                opacity: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- 
+            If you're putting an id, make sure it's unique across other plugins.
+
+            As for that, i suggest you to write an id with the plugin name such as `example-uniqueDiv`
+        -->
+        <div class="container" id="example-uniqueDiv"></div>
+
+        <!-- It's okay whether you wanted to use script on here or had the script as external source to be imported -->
+        <script>
+            /**
+             * We don't use classic document.addEventListener on here, but we're using events just like normally.
+             * - Learn about the list of events on https://developer.natuna.asia/fivem/modules/NUI.html
+             */
+            window.on("copytext", (data) => {
+                const node = document.createElement("textarea");
+                const selection = document.getSelection();
+
+                node.textContent = data.text;
+                document.body.appendChild(node);
+
+                selection.removeAllRanges();
+                node.select();
+                document.execCommand("copy");
+
+                selection.removeAllRanges();
+                document.body.removeChild(node);
+            });
+
+            /**
+             * JQUERY TIME!
+             * ---
+             *
+             * Like i said, there's a lot of limitations for this one.
+             * You need to use id to specify a query selector instead of class because that would trigger other class on the other plugin
+             *
+             * See the example below:
+             */
+            $("#example-uniqueDiv").html("<h1>Hello World!</h1>"); // This is Right ✔️
+            $(".container").html("<h1>Hello World!</h1>"); // This is WRONG ❌, it would trigger all DOM with container class across all plugins.
+        </script>
+
+        <!-- 
+            There're also a limitations when you creating a function. Since script would be apply globally, i suggest you to wrap a function inside a class instead of declaring it globally.
+         -->
+        <script>
+            new (class {
+                constructor() {
+                    // Any functions or variable or things written on here, would only apply locally on this class so it would not conflict with other function on another plugin
+                    // Do some works here...
+                }
+            })();
+        </script>
+    </body>
+</html>

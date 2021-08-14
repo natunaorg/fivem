@@ -27,6 +27,9 @@ export default function () {
         /**
          * @description
          * List of all script to be used.
+         *
+         * YOU ONLY NEED TO SPECIFY THE STARTING POINT, NOT ALL FILES.
+         * See the example files too to understand about it
          */
         plugins: {
             // Only writes the file name inside "client" folder

@@ -1,4 +1,5 @@
-import Server from "@server/index"; // Used only for typings reference. DO NOT DECLARE THIS.
+// Used only for typings reference. DO NOT DECLARE THIS CLASS.
+import Server from "@server/index";
 
 class Module {
     client: Server;
