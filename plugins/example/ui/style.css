@@ -1,0 +1,13 @@
+/* If the stylesheet was external and then imported, then it'd apply locally for the current plugin only */
+
+/* 
+    This class below at the end would be rendered as: #nui:(Plugin Name) .someClass
+    - example:
+
+    #nui:example .someClass {
+        opacity: 1;
+    }
+*/
+.someClass {
+    opacity: 1;
+}
