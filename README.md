@@ -3,11 +3,21 @@
 ![Github Repository Project Funding](https://img.shields.io/badge/Project%20Funding-%240.0-orange) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Github Repository Issues Tracking](https://img.shields.io/bitbucket/issues-raw/natuna-framework/natuna)
 
 # **Natuna Framework**
-##### FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.  
-\
-*© 2021 Natuna Framework by Natuna Indonesia. Natuna Indonesia and its associates are not affiliated with or endorsed by Rockstar North,Take-Two Interactive or other rightsholders. Any trademarks used belong to their respective owners.*
+#### FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.  
+
+&nbsp;
+
+##### *© 2021 Natuna Framework by Natuna Indonesia. Natuna Indonesia and its associates are not affiliated with or endorsed by Rockstar North,Take-Two Interactive or other rightsholders. Any trademarks used belong to their respective owners.*
 
 ---
+
+## Links:
+1. [Wiki](https://github.com/natuna-framework/fivem/wiki) (Guides, Additional Documentations)
+2. [Building Documentation](BUILDING.md) (See how to build to framework)
+3. [Code Documentation](https://developer.natuna.asia/fivem) (Functions, Variable, Classes, Interface, Type, etc.)
+4. [Contributing Guide](CONTRIBUTING.md)
+5. [Discord Server](https://discord.gg/kGPHBvXzGM) (Need Help?)
+6. [Donation, Additional Informations](#interested-with-this-framework) (Feeling Generous?)
 ---
 
 ## Summary
@@ -59,7 +69,7 @@ If you are using Visual Studio Code as your IDE/Code Editor, then it'd be a grea
 
 ![IntelliSense Example](https://code.visualstudio.com/assets/docs/editor/intellisense/intellisense_icons.png)
 
-*This image is an example, provided from [VSCode](https://code.visualstudio.com/docs/editor/intellisense*)
+*This image is an example, provided from [VSCode](https://code.visualstudio.com/docs/editor/intellisense)*
 
 ### 4 | **JSDOC Documentation Ready**
 I also have provided all necessary documentation for every usable function on the framework script so you don't even need to go to the documentation page to see what is the function about, and the example of how to use it.
@@ -197,7 +207,7 @@ Expect more from us in the future! We would give you something different and som
 ---
 
 ## Interested with this framework?
-Buckle up! Let's go to [Natuna Framework Wiki](https://github.com/natuna-framework/natuna/wiki) to setup this framework on your server.
+Buckle up! Let's go to [Natuna Framework Wiki](https://github.com/natuna-framework/fivem/wiki) to setup this framework on your server.
 
 \
 **We're Fully Open Sourced!**
@@ -206,7 +216,7 @@ You can be a part of our big journey in the future, please create and develop th
 
 You can also contribute even if only by providing suggestions or reporting problems with this framework in the Issues section of this repository or in the support link listed in the help section.
 
-[See Our Contributing Guide]()
+[See Our Contributing Guide](CONTRIBUTING.md)
 
 \
 **Need Help?**
