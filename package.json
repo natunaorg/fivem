@@ -1,14 +1,13 @@
 {
     "name": "@natuna-framework/natuna",
-    "version": "1.2.1-1",
+    "version": "1.2.2",
     "description": "FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.",
     "main": "src/",
     "repository": "https://github.com/natuna-framework/natuna",
     "author": "Rafly Maulana",
     "scripts": {
         "build": "webpack --mode=production --progress",
-        "watch": "webpack --mode=development --watch --progress",
-        "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+        "watch": "webpack --mode=development --watch --progress"
     },
     "license": "MIT",
     "private": false,
