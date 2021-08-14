@@ -90,6 +90,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server.default.html#crypter" class="tsd-kind-icon">crypter</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server.default.html#db" class="tsd-kind-icon">db</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server.default.html#dbQuery" class="tsd-kind-icon">db<wbr>Query</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server.default.html#players" class="tsd-kind-icon">players</a></li>
 							</ul>
 						</section>
@@ -119,13 +120,15 @@
 					<div class="tsd-signature tsd-kind-icon">crypter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>algorithm<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, secretKey<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="Server___Crypter.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/index.ts#L33">server/index.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/index.ts#L49">server/index.ts:49</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Crypter to Encrypt or Decrypt your secret data</p>
-						</div>
+						<dl class="tsd-comment-tags">
+							<dt>description</dt>
+							<dd><p>Crypter to Encrypt or Decrypt your secret data</p>
+							</dd>
+						</dl>
 					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
@@ -137,9 +140,11 @@
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<div class="tsd-comment tsd-typography">
-											<div class="lead">
-												<p>Crypter to Encrypt or Decrypt your secret data</p>
-											</div>
+											<dl class="tsd-comment-tags">
+												<dt>description</dt>
+												<dd><p>Crypter to Encrypt or Decrypt your secret data</p>
+												</dd>
+											</dl>
 										</div>
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
@@ -163,13 +168,15 @@
 					<div class="tsd-signature tsd-kind-icon">db<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>table<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><a href="Server___Database.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/index.ts#L28">server/index.ts:28</a></li>
+							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/index.ts#L30">server/index.ts:30</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Database wrapper</p>
-						</div>
+						<dl class="tsd-comment-tags">
+							<dt>description</dt>
+							<dd><p>Database wrapper</p>
+							</dd>
+						</dl>
 					</div>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
@@ -181,9 +188,11 @@
 								<ul class="tsd-descriptions">
 									<li class="tsd-description">
 										<div class="tsd-comment tsd-typography">
-											<div class="lead">
-												<p>Database wrapper</p>
-											</div>
+											<dl class="tsd-comment-tags">
+												<dt>description</dt>
+												<dd><p>Database wrapper</p>
+												</dd>
+											</dl>
 										</div>
 										<h4 class="tsd-parameters-title">Parameters</h4>
 										<ul class="tsd-parameters">
@@ -199,18 +208,78 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="dbQuery" class="tsd-anchor"></a>
+					<h3>db<wbr>Query</h3>
+					<div class="tsd-signature tsd-kind-icon">db<wbr>Query<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>query<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/index.ts#L43">server/index.ts:43</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>description</dt>
+							<dd><p>Database function to execute classic SQL query</p>
+							</dd>
+							<dt>example</dt>
+							<dd><pre><code class="language-ts"><span style="color: #88C0D0">dbQuery</span><span style="color: #D8DEE9FF">(</span><span style="color: #ECEFF4">&#039;</span><span style="color: #A3BE8C">CREATE DATABASE IF NOT EXISTS databaseName</span><span style="color: #ECEFF4">&#039;</span><span style="color: #D8DEE9FF">)</span><span style="color: #81A1C1">;</span>
+</code></pre>
+							</dd>
+						</dl>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-class">
+									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>query<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></li>
+								</ul>
+								<ul class="tsd-descriptions">
+									<li class="tsd-description">
+										<div class="tsd-comment tsd-typography">
+											<dl class="tsd-comment-tags">
+												<dt>description</dt>
+												<dd><p>Executing database query in promise</p>
+												</dd>
+												<dt>example</dt>
+												<dd><pre><code class="language-ts"><span style="color: #88C0D0">executeQuery</span><span style="color: #D8DEE9FF">(</span><span style="color: #ECEFF4">&quot;</span><span style="color: #A3BE8C">SELECT * FROM `users`</span><span style="color: #ECEFF4">&quot;</span><span style="color: #D8DEE9FF">)</span>
+</code></pre>
+												</dd>
+											</dl>
+										</div>
+										<h4 class="tsd-parameters-title">Parameters</h4>
+										<ul class="tsd-parameters">
+											<li>
+												<h5>query: <span class="tsd-signature-type">string</span></h5>
+												<div class="tsd-comment tsd-typography">
+													<div class="lead">
+														<p>SQL query string to execute</p>
+													</div>
+												</div>
+											</li>
+										</ul>
+										<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span></h4>
+									</li>
+								</ul>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="players" class="tsd-anchor"></a>
 					<h3>players</h3>
 					<div class="tsd-signature tsd-kind-icon">players<span class="tsd-signature-symbol">:</span> <a href="Server___Players.default.html" class="tsd-signature-type" data-tsd-kind="Class">default</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/index.ts#L62">server/index.ts:62</a></li>
+							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/index.ts#L55">server/index.ts:55</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Players wrapper</p>
-						</div>
+						<dl class="tsd-comment-tags">
+							<dt>description</dt>
+							<dd><p>Players wrapper</p>
+							</dd>
+						</dl>
 					</div>
 				</section>
 			</section>
@@ -227,7 +296,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.addServerCallbackEventHandler</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L81">server/modules/events.ts:81</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L81">server/modules/events.ts:81</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -271,7 +340,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.addServerEventHandler</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L26">server/modules/events.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L26">server/modules/events.ts:26</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -312,7 +381,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.addSharedCallbackEventHandler</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L189">server/modules/events.ts:189</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L189">server/modules/events.ts:189</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -356,7 +425,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.addSharedEventHandler</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L133">server/modules/events.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L133">server/modules/events.ts:133</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -396,7 +465,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/index.ts#L129">server/index.ts:129</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/index.ts#L155">server/index.ts:155</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -458,7 +527,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.triggerServerCallbackEvent</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L102">server/modules/events.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L102">server/modules/events.ts:102</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -509,7 +578,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.triggerServerEvent</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L50">server/modules/events.ts:50</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L50">server/modules/events.ts:50</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -553,7 +622,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.triggerSharedCallbackEvent</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L210">server/modules/events.ts:210</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L210">server/modules/events.ts:210</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -607,7 +676,7 @@
 							<aside class="tsd-sources">
 								<p>Inherited from Events.triggerSharedEvent</p>
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/modules/events.ts#L158">server/modules/events.ts:158</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/modules/events.ts#L158">server/modules/events.ts:158</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -656,7 +725,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/a3fe8b76/src/server/index.ts#L107">server/index.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/b5459784/src/server/index.ts#L133">server/index.ts:133</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -742,6 +811,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="Server.default.html#db" class="tsd-kind-icon">db</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="Server.default.html#dbQuery" class="tsd-kind-icon">db<wbr>Query</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="Server.default.html#players" class="tsd-kind-icon">players</a>
