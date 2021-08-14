@@ -44,7 +44,7 @@ class NUILoader {
                 }
                 return $1 + " " + collector.join(", ") + " " + $3;
             })
-            .replace(/body/, "");
+            .replace(/(body|html)/, "");
     };
 
     CSSParser = (pluginName, css, selector) => {
