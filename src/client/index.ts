@@ -18,38 +18,47 @@ import Doom from "figlet/importable-fonts/Doom";
 export default class Client extends Events {
     /**
      * @hidden
+     *
+     * @description
      * Client Configurations
      */
     config: any;
 
     /**
      * @hidden
+     *
+     * @description
      * List of Client Plugins
      */
     clientPlugins: any;
 
     /**
-     * List of utility functions
-     */
-    utils: UtilsWrapper;
-
-    /**
-     * Collection of Game Functions
-     */
-    game: GameWrapper;
-
-    /**
-     * Client Player Wrapper
-     */
-    players: PlayersWrapper;
-
-    /**
      * @hidden
+     *
+     * @description
      * List of client commands
      */
     commands: {
         [key: string]: Command.Handler;
     };
+
+    /**
+     * @description
+     * List of utility functions
+     */
+    utils: UtilsWrapper;
+
+    /**
+     * @description
+     * Collection of Game Functions
+     */
+    game: GameWrapper;
+
+    /**
+     * @description
+     * Client Player Wrapper
+     */
+    players: PlayersWrapper;
 
     /**
      * @hidden
@@ -282,14 +291,14 @@ export default class Client extends Events {
          */
         onClientResourceStart: async (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                // Event: Starting Process
+                // Starting Process
                 figlet.parseFont("Standard", Doom);
                 figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
 
                 this.triggerClientEvent("natuna:client:starting");
                 this.triggerSharedEvent("natuna:client:starting");
 
-                // Event: Initializing
+                // Initializing
                 this._logger("Starting Client...");
 
                 this.triggerClientEvent("natuna:client:initializing");
@@ -297,10 +306,9 @@ export default class Client extends Events {
                 this.triggerSharedEvent("natuna:server:addPlayerData");
 
                 this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", this._initClientSettings);
-
                 while (!this.config) await this.wait(100); // Wait for config before executing next script
 
-                // Event: Ready
+                // Ready
                 this._logger("Client Ready!");
 
                 this.triggerClientEvent("natuna:client:ready");
@@ -314,7 +322,7 @@ export default class Client extends Events {
          */
         onClientResourceStop: (resourceName: string) => {
             if (GetCurrentResourceName() == resourceName) {
-                // Event: Stopping
+                // Stopping
                 this.triggerClientEvent("natuna:client:stopped");
                 this.triggerSharedEvent("natuna:client:stopped");
             }
