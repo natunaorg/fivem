@@ -158,9 +158,7 @@ const config = {
             },
         },
         "raflymln-entitymenu": {
-            client: {
-                usedObjects: ["prop_bin_01a"],
-            },
+            client: {},
         },
     },
 };
