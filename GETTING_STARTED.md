@@ -1,8 +1,8 @@
 # Getting Started
 Interested using and developing this framework? Let's begin...
-1. [Installing]()
-2. [Updating]()
-3. [Frequently Asked Questions]()
+1. [Installing](#installing-it)
+2. [Updating](#updating)
+3. [Frequently Asked Questions](#frequently-asked-questions)
 
 ---
 
@@ -43,7 +43,7 @@ Interested using and developing this framework? Let's begin...
 
     Which means you have to wait it build process on FiveM until complete. Wait until the build process is completed and `Started resource natuna` text is logged to the console.
 
-8. **Rebuild the files**  
+8. **Rebuild the files** \
     Once the build process on the FiveM is completed, you much rebuild the files by doing the same as steps number 3.
 
     > Why must rebuild the files? Because the FiveM webpack build is different than the webpack on this resource, resulting to an error on the compiled files.
@@ -60,5 +60,23 @@ Everytime this resource is starting, you would find a log on console saying whet
 
 ## Frequently Asked Questions
 
-1. Why is my character not spawning after i join my server? \ 
+1. **Why is my character not spawning after i join my server?** \
     That because this framework currently has no built-in character maker/selector. Since this framework still on development, you should start making your own and we hope you can contribute to this current project.
+
+2. **How do i create a plugin?** \
+    Please check the example plugin on `/plugins` folder, i've documented how to do that on there.
+
+    Project structure:
+    ```
+    (Your Plugin Name)
+        + client/
+        |       +-- (...)
+        |
+        + server/
+        |       +-- (...)
+        |
+        + ui/
+        |       +-- (...)
+        |
+        + manifest.ts / manifest.json
+    ```
