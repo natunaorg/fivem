@@ -12,10 +12,10 @@
 ---
 
 ## Links:
-1. [Wiki](https://github.com/natuna-framework/fivem/wiki) (Guides, Additional Documentations)
-2. [Building Documentation](https://github.com/natuna-framework/fivem/blob/development/BUILDING.md) (See how to build to framework)
+1. [Getting Started](GETTING_STARTED.md) (Installing, Updating, FAQ, etc.)
+2. [Building Documentation](BUILDING.md) (See how to build to framework)
 3. [Code Documentation](https://developer.natuna.asia/fivem) (Functions, Variable, Classes, Interface, Type, etc.)
-4. [Contributing Guide](https://github.com/natuna-framework/fivem/blob/development/CONTRIBUTING.md)
+4. [Contributing Guide](CONTRIBUTING.md)
 5. [Discord Server](https://discord.gg/kGPHBvXzGM) (Need Help?)
 6. [Donation, Additional Informations](#interested-with-this-framework) (Feeling Generous?)
 ---
@@ -207,7 +207,7 @@ Expect more from us in the future! We would give you something different and som
 ---
 
 ## Interested with this framework?
-Buckle up! Let's go to [Natuna Framework Wiki](https://github.com/natuna-framework/fivem/wiki) to setup this framework on your server.
+Buckle up! Let's go to [Installation Documentation](GETTING_STARTED.md) to setup this framework on your server.
 
 \
 **We're Fully Open Sourced!**
@@ -216,7 +216,7 @@ You can be a part of our big journey in the future, please create and develop th
 
 You can also contribute even if only by providing suggestions or reporting problems with this framework in the Issues section of this repository or in the support link listed in the help section.
 
-[See Our Contributing Guide](https://github.com/natuna-framework/fivem/blob/development/CONTRIBUTING.md)
+[See Our Contributing Guide](CONTRIBUTING.md)
 
 \
 **Need Help?**
