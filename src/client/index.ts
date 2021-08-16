@@ -170,7 +170,7 @@ export default class Client extends Events {
      * @param text Text to logs
      */
     _logger = (...text: any) => {
-        return console.log("[🏝 Natuna Framework]", "[CLIENT]", ...text);
+        return console.log("[🏝️ Natuna Framework]", "[CLIENT]", ...text);
     };
 
     /**
