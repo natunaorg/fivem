@@ -21,7 +21,7 @@ Natuna Framework are made using webpack which compiles all file together in 1 fi
 
 ## Requirements
 1. Basic knowledge of Command Prompt
-2. Basic knowledge of NodeJS command
+2. Basic knowledge of NodeJS commands
 
 ---
 
