@@ -1,6 +1,6 @@
 {
     "name": "@natuna-framework/fivem",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "description": "FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.",
     "main": "src/",
     "repository": "https://github.com/natuna-framework/natuna",

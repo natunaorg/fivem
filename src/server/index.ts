@@ -292,7 +292,7 @@ export default class Server extends Events {
             this._logger(`You are currently using version ${pkg.version}.`);
 
             // Can't use async await, idk why :(
-            fetch("http://cdn.jsdelivr.net/gh/natuna-framework/fivem@latest/package.json")
+            fetch("https://raw.githack.com/natuna-framework/fivem/master/package.json")
                 .then((res) => res.text())
                 .then((data) => {
                     rpkg = JSON.parse(data);
