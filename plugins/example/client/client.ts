@@ -19,6 +19,28 @@ class Module {
         console.log(this.config.someExampleThirdClientConfig); // { example: true }
 
         someFunction(); // Hello World!
+
+        // Show a notification showing your server id
+        this.client.registerCommand("myid", (src) => {
+            this.client.utils.createFeedNotification(String(src));
+        });
+
+        // Spawn a Player
+        this.client.registerCommand("spawn", (src, args) => {
+            (global as any).exports.spawnmanager.spawnPlayer(
+                {
+                    x: 686.245,
+                    y: 577.95,
+                    z: 130.461,
+                    model: "a_m_m_skater_01",
+                },
+                () => {
+                    emit("chat:addMessage", {
+                        args: ["Hi, there!"],
+                    });
+                }
+            );
+        });
     }
 }
 
