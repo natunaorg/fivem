@@ -277,7 +277,14 @@ export default class Wrapper {
          * ```
          */
         getPlayerIds: (playerServerId: number) => {
-            const identifiers: { [key: string]: any } = {};
+            const identifiers: {
+                steam?: string;
+                license?: string;
+                fivem?: string;
+                discord?: string;
+                ip?: string;
+                [key: string]: any;
+            } = {};
 
             for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
                 const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
@@ -285,7 +292,7 @@ export default class Wrapper {
             }
 
             // prettier-ignore
-            identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? false : BigInt(`0x${identifiers.steam}`).toString();
+            identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? "" : BigInt(`0x${identifiers.steam}`).toString();
 
             return identifiers;
         },
