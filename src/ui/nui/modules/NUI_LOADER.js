@@ -89,8 +89,6 @@ class NUILoader {
                 const regex = new RegExp(`id=("|'|\`)${string}("|'|\`)`, "gm");
                 const newId = `${this.pluginName}-${match}`;
 
-                console.log(regex, newId);
-
                 content = content.replace(regex, `id="${newId}"`);
             }
         }
