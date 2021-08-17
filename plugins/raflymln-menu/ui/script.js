@@ -56,18 +56,16 @@ new (class {
     };
 
     handleFunctionKeys = (e) => {
-        this.menu.hide();
+        if (e.key === "Enter" || e.key === "Escape") {
+            switch (e.key) {
+                case "Enter":
+                    window.sendData("raflymln-menu:client:getMenuIndex", { index: this.currentMenuIndex });
+                    break;
 
-        if (e.key !== "Enter" || e.key !== "Escape") return;
-
-        switch (e.key) {
-            case "Enter":
-                window.sendData("raflymln-menu:client:getMenuIndex", { index: this.currentMenuIndex });
-                break;
-
-            case "Escape":
-                this.closeMenu();
-                break;
+                case "Escape":
+                    this.closeMenu();
+                    break;
+            }
         }
     };
 
@@ -75,34 +73,37 @@ new (class {
         const menuList = this.currentMenuList;
         if (!menuList || menuList.length === 0) return;
 
-        if (e.key !== "ArrowDown" || e.key !== "ArrowUp") return;
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+            // Old ID
+            $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
 
-        // Old ID
-        $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
+            // Change ID
+            switch (e.key) {
+                case "ArrowDown":
+                    this.currentMenuIndex += 1;
 
-        // Change ID
-        switch (e.key) {
-            case "ArrowDown":
-                this.currentMenuIndex += 1;
+                    if (this.currentMenuIndex > menuList.length) {
+                        this.currentMenuIndex = 1;
+                    }
 
-                if (this.currentMenuIndex > menuList.length) {
-                    this.currentMenuIndex = 1;
-                }
+                    break;
 
-                break;
+                case "ArrowUp":
+                    this.currentMenuIndex -= 1;
 
-            case "ArrowUp":
-                this.currentMenuIndex -= 1;
+                    if (this.currentMenuIndex < 1) {
+                        this.currentMenuIndex = menuList.length;
+                    }
 
-                if (this.currentMenuIndex < 1) {
-                    this.currentMenuIndex = menuList.length;
-                }
+                    break;
+            }
 
-                break;
+            const x = document.querySelector(`#menu-${this.currentMenuIndex}`).innerHTML;
+            console.log(x);
+
+            // New ID
+            $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
+            document.querySelector(`#menu-${this.currentMenuIndex}`).scrollIntoView(false);
         }
-
-        // New ID
-        $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
-        // document.getElementById(`menu-${this.currentMenuIndex}`).scrollIntoView(false);
     };
 })();
