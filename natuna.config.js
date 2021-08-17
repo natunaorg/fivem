@@ -139,7 +139,7 @@ const config = {
              * 4. Open any text editor
              * 5. Paste the text
              */
-            debug: false,
+            debug: true,
         },
 
         /**

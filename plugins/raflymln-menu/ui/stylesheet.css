@@ -116,6 +116,7 @@ body {
     padding: 1.25rem 1.875rem;
     margin-top: 0;
 
+    box-sizing: border-box;
     width: 100%;
 
     background: linear-gradient(180deg, #1c1c1c 0%, #333333 100%);

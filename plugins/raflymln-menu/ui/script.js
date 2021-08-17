@@ -1,5 +1,6 @@
 new (class {
     constructor() {
+        this.menu = $("#menu");
         this.currentMenuIndex = 1;
 
         window.on("raflymln-menu:nui:setMenu", this.openMenu);
@@ -10,12 +11,12 @@ new (class {
     }
 
     openMenu = (data) => {
-        $("#menu").show();
+        this.menu.show();
         this.setMenu(data.menuList);
     };
 
     setMenu = (menuList) => {
-        const container = $("#menu .menu-box-outer .menu-box-inner .menu-list");
+        const container = $(`#menu .menu-box-outer .menu-box-inner .menu-list`);
 
         container.empty();
         this.currentMenuIndex = 1;
@@ -39,7 +40,7 @@ new (class {
     };
 
     handleFunctionKeys = (e) => {
-        $("#menu").hide();
+        this.menu.hide();
 
         switch (e.key) {
             case "Enter":
