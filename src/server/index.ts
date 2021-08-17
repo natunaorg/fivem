@@ -435,6 +435,7 @@ export default class Server extends Events {
                 nuiLists,
                 discordRPC: this.config.core.discordRPC,
                 game: this.config.core.game,
+                nui: this.config.core.nui,
                 config: {
                     locationUpdateInterval: this.config.core.players.locationUpdateInterval,
                 },
