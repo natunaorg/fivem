@@ -18,6 +18,30 @@ class Module {
                         icon: "⭐",
                         title: "Add Star",
                     },
+                    {
+                        icon: "🌳",
+                        title: "Plant Tree",
+                    },
+                    {
+                        icon: "⭐",
+                        title: "Add Star",
+                    },
+                    {
+                        icon: "🌳",
+                        title: "Plant Tree",
+                    },
+                    {
+                        icon: "⭐",
+                        title: "Add Star",
+                    },
+                    {
+                        icon: "🌳",
+                        title: "Plant Tree",
+                    },
+                    {
+                        icon: "⭐",
+                        title: "Add Star",
+                    },
                 ],
             });
         });

@@ -98,12 +98,9 @@ new (class {
                     break;
             }
 
-            const x = document.querySelector(`#menu-${this.currentMenuIndex}`).innerHTML;
-            console.log(x);
-
             // New ID
             $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
-            document.querySelector(`#menu-${this.currentMenuIndex}`).scrollIntoView(false);
+            document.getElementById(`menu-${this.currentMenuIndex}`).scrollIntoView(false);
         }
     };
 })();
