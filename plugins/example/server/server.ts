@@ -10,6 +10,18 @@ class Module {
         this.config = config; // Config was imported from "natuna.config.js" file
 
         console.log(this.config.someExampleServerConfig); // true
+
+        // Example of getting user ID on database
+        this.client.registerCommand("mydbid", async (src) => {
+            const identifiers = this.client.players.utils.getPlayerIds(src);
+            const id = await this.client.db("users").findFirst({
+                where: {
+                    steam_id: identifiers.steam_id,
+                },
+            });
+
+            console.log(`My user id is: ${id}`);
+        });
     }
 }
 
