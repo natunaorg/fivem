@@ -1,91 +1,133 @@
 class NUILoader {
     constructor(pluginName) {
-        $.get(`../../../plugins/${pluginName}/ui/index.html`, (html) => {
-            const CSSParser = this.CSSParser;
-            const nuiWrapperId = `nui\\:${pluginName}`;
+        this.pluginName = pluginName;
+        this.nuiWrapperId = `natuna-nui\\:${this.pluginName}`;
 
-            /**
-             * Append the Parsed HTML
-             */
-            $("body").prepend(`<section id="${nuiWrapperId}" class="nui-wrapper">${this.DOMParser(pluginName, html)}</section>`);
+        new Promise(async (resolve, reject) => {
+            const html = await this.utils.getContent(`../../../plugins/${this.pluginName}/ui/index.html`);
+            const parsedHTML = await this.HTMLParser(html);
 
-            /**
-             * Set the Z-Index of the NUI
-             */
-            const zIndex = $(`#${nuiWrapperId} meta[name="nuiIndex"]`).attr("content") || 1;
-            $(`#${nuiWrapperId}`).css("z-index", parseInt(zIndex));
+            // Append the Parsed HTML
+            $("body").prepend(`<section id="${this.nuiWrapperId.replace("\\", "")}" class="nui-wrapper">${parsedHTML}</section>`);
 
-            /**
-             * Parse the CSS file
-             * [IMPORTANT] CSSParser must be declared from outer the function
-             */
-            $(`#${nuiWrapperId} [href]`).each(function () {
-                const attr = $(this).attr("href");
-
-                if (attr.endsWith(".css")) {
-                    $.get(attr, (css) => CSSParser(pluginName, css, nuiWrapperId));
-                    $(this).remove();
-                }
-            });
+            // Set the Z-Index of the NUI
+            const zIndex = $(`#${this.nuiWrapperId} meta[name="nuiIndex"]`).attr("content") || 1;
+            $(`#${this.nuiWrapperId}`).css("z-index", parseInt(zIndex));
+            return resolve(true);
         });
     }
 
-    // https://stackoverflow.com/questions/7379168/load-an-external-css-for-a-specific-div/18252363#18252363
-    renderCSSForSelector = (css, selector) => {
-        return (css + "" || "")
-            .replace(/\n|\t/g, " ")
-            .replace(/\s+/g, " ")
-            .replace(/\s*\/\*.*?\*\/\s*/g, " ")
-            .replace(/(^|\})(.*?)(\{)/g, function ($0, $1, $2, $3) {
-                var collector = [],
-                    parts = $2.split(",");
-                for (var i in parts) {
-                    collector.push(selector + " " + parts[i].replace(/^\s*|\s*$/, ""));
-                }
-                return $1 + " " + collector.join(", ") + " " + $3;
-            })
-            .replace(/(body|html)/, "");
-    };
-
-    CSSParser = (pluginName, css, selector) => {
-        let regexMatched;
+    CSSParser = (content) => {
         const regex = /url\(("|'|`|)(.*?)("|'|`|)(\))/gm;
+        const regexMatched = this.utils.getMatchedRegex(regex, content);
 
-        while ((regexMatched = regex.exec(css)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (regexMatched.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-
-            for (const url of regexMatched) {
-                for (const prefix of [".", "@"]) {
-                    if (url.startsWith(`${prefix}/`)) {
-                        const newUrl = url.replace(prefix, `../../../plugins/${pluginName}/ui`);
-                        css = css.replace(url, newUrl);
-                    }
-                }
+        for (const match of regexMatched) {
+            if (match.startsWith(`./`)) {
+                const newAttribute = match.replace(".", `../../../plugins/${this.pluginName}/ui`);
+                content = content.replace(match, newAttribute);
             }
         }
 
-        $(`#${selector}`).append(`<style>${this.renderCSSForSelector(css, `#${selector}`)}</style>`);
+        content = this.utils.renderCSSWithSelector(content, `#${this.nuiWrapperId} >`);
+
+        return content;
     };
 
-    DOMParser = (pluginName, html) => {
-        for (const attr of ["href", "src"]) {
-            $(`${html} [${attr}]`).each(function () {
-                const currAttr = $(this).attr(attr);
-                if (!currAttr || typeof currAttr == "undefined" || currAttr == "") return;
+    JSParser = (content) => {
+        const regex = /(\$|querySelector)\(("|'|`)(.*?)("|'|`)\)/gm;
+        const regexMatched = this.utils.getMatchedRegex(regex, content);
 
-                for (const prefix of ["@", "."]) {
-                    if (currAttr.startsWith(`${prefix}/`)) {
-                        const newAttr = currAttr.replace(prefix, `../../../plugins/${pluginName}/ui`);
-                        html = html.replace(currAttr, newAttr);
-                    }
-                }
-            });
+        for (const match of regexMatched) {
+            if (match.startsWith(`#`)) {
+                const newAttribute = match.replace("#", `#${this.pluginName}-`);
+                content = content.replace(match, newAttribute);
+            }
         }
 
-        return html;
+        return content;
+    };
+
+    HTMLParser = async (content) => {
+        // Find 'src' and 'href' attributes
+        const regex1 = /(src|href)=("|'|`)(.*?)("|'|`)/gm;
+        const regexMatched1 = this.utils.getMatchedRegex(regex1, content);
+
+        for (const match of regexMatched1) {
+            if (match.startsWith(`./`)) {
+                let file;
+                const newUrl = match.replace(".", `../../../plugins/${this.pluginName}/ui`);
+
+                if (match.endsWith(".js") || match.endsWith(".css")) {
+                    file = await this.utils.getContent(newUrl);
+                    content = content.replace(match, "//:0");
+                }
+
+                if (match.endsWith(".js")) {
+                    content += "<script>" + this.JSParser(file) + "</script>";
+                } else if (match.endsWith(".css")) {
+                    content += "<style>" + this.CSSParser(file) + "</style>";
+                } else {
+                    content = content.replace(match, newUrl);
+                }
+            }
+        }
+
+        // Find 'id' attributes
+        const regex2 = /id=("|'|`)(.*?)("|'|`)/gm;
+        const regexMatched2 = this.utils.getMatchedRegex(regex2, content);
+
+        for (const match of regexMatched2) {
+            if (!match.startsWith(`id=`) && !match.match("(\"|'|`)")) {
+                const regex = new RegExp(`id=("|'|\`)${match}("|'|\`)`, "gm");
+                const newId = `${this.pluginName}-${match}`;
+
+                content = content.replace(regex, `id="${newId}"`);
+            }
+        }
+
+        return content;
+    };
+
+    utils = {
+        getContent: (url) => {
+            return new Promise((resolve, reject) => {
+                $.get(url, (content) => {
+                    resolve(content);
+                });
+            });
+        },
+        getMatchedRegex: (regex, content) => {
+            let regexMatched;
+            let returnMatch = [];
+
+            while ((regexMatched = regex.exec(content)) !== null) {
+                // This is necessary to avoid infinite loops with zero-width matches
+                if (regexMatched.index === regex.lastIndex) {
+                    regex.lastIndex++;
+                }
+
+                for (const match of regexMatched) {
+                    returnMatch.push(match);
+                }
+            }
+
+            return returnMatch;
+        },
+        renderCSSWithSelector: (css, selector) => {
+            return (css + "" || "")
+                .replace(/\n|\t/g, " ")
+                .replace(/\s+/g, " ")
+                .replace(/\s*\/\*.*?\*\/\s*/g, " ")
+                .replace(/(^|\})(.*?)(\{)/g, function ($0, $1, $2, $3) {
+                    var collector = [],
+                        parts = $2.split(",");
+                    for (var i in parts) {
+                        collector.push(selector + " " + parts[i].replace(/^\s*|\s*$/, ""));
+                    }
+                    return $1 + " " + collector.join(", ") + " " + $3;
+                })
+                .replace(/(body|html)/, "");
+        },
     };
 }
 
@@ -96,5 +138,24 @@ window.addEventListener("message", (event) => {
 });
 
 window.on("natuna:nui:retrievePluginList", (data) => {
-    return new NUILoader(data.name);
+    return new NUILoader(data.name, data.debug || false);
+});
+
+window.on("natuna:nui:debugHTML", () => {
+    const text = $("html").html();
+    const node = document.createElement("textarea");
+    const selection = document.getSelection();
+
+    node.textContent = text;
+    document.body.appendChild(node);
+
+    selection.removeAllRanges();
+    node.select();
+    document.execCommand("copy");
+
+    selection.removeAllRanges();
+    document.body.removeChild(node);
+
+    window.emit("natuna:client:nuiDebugSuccess");
+    return true;
 });
