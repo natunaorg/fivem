@@ -43,7 +43,9 @@ export default class Wrapper {
             const keys = Object.keys(obj.data)
                 .map((x) => this.parser.key(x))
                 .join(",");
-            const values = Object.values(obj.data).join(",");
+            const values = Object.values(obj.data)
+                .map((x) => typeof x === 'string' ? `'${x}'` : x)
+                .join(",");
 
             const query = `INSERT INTO \`${this.table}\`(${keys}) VALUES (${values})`;
 
