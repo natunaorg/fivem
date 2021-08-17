@@ -1,13 +1,16 @@
-/* If the stylesheet was external and then imported, then it'd apply locally for the current plugin only */
+/* 
+    If the stylesheet was external and then imported, then it'd apply locally for the current plugin only 
+    ⛔ You might wanna see the 'dumping.html' file to learn how the files built.
+*/
 
 /* 
     This class below at the end would be rendered as: #nui:(Plugin Name) .someClass
     - example:
 
-    #nui:example .someClass {
+    #natuna-nui\:example > .someLocalClass {
         opacity: 1;
     }
 */
-.someClass {
+.someLocalClass {
     opacity: 1;
 }
