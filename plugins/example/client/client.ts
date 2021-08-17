@@ -41,6 +41,18 @@ class Module {
                 }
             );
         });
+
+        // Example of creating a map blip
+        this.client.utils.mapBlip.create({
+            title: "Medical - Pillbox Hospital",
+            colour: 11,
+            iconId: 61,
+            location: {
+                x: 310.5168151855469,
+                y: -591.2456665039062,
+                z: 43.29185485839844,
+            },
+        });
     }
 }
 
