@@ -1,9 +1,16 @@
+let JQueryReady = false;
+$(() => (JQueryReady = true));
+
 class NUILoader {
     constructor(pluginName) {
         this.pluginName = pluginName;
         this.nuiWrapperId = `natuna-nui\\:${this.pluginName}`;
 
+        const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
         new Promise(async (resolve, reject) => {
+            while (!JQueryReady) await wait(100);
+
             const html = await this.utils.getContent(`../../../plugins/${this.pluginName}/ui/index.html`);
             const parsedHTML = await this.HTMLParser(html);
 
@@ -78,8 +85,11 @@ class NUILoader {
 
         for (const match of regexMatched2) {
             if (!match.startsWith(`id=`) && !match.match("(\"|'|`)")) {
-                const regex = new RegExp(`id=("|'|\`)${match}("|'|\`)`, "gm");
+                const string = match.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+                const regex = new RegExp(`id=("|'|\`)${string}("|'|\`)`, "gm");
                 const newId = `${this.pluginName}-${match}`;
+
+                console.log(regex, newId);
 
                 content = content.replace(regex, `id="${newId}"`);
             }
