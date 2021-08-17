@@ -157,9 +157,6 @@ const config = {
                 carWithManualTransmissions: ["lynx", "jb700", "dominator"],
             },
         },
-        "raflymln-entitymenu": {
-            client: {},
-        },
     },
 };
 

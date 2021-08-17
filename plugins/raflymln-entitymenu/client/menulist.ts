@@ -137,15 +137,19 @@ export default class MenuList {
                         text: "Grab",
                         callback: async () => {
                             let distance = 1.3;
-                            const animDict = "anim@heists@box_carry@";
+                            let dict = "impexp_int-0";
 
                             SetEntityAsMissionEntity(this.entity.id, true, true);
                             SetEntityAlpha(this.entity.id, 150, true);
 
-                            RequestAnimDict(animDict);
-                            while (!HasAnimDictLoaded(animDict)) await this.client.wait(100);
-                            TaskPlayAnim(PlayerPedId(), animDict, "idle", 2.0, 2.0, -1, 51, 0, false, false, false);
-                            RemoveAnimDict(animDict);
+                            RequestAnimDict(dict);
+
+                            while (!HasAnimDictLoaded(dict)) {
+                                await this.client.wait(100);
+                            }
+
+                            TaskPlayAnim(PlayerPedId(), dict, "mp_m_waremech_01_dual-0", 2.0, 2.0, -1, 51, 0, false, false, false);
+                            RemoveAnimDict(dict);
 
                             const tick = setTick(async () => {
                                 const { x, y, z } = this.client.utils.getCamTargetedCoords(distance);

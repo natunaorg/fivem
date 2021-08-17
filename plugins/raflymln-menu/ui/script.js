@@ -1,7 +1,6 @@
-new (class Menu {
+new (class {
     constructor() {
         this.currentMenuIndex = 1;
-        // $(".menu").hide();
 
         window.on("raflymln-menu:nui:setMenu", this.openMenu);
         $(document).keyup((e) => {
@@ -11,12 +10,12 @@ new (class Menu {
     }
 
     openMenu = (data) => {
-        $(".menu").show();
-        setMenu(data.menuList);
+        $("#menu").show();
+        this.setMenu(data.menuList);
     };
 
     setMenu = (menuList) => {
-        const container = $(".menu .menu-box-outer .menu-box-inner .menu-list");
+        const container = $("#menu .menu-box-outer .menu-box-inner .menu-list");
 
         container.empty();
         this.currentMenuIndex = 1;
@@ -40,7 +39,7 @@ new (class Menu {
     };
 
     handleFunctionKeys = (e) => {
-        $(".menu").hide();
+        $("#menu").hide();
 
         switch (e.key) {
             case "Enter":
