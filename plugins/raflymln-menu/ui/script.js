@@ -2,8 +2,13 @@ new (class {
     constructor() {
         this.menu = $("#menu");
         this.currentMenuIndex = 1;
+        this.currentMenuList = [];
+
+        this.menu.hide();
 
         window.on("raflymln-menu:nui:setMenu", this.openMenu);
+        window.on("raflymln-menu:nui:closeMenu", this.openMenu);
+
         $(document).keyup((e) => {
             this.handleArrowKeys(e);
             this.handleFunctionKeys(e);
@@ -11,11 +16,22 @@ new (class {
     }
 
     openMenu = (data) => {
+        this.currentMenuList = data.menuList;
+
         this.menu.show();
-        this.setMenu(data.menuList);
+        this.setMenu();
     };
 
-    setMenu = (menuList) => {
+    closeMenu = () => {
+        this.currentMenuList = [];
+        this.menu.hide();
+        window.sendData("raflymln-menu:client:closeMenu");
+    };
+
+    setMenu = () => {
+        const menuList = this.currentMenuList;
+        if (!menuList || menuList.length === 0) return;
+
         const container = $(`#menu .menu-box-outer .menu-box-inner .menu-list`);
 
         container.empty();
@@ -42,18 +58,25 @@ new (class {
     handleFunctionKeys = (e) => {
         this.menu.hide();
 
+        if (e.key !== "Enter" || e.key !== "Escape") return;
+
         switch (e.key) {
             case "Enter":
                 window.sendData("raflymln-menu:client:getMenuIndex", { index: this.currentMenuIndex });
                 break;
 
             case "Escape":
-                window.sendData("raflymln-menu:client:closeMenu");
+                this.closeMenu();
                 break;
         }
     };
 
     handleArrowKeys = (e) => {
+        const menuList = this.currentMenuList;
+        if (!menuList || menuList.length === 0) return;
+
+        if (e.key !== "ArrowDown" || e.key !== "ArrowUp") return;
+
         // Old ID
         $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
 
@@ -80,6 +103,6 @@ new (class {
 
         // New ID
         $(`#menu-${this.currentMenuIndex}`).toggleClass("active");
-        document.getElementById(`menu-${this.currentMenuIndex}`).scrollIntoView(false);
+        // document.getElementById(`menu-${this.currentMenuIndex}`).scrollIntoView(false);
     };
 })();
