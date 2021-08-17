@@ -35,19 +35,34 @@ class NUILoader {
             }
         }
 
-        content = this.utils.renderCSSWithSelector(content, `#${this.nuiWrapperId} >`);
+        content = this.utils.renderCSSWithSelector(content, `#${this.nuiWrapperId}`);
 
         return content;
     };
 
     JSParser = (content) => {
-        const regex = /(\$|querySelector)\(("|'|`)(.*?)("|'|`)\)/gm;
-        const regexMatched = this.utils.getMatchedRegex(regex, content);
+        // $("") && document.querySelector()
+        const regex1 = /(\$|querySelector)\(("|'|`)(.*?)("|'|`)\)/gm;
+        const regexMatched1 = this.utils.getMatchedRegex(regex1, content);
 
-        for (const match of regexMatched) {
+        for (const match of regexMatched1) {
             if (match.startsWith(`#`)) {
                 const newAttribute = match.replace("#", `#${this.pluginName}-`);
                 content = content.replace(match, newAttribute);
+            }
+        }
+
+        // document.getElementById()
+        const regex2 = /(getElementById)\(("|'|`)(.*?)("|'|`)\)/gm;
+        const regexMatched2 = this.utils.getMatchedRegex(regex2, content);
+
+        for (const match of regexMatched2) {
+            if (!match.startsWith(`getElementById`) && !match.match("(\"|'|`)")) {
+                const string = match.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+                const regex = new RegExp(`getElementById\\(("|'|\`)${string}("|'|\`)\\)`, "gm");
+                const newId = `${this.pluginName}-${match}`;
+
+                content = content.replace(regex, `getElementById(\`${newId}\`)`);
             }
         }
 
