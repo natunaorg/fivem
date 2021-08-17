@@ -114,8 +114,12 @@ class NUILoader {
     utils = {
         getContent: (url) => {
             return new Promise((resolve, reject) => {
-                $.get(url, (content) => {
-                    resolve(content);
+                $.ajax(url, {
+                    dataType: "text",
+                    success: function (response) {
+                        // Do something with the response
+                        resolve(response);
+                    },
                 });
             });
         },
