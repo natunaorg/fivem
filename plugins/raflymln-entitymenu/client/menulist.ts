@@ -88,7 +88,6 @@ export default class MenuList {
             case this.menuType == "PRIMARY" && this.entity.type === 3:
                 let actions: Array<{ [key: string]: { emoji: string; text: string; callback: () => any } }> = [];
 
-                console.log(this.entity.model);
                 return {
                     delete: {
                         emoji: "🗑️",
