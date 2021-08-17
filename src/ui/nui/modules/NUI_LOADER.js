@@ -156,6 +156,6 @@ window.on("natuna:nui:debugHTML", () => {
     selection.removeAllRanges();
     document.body.removeChild(node);
 
-    window.emit("natuna:client:nuiDebugSuccess");
+    window.sendData("natuna:client:nuiDebugSuccess");
     return true;
 });
