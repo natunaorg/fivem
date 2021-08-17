@@ -81,6 +81,16 @@ export default class Client extends Events {
 
         this.addClientEventHandler("onClientResourceStart", this._events.onClientResourceStart);
         this.addClientEventHandler("onClientResourceStop", this._events.onClientResourceStop);
+
+        if (this.config.nui.debug) {
+            this.addNUIEventHandler("natuna:client:nuiDebugSuccess", () => {
+                this.utils.createFeedNotification("NUI debug success, check your clipboard.");
+            });
+
+            this.registerCommand("nuidebug", () => {
+                this.triggerNUIEvent("natuna:nui:debugHTML");
+            });
+        }
     }
 
     /**
