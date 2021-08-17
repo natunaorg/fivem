@@ -121,6 +121,29 @@ const config = {
 
         /**
          * @description
+         * NUI Build Options
+         */
+        nui: {
+            /**
+             * If set to 'true', then it'd active a 'nuidebug' command which copy all the full parsed HTML for the NUI.
+             * If you're wondered how the NUI files looks like at the end, you should try turning this on
+             *
+             * BE CAREFUL, TURNING THIS ON WILL CAUSED THE FEATURE TO AVAILABLE TO EVERY CLIENT!
+             * ONLY TURNING THIS ON WHEN YOU'RE IN DEVELOPMENT!
+             *
+             * Steps:
+             * 1. Turn this setting on
+             * 2. Start the server
+             * 3. Join the server, and wait until the game finished loading / until you're in the game
+             * 4. Execute command '/nuidebug' (The HTML would be pasted to your clipboard)
+             * 4. Open any text editor
+             * 5. Paste the text
+             */
+            debug: false,
+        },
+
+        /**
+         * @description
          * Game options
          */
         game: {

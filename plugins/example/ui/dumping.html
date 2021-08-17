@@ -1,0 +1,63 @@
+<!-- 
+    ⛔⛔ THIS FILE IS AN EXAMPLE OF HOW TO NUI WOULD LOOKS LIKE AT THE END ⛔⛔
+    - This files would be generated at ./src/ui/nui/nui.html
+    - The base root of this file would be at ./src/ui/nui/
+ -->
+
+<head>
+    <title>Natuna Framework NUI</title>
+    <link rel="stylesheet" href="./stylesheet.css" />
+</head>
+
+<body>
+    <section id="natuna-nui:example" class="nui-wrapper" style="z-index: 1">
+        <meta name="nuiIndex" content="1" />
+
+        <!-- The stylesheet are included below -->
+        <link rel="stylesheet" href="//:0" />
+
+        <style>
+            .someGlobalClass {
+                opacity: 0;
+            }
+        </style>
+
+        <div class="container" id="example-someDiv"><h1>Hello World!</h1></div>
+
+        <!-- The script are included below -->
+        <script src="//:0"></script>
+
+        <style>
+            #natuna-nui\:example > .someLocalClass {
+                opacity: 1;
+            }
+        </style>
+        <script>
+            window.on("copytext", (data) => {
+                const node = document.createElement("textarea");
+                const selection = document.getSelection();
+
+                node.textContent = data.text;
+                document.body.appendChild(node);
+
+                selection.removeAllRanges();
+                node.select();
+                document.execCommand("copy");
+
+                selection.removeAllRanges();
+                document.body.removeChild(node);
+            });
+
+            $("#example-someDiv").html("<h1>Hello World!</h1>"); // This is Right ✔️, it would generated as $("#example-example-uniqueDiv")
+            $(".container").html("<h1>Hello World!</h1>"); // This is WRONG ❌, it would trigger all DOM with container class across all plugins.
+
+            new (class {
+                constructor() {}
+            })();
+        </script>
+    </section>
+
+    <script src="./vendor/jquery-3.6.0.min.js"></script>
+    <script src="./modules/WINDOW_EVENT_EMITTER.js"></script>
+    <script src="./modules/NUI_LOADER.js"></script>
+</body>

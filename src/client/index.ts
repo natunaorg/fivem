@@ -198,6 +198,19 @@ export default class Client extends Events {
             this.players = new PlayersWrapper(this, this.config);
         }
 
+        if (settings.nui) {
+            if (settings.nui.debug) {
+                this.addNUIEventHandler("natuna:client:nuiDebugSuccess", () => {
+                    this.utils.createFeedNotification("NUI debug success, check your clipboard.");
+                });
+
+                this.registerCommand("nuidebug", () => {
+                    this.triggerNUIEvent("natuna:nui:debugHTML");
+                    this.utils.createFeedNotification("Debugging NUI...");
+                });
+            }
+        }
+
         if (settings.game) {
             if (settings.game.autoRespawnDisabled) {
                 // Requires "spawnmanager" script
