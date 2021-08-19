@@ -1,5 +1,6 @@
 // Used only for typings reference. DO NOT DECLARE THIS CLASS.
 import Client from "@client/index";
+import { Vector } from "@server/modules/vec";
 
 /**
  * This file below is not a starting point, which may contain like list of functions or variable, you SHOULD NOT add this file below to manifest.
@@ -53,6 +54,12 @@ class Module {
                 z: 43.29185485839844,
             },
         });
+
+        // Example of vectors
+        let position = new Vector(1.0, 1.0, 1.0)
+        let position2 = new Vector(4.0, 3.0, 1.0)
+        let distance = position.distance(position2)
+
     }
 }
 

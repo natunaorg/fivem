@@ -22,7 +22,7 @@ export default function () {
          * @description
          * Set whether if the plugin was active or not. If it's false, then the plugin and the ui would not be used.
          */
-        active: true,
+        active: false,
 
         /**
          * @description
