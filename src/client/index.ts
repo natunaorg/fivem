@@ -113,7 +113,8 @@ export default class Client extends Events {
    * })();
    * ```
    */
-  wait = (ms: number) => new Promise((res) => setTimeout(res, ms));
+  wait = (ms: number): Promise<void> =>
+    new Promise((res) => setTimeout(res, ms));
 
   /**
    * @description
@@ -134,7 +135,7 @@ export default class Client extends Events {
     name: string | Array<string>,
     handler: Command.Handler,
     config: Command.Config = {}
-  ) => {
+  ): void => {
     const addCommand = (name: string) => {
       this.commands[name] = handler;
       this.triggerSharedEvent(
@@ -164,7 +165,7 @@ export default class Client extends Events {
     description: string,
     onClick: () => any,
     onReleased: () => any = () => false
-  ) => {
+  ): string => {
     const controlID = this.utils.getHashString(onClick.toString());
     const controlIDHash =
       "~INPUT_" + this.utils.getHashString(`+${controlID}`) + "~";
@@ -188,7 +189,7 @@ export default class Client extends Events {
       description: string;
       argsDescription?: Array<{ name: string; help: string }>;
     }
-  ) => {
+  ): boolean => {
     setImmediate(() =>
       this.triggerClientEvent(
         "chat:addSuggestion",
@@ -210,7 +211,7 @@ export default class Client extends Events {
    *
    * @param text Text to logs
    */
-  _logger = (...text: any) => {
+  _logger = (...text: any): void => {
     return console.log("[🏝️ Natuna Framework]", "[CLIENT]", ...text);
   };
 
@@ -223,7 +224,7 @@ export default class Client extends Events {
    *
    * @param settings Client settings
    */
-  _initClientSettings = async (settings: any) => {
+  _initClientSettings = async (settings: any): Promise<void> => {
     if (settings.pluginLists) {
       this._initClientPlugins(settings.pluginLists);
     }
@@ -333,7 +334,7 @@ export default class Client extends Events {
    */
   _initClientPlugins = async (
     plugins: Array<{ name: string; file: string; config: any }>
-  ) => {
+  ): Promise<void> => {
     this._logger(`Intializing Client Plugins`);
 
     let count = 1; // Start from 1
@@ -363,7 +364,7 @@ export default class Client extends Events {
      * @description
      * Listen when Natuna Framework is starting
      */
-    onClientResourceStart: async (resourceName: string) => {
+    onClientResourceStart: async (resourceName: string): Promise<void> => {
       if (GetCurrentResourceName() == resourceName) {
         // Starting Process
         figlet.parseFont("Standard", Doom);
@@ -401,7 +402,7 @@ export default class Client extends Events {
      * @description
      * Listen when Natuna Framework is stopping
      */
-    onClientResourceStop: (resourceName: string) => {
+    onClientResourceStop: (resourceName: string): void => {
       if (GetCurrentResourceName() == resourceName) {
         // Stopping
         this.triggerClientEvent("natuna:client:stopped");

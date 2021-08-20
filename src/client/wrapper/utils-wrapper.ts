@@ -63,7 +63,7 @@ export default class Wrapper {
       size?: number;
       colour: [number, number, number, number];
     }
-  ) => {
+  ): void => {
     SetDrawOrigin(config.x, config.y, config.z, 0);
     SetTextFont(config.font || 4);
     SetTextProportional(false);
@@ -103,7 +103,7 @@ export default class Wrapper {
   drawText = (
     text: string,
     config: { x: number; y: number; font?: number; size?: number }
-  ) => {
+  ): void => {
     SetTextFont(config.font || 4);
     SetTextProportional(true);
     SetTextScale(0.0, config.size || 0.6);
@@ -140,7 +140,7 @@ export default class Wrapper {
       controlId: number;
       message: string;
     }>
-  ) => {
+  ): Promise<number> => {
     const SetButton = (padIndex: number, control: number) => {
       ScaleformMovieMethodAddParamPlayerNameString(
         GetControlInstructionalButton(padIndex, control, true)
@@ -206,7 +206,7 @@ export default class Wrapper {
   createFeedNotification = (
     text: string,
     config: { backgroundColor?: number } = {}
-  ) => {
+  ): void => {
     BeginTextCommandThefeedPost("STRING");
     ThefeedSetNextPostBackgroundColor(config.backgroundColor || 140);
     AddTextComponentSubstringPlayerName(text);
@@ -224,7 +224,10 @@ export default class Wrapper {
    * createHelpNotification("Press ~INPUT_MOVE_UP_ONLY~ to Walk");
    * ```
    */
-  createHelpNotification = (text: string, config: { beep?: boolean } = {}) => {
+  createHelpNotification = (
+    text: string,
+    config: { beep?: boolean } = {}
+  ): void => {
     BeginTextCommandDisplayHelp("STRING");
     AddTextComponentSubstringPlayerName(text);
     EndTextCommandDisplayHelp(0, false, config.beep || false, -1);
@@ -239,7 +242,7 @@ export default class Wrapper {
    * getHashString('Some Value');
    * ```
    */
-  getHashString = (val: string) => {
+  getHashString = (val: string): string => {
     let hash = 0;
     const string = val.toLowerCase();
 
@@ -272,7 +275,9 @@ export default class Wrapper {
    * getCamTargetedCoords(6.0);
    * ```
    */
-  getCamTargetedCoords = (distance: number) => {
+  getCamTargetedCoords = (
+    distance: number
+  ): { x: number; y: number; z: number } => {
     const [camRotX, , camRotZ] = GetGameplayCamRot(2);
     const [camX, camY, camZ] = GetGameplayCamCoord();
 
@@ -296,7 +301,7 @@ export default class Wrapper {
    * getCamDirection();
    * ```
    */
-  getCamDirection = () => {
+  getCamDirection = (): { x: number; y: number; z: number } => {
     const heading =
       GetGameplayCamRelativeHeading() + GetEntityHeading(GetPlayerPed(-1));
     const pitch = GetGameplayCamRelativePitch();
@@ -352,7 +357,7 @@ export default class Wrapper {
    * ucwords('hello world'); // Hello World
    * ```
    */
-  ucwords = (str: string) => {
+  ucwords = (str: string): string => {
     return str
       .toLowerCase()
       .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
@@ -423,7 +428,7 @@ export default class Wrapper {
      * });
      * ```
      */
-    edit: (blipId: number, newConfig: MapBlip) => {
+    edit: (blipId: number, newConfig: MapBlip): MapBlip => {
       const oldConfig: MapBlip = (this.mapBlip as any).lists[blipId];
       newConfig = {
         ...oldConfig,
@@ -449,7 +454,7 @@ export default class Wrapper {
      * remove(1);
      * ```
      */
-    remove: (blipId: number) => {
+    remove: (blipId: number): void => {
       RemoveBlip(blipId);
     },
   };

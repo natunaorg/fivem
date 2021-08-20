@@ -30,7 +30,7 @@ export default class Wrapper {
    * optimizeFPS(PlayerPedId());
    * ```
    */
-  optimizeFPS = (ped: number = PlayerPedId()) => {
+  optimizeFPS = (ped: number = PlayerPedId()): void => {
     ClearAllBrokenGlass();
     ClearAllHelpMessages();
     LeaderboardsReadClearAll();
@@ -57,7 +57,7 @@ export default class Wrapper {
    * disableDispatchService();
    * ```
    */
-  disableDispatchService = () => {
+  disableDispatchService = (): void => {
     for (let i = 0; i >= 20; i++) {
       EnableDispatchService(i, false);
       Citizen.invokeNative("0xDC0F817884CDD856", i, false); // EnableDispatchService in Native
@@ -75,7 +75,7 @@ export default class Wrapper {
    * resetWantedLevel(PlayerId());
    * ```
    */
-  resetWantedLevel = (playerId: number = PlayerId()) => {
+  resetWantedLevel = (playerId: number = PlayerId()): boolean => {
     if (GetPlayerWantedLevel(playerId) !== 0) {
       SetPlayerWantedLevel(playerId, 0, false);
       SetPlayerWantedLevelNow(playerId, false);
@@ -100,7 +100,9 @@ export default class Wrapper {
      * getCoords(PlayerPedId());
      * ```
      */
-    getCoords: (entity: number = PlayerPedId()) => {
+    getCoords: (
+      entity: number = PlayerPedId()
+    ): { x: number; y: number; z: number; heading: number } => {
       const [x, y, z] = GetEntityCoords(entity, true);
       const heading = GetEntityHeading(entity);
 
@@ -124,7 +126,7 @@ export default class Wrapper {
      * teleportToMarker(PlayerPedId());
      * ```
      */
-    teleportToMarker: async (ped: number = PlayerPedId()) => {
+    teleportToMarker: async (ped: number = PlayerPedId()): Promise<boolean> => {
       if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
         throw new Error("Entity given was not a ped!");
       }
@@ -173,7 +175,7 @@ export default class Wrapper {
     teleportToCoordinates: (
       ped: number = PlayerPedId(),
       coords: { x: string | number; y: string | number; z: string | number }
-    ) => {
+    ): number | boolean => {
       if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
         throw new Error("Entity given was not a ped!");
       }
@@ -209,7 +211,10 @@ export default class Wrapper {
      * getCurrentVehicle(PlayerPedId(), false);
      * ```
      */
-    getCurrentVehicle: (ped: number = PlayerPedId(), isDriver = false) => {
+    getCurrentVehicle: (
+      ped: number = PlayerPedId(),
+      isDriver = false
+    ): number | boolean => {
       if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
         throw new Error("Entity given was not a ped!");
       }
@@ -245,7 +250,7 @@ export default class Wrapper {
      * setNoClip(PlayerPedId());
      * ```
      */
-    setNoClip: async (speed = 2) => {
+    setNoClip: async (speed = 2): Promise<boolean> => {
       const ped = PlayerPedId();
       const entity = IsPedInAnyVehicle(ped, false)
         ? GetVehiclePedIsUsing(ped)
@@ -365,7 +370,7 @@ export default class Wrapper {
      * getNearestOneFrom(PlayerPedId());
      * ```
      */
-    getNearestOneFrom: (entity: number, radius: number) => {
+    getNearestOneFrom: (entity: number, radius: number): Promise<number[]> => {
       if (!DoesEntityExist(entity)) {
         throw new Error("Entity does not exist");
       }
@@ -400,7 +405,7 @@ export default class Wrapper {
         z: number;
         heading?: number;
       } = this.entity.getCoords()
-    ) => {
+    ): Promise<boolean> => {
       const hash = GetHashKey(model);
 
       if (!IsModelInCdimage(hash) || !IsModelAVehicle(hash)) {
@@ -439,7 +444,7 @@ export default class Wrapper {
      * delete(1024);
      * ```
      */
-    delete: (vehicle: number) => {
+    delete: (vehicle: number): boolean => {
       if (!DoesEntityExist(vehicle) || !IsEntityAVehicle(vehicle)) {
         throw new Error("Vehicle does not exist!");
       }
@@ -466,7 +471,7 @@ export default class Wrapper {
       y: number;
       z: number;
       radius?: number;
-    }) => {
+    }): number | boolean => {
       const vehicleList = [];
       const vehicleFlags = [
         0, 2, 4, 6, 7, 23, 127, 260, 2146, 2175, 12294, 16384, 16386, 20503,
@@ -500,7 +505,7 @@ export default class Wrapper {
      * getNearestOneFrom(PlayerPedId());
      * ```
      */
-    getNearestOneFrom: (entity: number, radius?: number) => {
+    getNearestOneFrom: (entity: number, radius?: number): number | boolean => {
       if (!DoesEntityExist(entity)) {
         throw new Error("Entity does not exist");
       }

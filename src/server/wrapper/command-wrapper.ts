@@ -130,7 +130,7 @@ export default class Wrapper {
    *
    * @param config Command Configuration
    */
-  parseConfig = (config: Config) => {
+  parseConfig = (config: Config): Config => {
     config = this.validator.isObject(config) ? config : {};
     config.requirements = this.validator.isObject(config.requirements)
       ? config.requirements
@@ -172,7 +172,11 @@ export default class Wrapper {
    * @param args Arguments given in the command
    * @param raw Raw command output
    */
-  validateExecution = (src: number, args: Array<any>, raw: string) => {
+  validateExecution = (
+    src: number,
+    args: Array<any>,
+    raw: string
+  ): string | boolean => {
     if (this.config.argsRequired && args.length < this.config.argsRequired) {
       return "Not enough arguments passed.";
     }
@@ -221,7 +225,7 @@ export default class Wrapper {
   };
 
   validator = {
-    isObject: (obj: object) => {
+    isObject: (obj: object): boolean => {
       if (
         !obj ||
         typeof obj == "undefined" ||
@@ -232,7 +236,7 @@ export default class Wrapper {
       }
       return true;
     },
-    isArray: (arr: Array<any>) => {
+    isArray: (arr: Array<any>): boolean => {
       if (!arr || typeof arr == "undefined" || !Array.isArray(arr)) {
         return false;
       }

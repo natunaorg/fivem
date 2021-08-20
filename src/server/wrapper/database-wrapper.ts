@@ -38,7 +38,7 @@ export default class Wrapper {
    * })
    * ```
    */
-  write = (obj: { data: { [key: string]: any } }) => {
+  write = (obj: { data: { [key: string]: any } }): Promise<any> => {
     if (this.utils.validateQueryObject(obj, ["data"])) {
       const keys = Object.keys(obj.data)
         .map((x) => this.parser.key(x))
@@ -66,7 +66,7 @@ export default class Wrapper {
    * })
    * ```
    */
-  find = (obj: { where: { [key: string]: any } }) => {
+  find = (obj: { where: { [key: string]: any } }): Promise<any> => {
     if (this.utils.validateQueryObject(obj, ["where"])) {
       let query;
 
@@ -94,7 +94,7 @@ export default class Wrapper {
    * })
    * ```
    */
-  findFirst = async (obj: { where: { [key: string]: any } }) => {
+  findFirst = async (obj: { where: { [key: string]: any } }): Promise<any> => {
     if (this.utils.validateQueryObject(obj, ["where"])) {
       const result: any = await this.find(obj);
       return result && result.length > 0 ? result[0] : false;
@@ -134,7 +134,7 @@ export default class Wrapper {
   update = (obj: {
     data: { [key: string]: any };
     where: { [key: string]: any };
-  }) => {
+  }): Promise<any> => {
     if (this.utils.validateQueryObject(obj, ["data", "where"])) {
       const whereOptions = this.parser.keyVal(obj.where);
       let updateOptions;
@@ -171,7 +171,7 @@ export default class Wrapper {
    * })
    * ```
    */
-  delete = (obj: { where: { [key: string]: any } }) => {
+  delete = (obj: { where: { [key: string]: any } }): Promise<any> => {
     if (this.utils.validateQueryObject(obj, ["where"])) {
       const whereOptions = this.parser.keyVal(obj.where);
 
@@ -186,13 +186,13 @@ export default class Wrapper {
      * @description
      * Put a templated string around the key for SQL to identified it as a structure name, not a value
      */
-    key: (key: string) => `\`${key}\``,
+    key: (key: string): string => `\`${key}\``,
 
     /**
      * @description
      * Parsing object keys and it values to SQL key and value format and mapping it into a string format
      */
-    keyVal: (dataObj: { [key: string]: any }) =>
+    keyVal: (dataObj: { [key: string]: any }): any =>
       Object.keys(dataObj).map((x) => {
         const value =
           typeof dataObj[x] == "string"
@@ -207,7 +207,10 @@ export default class Wrapper {
      * @description
      * Validating query object before starting to execute it
      */
-    validateQueryObject: (obj: any, requiredKey: Array<string> = []) => {
+    validateQueryObject: (
+      obj: any,
+      requiredKey: Array<string> = []
+    ): boolean => {
       if (typeof obj !== "object" || Array.isArray(obj)) {
         throw new Error("Database Query Object MUST be in object (JSON) type!");
       }
@@ -223,7 +226,7 @@ export default class Wrapper {
      * @description
      * Validating object data whether if it's object or not
      */
-    validateQueryObjectData: (key: string, data: any) => {
+    validateQueryObjectData: (key: string, data: any): boolean => {
       if (
         typeof data !== "undefined" &&
         (typeof data !== "object" || Array.isArray(data))
@@ -245,7 +248,7 @@ export default class Wrapper {
      * executeQuery("SELECT * FROM `users`")
      * ```
      */
-    executeQuery: async (query: string) => {
+    executeQuery: async (query: string): Promise<any> => {
       return new Promise((resolve, reject) => {
         this.connection.execute(query, (err: string, result: any) => {
           if (err) reject(err);

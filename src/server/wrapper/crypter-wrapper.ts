@@ -64,7 +64,7 @@ export default class Wrapper {
    * encrypt('bacon'); // Result: "e7b75a472b65bc4a42e7b3f788..."
    * ```
    */
-  encrypt = (text: string) => {
+  encrypt = (text: string): string => {
     const cipher = createCipheriv(this.algorithm, this.secretKey, this.iv);
     const encrypted = Buffer.concat([cipher.update(text), cipher.final()]);
 
@@ -80,7 +80,7 @@ export default class Wrapper {
    * decrypt('e7b75a472b65bc4a42e7b3f788...') // Result: "bacon"
    * ```
    */
-  decrypt = (hash: any) => {
+  decrypt = (hash: any): string => {
     const decipher = createDecipheriv(
       this.algorithm,
       this.secretKey,

@@ -23,7 +23,10 @@ export default class Events {
    * addServerEventHandler("someEvent", (playerID) => console.log(playerID))
    * ```
    */
-  addServerEventHandler = (name: string | Array<string>, handler: Function) => {
+  addServerEventHandler = (
+    name: string | Array<string>,
+    handler: Function
+  ): void => {
     if (typeof name == "object" && Array.isArray(name)) {
       for (const alias of name) {
         on(alias, handler);
@@ -47,7 +50,7 @@ export default class Events {
    * triggerServerEvent("someEvent", true)
    * ```
    */
-  triggerServerEvent = (name: string | Array<string>, ...args: any) => {
+  triggerServerEvent = (name: string | Array<string>, ...args: any): void => {
     if (typeof name == "object" && Array.isArray(name)) {
       for (const alias of name) {
         emit(alias, ...args);
@@ -78,7 +81,7 @@ export default class Events {
    * addServerCallbackEventHandler('getPlayerName', (id) => getName(id));
    * ```
    */
-  addServerCallbackEventHandler = (name: string, handler: Function) => {
+  addServerCallbackEventHandler = (name: string, handler: Function): void => {
     this.addServerEventHandler(
       `cb-${name}`,
       async (temporalEventName: string, ...args: any) => {
@@ -106,7 +109,7 @@ export default class Events {
     name: string,
     callbackHandler: Function,
     ...args: any
-  ) => {
+  ): void => {
     const temporalEventName = uniqid("cbtemp-");
 
     this.addServerEventHandler(temporalEventName, (...args: any) => {
@@ -137,7 +140,10 @@ export default class Events {
    * addSharedEventHandler("someEvent", (playerID) => console.log(playerID))
    * ```
    */
-  addSharedEventHandler = (name: string | Array<string>, handler: Function) => {
+  addSharedEventHandler = (
+    name: string | Array<string>,
+    handler: Function
+  ): void => {
     if (typeof name == "object" && Array.isArray(name)) {
       for (const alias of name) {
         onNet(alias, handler);
@@ -166,7 +172,7 @@ export default class Events {
     name: string | Array<string>,
     target: number,
     ...args: any
-  ) => {
+  ): void => {
     if (typeof name == "object" && Array.isArray(name)) {
       for (const alias of name) {
         emitNet(alias, target, ...args);
@@ -197,7 +203,7 @@ export default class Events {
    * addSharedCallbackEventHandler('getPlayerName', (id) => getName(id));
    * ```
    */
-  addSharedCallbackEventHandler = (name: string, handler: Function) => {
+  addSharedCallbackEventHandler = (name: string, handler: Function): void => {
     this.addSharedEventHandler(
       `cb-${name}`,
       async (temporalEventName: string, ...args: any) => {
@@ -230,7 +236,7 @@ export default class Events {
     target: number,
     callbackHandler: Function,
     ...args: any
-  ) => {
+  ): void => {
     const temporalEventName = uniqid("cbtemp-");
 
     this.addSharedEventHandler(temporalEventName, (...args: any) => {
