@@ -1,6 +1,6 @@
 // Used only for typings reference. DO NOT DECLARE THIS CLASS.
 import Client from "@client/index";
-import { Vector } from "@server/modules/vec";
+import { Vector } from "@client/modules/vec";
 
 /**
  * This file below is not a starting point, which may contain like list of functions or variable, you SHOULD NOT add this file below to manifest.
