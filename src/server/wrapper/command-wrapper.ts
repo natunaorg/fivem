@@ -14,7 +14,7 @@ import Server from "@server/index";
  * @param args (Arguments) return text after command in Array, example, if you're triggering the command like this "/hello all people", the arguments returns was ["all", "people"].
  * @param raw (Raw) return raw version of the command triggered.
  */
-export type Handler = (src: number, args: any[], raw: String) => any;
+export type Handler = (src: number, args: any[], raw: string) => any;
 
 /**
  * @description
@@ -41,20 +41,20 @@ export type Handler = (src: number, args: any[], raw: String) => any;
  * ```
  */
 export type Config = {
-    argsRequired?: boolean | number;
-    description?: string;
-    argsDescription?: Array<{ name: string; help: string }>;
-    cooldown?: number;
-    consoleOnly?: boolean;
-    requirements?: {
-        steamIDs?: Array<string>;
-        custom?: Function;
-    };
-    caseInsensitive?: boolean;
-    cooldownExclusions?: {
-        steamIDs?: Array<string>;
-    };
-    restricted?: boolean;
+  argsRequired?: boolean | number;
+  description?: string;
+  argsDescription?: Array<{ name: string; help: string }>;
+  cooldown?: number;
+  consoleOnly?: boolean;
+  requirements?: {
+    steamIDs?: Array<string>;
+    custom?: Function;
+  };
+  caseInsensitive?: boolean;
+  cooldownExclusions?: {
+    steamIDs?: Array<string>;
+  };
+  restricted?: boolean;
 };
 
 /**
@@ -63,147 +63,180 @@ export type Config = {
  * Use it if you know what you're doing.
  */
 export default class Wrapper {
-    /**
-     * @hidden
-     */
-    client: Server;
+  /**
+   * @hidden
+   */
+  client: Server;
 
-    /**
-     * @hidden
-     */
-    cooldownList: any;
+  /**
+   * @hidden
+   */
+  cooldownList: any;
 
-    /**
-     * @hidden
-     */
-    isClientCommand: boolean;
+  /**
+   * @hidden
+   */
+  isClientCommand: boolean;
 
-    name: string;
-    handler: Handler;
-    config: Config;
+  name: string;
+  handler: Handler;
+  config: Config;
 
-    /**
-     * @hidden
-     */
-    constructor(client: Server, name: string, handler: Handler, config: Config, isClientCommand: boolean) {
-        this.client = client;
-        this.cooldownList = {};
+  /**
+   * @hidden
+   */
+  constructor(
+    client: Server,
+    name: string,
+    handler: Handler,
+    config: Config,
+    isClientCommand: boolean
+  ) {
+    this.client = client;
+    this.cooldownList = {};
 
-        this.name = name;
-        this.isClientCommand = isClientCommand;
-        this.config = this.parseConfig(config);
-        this.handler = (src, args, raw) => (this.isClientCommand ? this.client.triggerSharedEvent(`natuna:client:executeCommand`, src, this.name, args, raw) : handler);
+    this.name = name;
+    this.isClientCommand = isClientCommand;
+    this.config = this.parseConfig(config);
+    this.handler = (src, args, raw) =>
+      this.isClientCommand
+        ? this.client.triggerSharedEvent(
+            `natuna:client:executeCommand`,
+            src,
+            this.name,
+            args,
+            raw
+          )
+        : handler;
 
-        RegisterCommand(
-            name,
-            (src: number, args: Array<any>, raw: string) => {
-                const validation = this.validateExecution(src, args, raw);
-                if (validation == true) {
-                    this.handler(src, args, raw);
-                } else if (validation !== false) {
-                    // If validation returns was a string
-                    return console.log(validation);
-                }
-            },
-            this.config.restricted
-        );
+    RegisterCommand(
+      name,
+      (src: number, args: Array<any>, raw: string) => {
+        const validation = this.validateExecution(src, args, raw);
+        if (validation == true) {
+          this.handler(src, args, raw);
+        } else if (validation !== false) {
+          // If validation returns was a string
+          return console.log(validation);
+        }
+      },
+      this.config.restricted
+    );
+  }
+
+  /**
+   * @description
+   * Parse the command configuration and validate it.
+   *
+   * @param config Command Configuration
+   */
+  parseConfig = (config: Config) => {
+    config = this.validator.isObject(config) ? config : {};
+    config.requirements = this.validator.isObject(config.requirements)
+      ? config.requirements
+      : {};
+    config.cooldownExclusions = this.validator.isObject(
+      config.cooldownExclusions
+    )
+      ? config.cooldownExclusions
+      : {};
+    config.argsDescription = this.validator.isArray(config.argsDescription)
+      ? config.argsDescription
+      : [];
+
+    config = {
+      argsRequired: false,
+      description: "No Description Available",
+      cooldown: 0,
+      consoleOnly: false,
+      caseInsensitive: false,
+      restricted: false,
+      ...config,
+      argsDescription: [...config.argsDescription],
+      requirements: {
+        ...config.requirements,
+      },
+      cooldownExclusions: {
+        ...config.cooldownExclusions,
+      },
+    };
+
+    return config;
+  };
+
+  /**
+   * @description
+   * Validate an execution of the command.
+   *
+   * @param src Server ID of the player that executed the command
+   * @param args Arguments given in the command
+   * @param raw Raw command output
+   */
+  validateExecution = (src: number, args: Array<any>, raw: string) => {
+    if (this.config.argsRequired && args.length < this.config.argsRequired) {
+      return "Not enough arguments passed.";
     }
 
-    /**
-     * @description
-     * Parse the command configuration and validate it.
-     *
-     * @param config Command Configuration
-     */
-    parseConfig = (config: Config) => {
-        config = this.validator.isObject(config) ? config : {};
-        config.requirements = this.validator.isObject(config.requirements) ? config.requirements : {};
-        config.cooldownExclusions = this.validator.isObject(config.cooldownExclusions) ? config.cooldownExclusions : {};
-        config.argsDescription = this.validator.isArray(config.argsDescription) ? config.argsDescription : [];
+    if (this.config.consoleOnly && src !== 0) {
+      return "This command can only be executed from console!";
+    }
 
-        config = {
-            argsRequired: false,
-            description: "No Description Available",
-            cooldown: 0,
-            consoleOnly: false,
-            caseInsensitive: false,
-            restricted: false,
-            ...config,
-            argsDescription: [...config.argsDescription],
-            requirements: {
-                ...config.requirements,
-            },
-            cooldownExclusions: {
-                ...config.cooldownExclusions,
-            },
-        };
+    const userID = this.client.players.utils.getPlayerIds(src).steam.toString();
 
-        return config;
-    };
+    const cooldown = this.config.cooldown;
+    const cooldownList = this.cooldownList;
+    const cooldownExclusions = this.config.cooldownExclusions;
 
-    /**
-     * @description
-     * Validate an execution of the command.
-     *
-     * @param src Server ID of the player that executed the command
-     * @param args Arguments given in the command
-     * @param raw Raw command output
-     */
-    validateExecution = (src: number, args: Array<any>, raw: string) => {
-        if (this.config.argsRequired && args.length < this.config.argsRequired) {
-            return "Not enough arguments passed.";
-        }
+    if (
+      cooldown &&
+      cooldownList[src] &&
+      Date.now() - cooldownList[src] <= cooldown
+    ) {
+      if (
+        !cooldownExclusions || // Option A: If there are no cooldown exclusion
+        (cooldownExclusions.steamIDs &&
+          !cooldownExclusions.steamIDs.includes(userID)) // Option B: If there are steamIDs configured, but player wasn't on the list
+      ) {
+        return "Still under cooldown.";
+      }
+    }
 
-        if (this.config.consoleOnly && src !== 0) {
-            return "This command can only be executed from console!";
-        }
+    const requirements = this.config.requirements;
 
-        const userID = this.client.players.utils.getPlayerIds(src).steam.toString();
+    if (requirements) {
+      if (
+        (requirements.steamIDs && !requirements.steamIDs.includes(userID)) || // Option A: Not included in User IDs
+        (requirements.custom && !requirements.custom()) // Option B: Custom requirement function return false
+      ) {
+        return "You dont have enough permission!";
+      }
+    }
 
-        const cooldown = this.config.cooldown;
-        const cooldownList = this.cooldownList;
-        const cooldownExclusions = this.config.cooldownExclusions;
+    if (this.config.caseInsensitive && this.name !== raw) {
+      return false;
+    }
 
-        if (cooldown && cooldownList[src] && Date.now() - cooldownList[src] <= cooldown) {
-            if (
-                !cooldownExclusions || // Option A: If there are no cooldown exclusion
-                (cooldownExclusions.steamIDs && !cooldownExclusions.steamIDs.includes(userID)) // Option B: If there are steamIDs configured, but player wasn't on the list
-            ) {
-                return "Still under cooldown.";
-            }
-        }
+    this.cooldownList[src] = Date.now();
+    return true;
+  };
 
-        const requirements = this.config.requirements;
-
-        if (requirements) {
-            if (
-                (requirements.steamIDs && !requirements.steamIDs.includes(userID)) || // Option A: Not included in User IDs
-                (requirements.custom && !requirements.custom()) // Option B: Custom requirement function return false
-            ) {
-                return "You dont have enough permission!";
-            }
-        }
-
-        if (this.config.caseInsensitive && this.name !== raw) {
-            return false;
-        }
-
-        this.cooldownList[src] = Date.now();
-        return true;
-    };
-
-    validator = {
-        isObject: (obj: object) => {
-            if (!obj || typeof obj == "undefined" || typeof obj !== "object" || Array.isArray(obj)) {
-                return false;
-            }
-            return true;
-        },
-        isArray: (arr: Array<any>) => {
-            if (!arr || typeof arr == "undefined" || !Array.isArray(arr)) {
-                return false;
-            }
-            return true;
-        },
-    };
+  validator = {
+    isObject: (obj: object) => {
+      if (
+        !obj ||
+        typeof obj == "undefined" ||
+        typeof obj !== "object" ||
+        Array.isArray(obj)
+      ) {
+        return false;
+      }
+      return true;
+    },
+    isArray: (arr: Array<any>) => {
+      if (!arr || typeof arr == "undefined" || !Array.isArray(arr)) {
+        return false;
+      }
+      return true;
+    },
+  };
 }
