@@ -7,7 +7,9 @@
     "author": "Rafly Maulana",
     "scripts": {
         "build": "webpack --mode=production --progress",
-        "watch": "webpack --mode=development --watch --progress"
+        "watch": "webpack --mode=development --watch --progress",
+        "lint": "eslint . --ext .ts",
+        "lint:fix": "eslint --fix . --ext .ts"
     },
     "license": "MIT",
     "private": false,
@@ -25,6 +27,12 @@
     },
     "devDependencies": {
         "@types/node-fetch": "^2.5.12",
+        "@typescript-eslint/eslint-plugin": "^4.29.2",
+        "@typescript-eslint/parser": "^4.29.2",
+        "eslint": "^7.32.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^3.4.0",
+        "prettier": "^2.3.2",
         "remove-files-webpack-plugin": "^1.4.3",
         "ts-loader": "9.2.3",
         "typescript": "^4.3.5",

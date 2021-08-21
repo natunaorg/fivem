@@ -15,8 +15,8 @@
         "allowJs": true,
         "lib": ["es2017"],
         "types": [
-            "@citizenfx/client", 
-            "@citizenfx/server", 
+            "@citizenfx/client",
+            "@citizenfx/server",
             "@types/node",
         ],
         "moduleResolution": "node",
@@ -27,11 +27,11 @@
         "alwaysStrict": true
     },
     "include": [
-        "./src/**/*", 
+        "./src/**/*",
         "./plugins/**/*",
     ],
     "exclude": [
-        "**/node_modules", 
-        "**/__tests__/*", 
+        "**/node_modules",
+        "**/__tests__/*",
     ],
 }
