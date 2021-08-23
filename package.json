@@ -9,13 +9,15 @@
         "build": "webpack --mode=production --progress",
         "watch": "webpack --mode=development --watch --progress",
         "lint": "eslint . --ext .ts",
-        "lint:fix": "eslint --fix . --ext .ts"
+        "lint:fix": "eslint --fix . --ext .ts",
+        "generate-docs": "typedoc"
     },
     "license": "MIT",
     "private": false,
     "dependencies": {
         "@citizenfx/client": "^2.0.4358-1",
         "@citizenfx/server": "^2.0.4249-1",
+        "@natuna-framework/typedoc-theme": "https://github.com/natuna-framework/typedoc-theme",
         "@types/figlet": "^1.5.4",
         "@types/node": "^16.4.1",
         "@types/uniqid": "^5.3.1",
