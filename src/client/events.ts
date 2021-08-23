@@ -2,8 +2,6 @@
 import uniqid from "uniqid";
 
 export default class Events {
-    constructor() {}
-
     //  _   _ _   _ _____   _____                _
     // | \ | | | | |_   _| |  ___|              | |
     // |  \| | | | | | |   | |____   _____ _ __ | |_
@@ -23,7 +21,7 @@ export default class Events {
      * addNUIEventHandler('menu:clicked', (data) => console.log(data.title))
      * ```
      */
-    addNUIEventHandler = (name: string, handler: (data: any, callback: Function) => any) => {
+    addNUIEventHandler = (name: string, handler: (data: any, callback: (data: { [key: string]: any }) => void) => any) => {
         name = encodeURIComponent(name);
 
         RegisterNuiCallbackType(name);
@@ -44,7 +42,7 @@ export default class Events {
      * })
      * ```
      */
-    triggerNUIEvent = (name: string, data: object = {}) => {
+    triggerNUIEvent = (name: string, data: { [key: string]: any } = {}) => {
         SendNuiMessage(
             JSON.stringify({
                 name,
@@ -72,7 +70,7 @@ export default class Events {
      * addClientEventHandler("someEvent", (playerID) => console.log(playerID))
      * ```
      */
-    addClientEventHandler = (name: string | Array<string>, handler: Function) => {
+    addClientEventHandler = (name: string | Array<string>, handler: (...args: any) => any) => {
         if (typeof name == "object" && Array.isArray(name)) {
             for (const alias of name) {
                 on(alias, handler);
@@ -127,7 +125,7 @@ export default class Events {
      * addServerCallbackEventHandler('getPlayerName', (id) => getName(id));
      * ```
      */
-    addClientCallbackEventHandler = (name: string, handler: Function) => {
+    addClientCallbackEventHandler = (name: string, handler: (...args: any) => any) => {
         this.addClientEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
             this.triggerClientEvent(temporalEventName, await handler(...args));
         });
@@ -179,7 +177,7 @@ export default class Events {
      * addSharedEventHandler("someEvent", (playerID) => console.log(playerID))
      * ```
      */
-    addSharedEventHandler = (name: string | Array<string>, handler: Function) => {
+    addSharedEventHandler = (name: string | Array<string>, handler: (...args: any) => any) => {
         if (typeof name == "object" && Array.isArray(name)) {
             for (const alias of name) {
                 onNet(alias, handler);
@@ -235,7 +233,7 @@ export default class Events {
      * addSharedCallbackEventHandler('getPlayerName', (id) => getName(id));
      * ```
      */
-    addSharedCallbackEventHandler = (name: string, handler: Function) => {
+    addSharedCallbackEventHandler = (name: string, handler: (...args: any) => any) => {
         this.addSharedEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
             this.triggerSharedEvent(temporalEventName, await handler(...args));
         });

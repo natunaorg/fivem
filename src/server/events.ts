@@ -2,8 +2,6 @@
 import uniqid from "uniqid";
 
 export default class Events {
-    constructor() {}
-
     //  _____                            _____                _
     // /  ___|                          |  ___|              | |
     // \ `--.  ___ _ ____   _____ _ __  | |____   _____ _ __ | |_
@@ -23,7 +21,7 @@ export default class Events {
      * addServerEventHandler("someEvent", (playerID) => console.log(playerID))
      * ```
      */
-    addServerEventHandler = (name: string | Array<string>, handler: Function) => {
+    addServerEventHandler = (name: string | Array<string>, handler: (...args: any) => any) => {
         if (typeof name == "object" && Array.isArray(name)) {
             for (const alias of name) {
                 on(alias, handler);
@@ -78,7 +76,7 @@ export default class Events {
      * addServerCallbackEventHandler('getPlayerName', (id) => getName(id));
      * ```
      */
-    addServerCallbackEventHandler = (name: string, handler: Function) => {
+    addServerCallbackEventHandler = (name: string, handler: (...args: any) => any) => {
         this.addServerEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
             this.triggerServerEvent(temporalEventName, await handler(...args));
         });
@@ -99,7 +97,7 @@ export default class Events {
      * triggerSharedCallbackEvent('getPlayerName', (name) => console.log(name), 1);
      * ```
      */
-    triggerServerCallbackEvent = (name: string, callbackHandler: Function, ...args: any) => {
+    triggerServerCallbackEvent = (name: string, callbackHandler: (...args: any) => any, ...args: any) => {
         const temporalEventName = uniqid("cbtemp-");
 
         this.addServerEventHandler(temporalEventName, (...args: any) => {
@@ -130,7 +128,7 @@ export default class Events {
      * addSharedEventHandler("someEvent", (playerID) => console.log(playerID))
      * ```
      */
-    addSharedEventHandler = (name: string | Array<string>, handler: Function) => {
+    addSharedEventHandler = (name: string | Array<string>, handler: (...args: any) => any) => {
         if (typeof name == "object" && Array.isArray(name)) {
             for (const alias of name) {
                 onNet(alias, handler);
@@ -186,7 +184,7 @@ export default class Events {
      * addSharedCallbackEventHandler('getPlayerName', (id) => getName(id));
      * ```
      */
-    addSharedCallbackEventHandler = (name: string, handler: Function) => {
+    addSharedCallbackEventHandler = (name: string, handler: (...args: any) => any) => {
         this.addSharedEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
             this.triggerSharedEvent(temporalEventName, (global as any).source, await handler(...args));
         });
@@ -207,7 +205,7 @@ export default class Events {
      * triggerSharedCallbackEvent('getPlayerName', (name) => console.log(name), 1);
      * ```
      */
-    triggerSharedCallbackEvent = (name: string, target: number, callbackHandler: Function, ...args: any) => {
+    triggerSharedCallbackEvent = (name: string, target: number, callbackHandler: (...args: any) => any, ...args: any) => {
         const temporalEventName = uniqid("cbtemp-");
 
         this.addSharedEventHandler(temporalEventName, (...args: any) => {

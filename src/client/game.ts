@@ -58,7 +58,7 @@ export default class Game {
      * ```
      */
     disableDispatchService = () => {
-        for (let i = 0; i >= 20; i++) {
+        for (let i = 0; i <= 20; i++) {
             EnableDispatchService(i, false);
             Citizen.invokeNative("0xDC0F817884CDD856", i, false); // EnableDispatchService in Native
         }
@@ -192,7 +192,7 @@ export default class Game {
          * getCurrentVehicle(PlayerPedId(), false);
          * ```
          */
-        getCurrentVehicle: (ped: number = PlayerPedId(), isDriver: boolean = false) => {
+        getCurrentVehicle: (ped: number = PlayerPedId(), isDriver = false) => {
             if (!DoesEntityExist(ped) || !IsEntityAPed(ped)) {
                 throw new Error("Entity given was not a ped!");
             }
@@ -225,7 +225,7 @@ export default class Game {
          * setNoClip(PlayerPedId());
          * ```
          */
-        setNoClip: async (speed: number = 2) => {
+        setNoClip: async (speed = 2) => {
             const ped = PlayerPedId();
             const entity = IsPedInAnyVehicle(ped, false) ? GetVehiclePedIsUsing(ped) : ped;
 

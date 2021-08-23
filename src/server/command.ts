@@ -14,7 +14,7 @@ import Server from "@server";
  * @param args (Arguments) return text after command in Array, example, if you're triggering the command like this "/hello all people", the arguments returns was ["all", "people"].
  * @param raw (Raw) return raw version of the command triggered.
  */
-export type Handler = (src: number, args: any[], raw: String) => any;
+export type Handler = (src: number, args: any[], raw: string) => any;
 
 /**
  * @description
@@ -48,7 +48,7 @@ export type Config = {
     consoleOnly?: boolean;
     requirements?: {
         userIDs?: Array<number>;
-        custom?: Function;
+        custom?: () => boolean;
     };
     caseInsensitive?: boolean;
     cooldownExclusions?: {
@@ -201,7 +201,7 @@ export default class Command {
     };
 
     validator = {
-        isObject: (obj: object) => {
+        isObject: (obj: { [key: string]: any }) => {
             if (!obj || typeof obj == "undefined" || typeof obj !== "object" || Array.isArray(obj)) {
                 return false;
             }

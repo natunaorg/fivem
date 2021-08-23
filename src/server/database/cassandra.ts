@@ -1,3 +1,1 @@
-export default class Cassandra {
-    constructor() {}
-}
+export default class Cassandra {}

@@ -227,7 +227,7 @@ export default class Utils {
         let hash = 0;
         let string = val.toLowerCase();
 
-        for (var i = 0; i < string.length; i++) {
+        for (let i = 0; i < string.length; i++) {
             let letter = (string[i] as any).charCodeAt();
             hash = hash + letter;
             hash += (hash << 10) >>> 0;
