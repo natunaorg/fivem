@@ -1,13 +1,19 @@
 const path = require("path");
+const buildPath = path.resolve(__dirname, "dist");
+
 const { DefinePlugin, IgnorePlugin } = require("webpack");
 const RemoveFilesPlugin = require("remove-files-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 
-const buildPath = path.resolve(__dirname, "dist");
+const nodeExternals = require("webpack-node-externals");
 
 const server = {
     entry: "./src/server/index.ts",
     cache: false,
+    target: "node",
+    node: {
+        __dirname: true,
+    },
     module: {
         rules: [
             {
@@ -47,19 +53,17 @@ const server = {
         filename: "[contenthash].server.js",
         path: path.resolve(buildPath, "server"),
     },
-    target: "node",
-    node: {
-        __dirname: true,
-    },
     watchOptions: {
         poll: true,
         ignored: ["**/node_modules", "**/ui"],
     },
+    externals: [nodeExternals()],
 };
 
 const client = {
     entry: "./src/client/index.ts",
     cache: false,
+    target: "web",
     module: {
         rules: [
             {
