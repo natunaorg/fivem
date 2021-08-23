@@ -1,13 +1,14 @@
 import Server from "@server/index";
 
+let savednum: number = 2;
+
 class Module {
     client: Server;
 
     constructor(client: Server) {
         this.client = client;
 
-        const identifier = this.client.players.utils.getPlayerIds(5);
-        console.log(identifier.license, identifier.ip);
+        console.log("multitools", savednum);
     }
 }
 

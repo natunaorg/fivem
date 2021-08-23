@@ -168,9 +168,7 @@ class Module {
             {
                 description: "Revive a player",
                 cooldown: 5000,
-                requirements: {
-                    steamIDs: ["76561198290395137"],
-                },
+                requirements: {},
             }
         );
 
@@ -181,9 +179,7 @@ class Module {
             },
             {
                 description: "Kill a player",
-                requirements: {
-                    steamIDs: ["76561198290395137"],
-                },
+                requirements: {},
             }
         );
 
@@ -195,9 +191,7 @@ class Module {
             {
                 description: "Spawn a car",
                 argsRequired: 1,
-                requirements: {
-                    steamIDs: ["76561198290395137"],
-                },
+                requirements: {},
             }
         );
 
