@@ -1,6 +1,6 @@
 {
     "includes": "src/ui/nui",
-    "entryPoints": ["src/client/index.ts", "src/client/wrapper/", "src/server/index.ts", "src/server/wrapper/", "src/ui/nui/types.d.ts"],
+    "entryPoints": ["src/client/", "src/server/", "src/ui/nui/types.d.ts"],
     "out": "docs",
     "name": "Natuna Framework",
     "theme": "./node_modules/@natuna-framework/typedoc-theme",
