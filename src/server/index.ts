@@ -75,17 +75,26 @@ export default class Server extends Events {
      * @hidden
      *
      * @description
-     * List of All Plugins (Client, Server, NUI)
+     * List of All Plugins
      */
-    private plugins: { [key: string]: Array<{ name: string; file?: string; config?: any }> };
-
-    /**
-     * @hidden
-     *
-     * @description
-     * List of Server Plugins
-     */
-    private serverPlugins: { [key: string]: any };
+    private plugins: {
+        [key: string]: {
+            path: string;
+            client?: {
+                modules: Array<string>;
+                config: {
+                    [key: string]: any;
+                };
+            };
+            server?: {
+                modules: Array<string>;
+                config: {
+                    [key: string]: any;
+                };
+            };
+            nui?: boolean;
+        };
+    };
 
     /**
      * @hidden
@@ -102,7 +111,6 @@ export default class Server extends Events {
         super();
         this.config = config;
         this.plugins = {};
-        this.serverPlugins = {};
         this.commands = {};
 
         this.dbQuery = this.db("").utils.executeQuery;
@@ -214,7 +222,7 @@ export default class Server extends Events {
      *
      * @param text Text to logs
      */
-    _logger = (...text: any) => {
+    private _logger = (...text: any) => {
         return console.log("\x1b[33m%s\x1b[0m", "[🏝️ Natuna Framework]", "[SERVER]", ...text);
     };
 
@@ -227,14 +235,8 @@ export default class Server extends Events {
      *
      * @param type Type of the plugin (Client or Server)
      */
-    _getPlugins = async (type: string) => {
-        let plugins: {
-            [key: string]: {
-                client?: Array<string>;
-                server?: Array<string>;
-                nui?: boolean;
-            };
-        } = {};
+    private _getPlugins = async () => {
+        let plugins: Server["plugins"] = {};
 
         const basePath = GetResourcePath(GetCurrentResourceName());
 
@@ -251,78 +253,39 @@ export default class Server extends Events {
                     cwd: pluginFullPath,
                 });
 
-                plugins[pluginName] = {};
+                plugins[pluginName] = {
+                    path: path.normalize(pluginPath),
+                    client: {
+                        modules: [],
+                        config: this.config.plugins[pluginName]?.client || {},
+                    },
+                    server: {
+                        modules: [],
+                        config: this.config.plugins[pluginName]?.server || {},
+                    },
+                    nui: false,
+                };
 
                 for (const moduleType of moduleTypeList) {
-                    const moduleTypePath = path.join(basePath, pluginPath, moduleType);
+                    const moduleTypePath = path.join(pluginFullPath, moduleType);
 
-                    if (fs.lstatSync(moduleTypePath).isDirectory()) {
-                        const modules = await glob("**/*.ts", {
+                    if (moduleType === "ui") {
+                        plugins[pluginName].nui = true;
+                    } else if (fs.lstatSync(moduleTypePath).isDirectory()) {
+                        const modules = await glob("**/*.{ts,js}", {
                             cwd: moduleTypePath,
                         });
 
-                        console.log(modules);
+                        for (let module of modules) {
+                            module = path.normalize(module).replace(/\\/g, "/");
+                            plugins[pluginName][moduleType as "client" | "server"].modules.push(module);
+                        }
                     }
                 }
             }
         }
 
-        const getPlugins = async (type: string) => {
-            const activePluginLists: Array<{
-                name: string;
-                file?: string;
-                config?: any;
-            }> = [];
-
-            const readDirAsync = util.promisify(fs.readdir);
-            const pluginsFolderPath = path.join(GetResourcePath(GetCurrentResourceName()), "plugins");
-            const pluginLists = await readDirAsync(pluginsFolderPath);
-
-            while (!this.config) await this.wait(1000);
-
-            for (const pluginName of pluginLists) {
-                try {
-                    let manifest: any;
-
-                    try {
-                        manifest = require(`../../plugins/${pluginName}/manifest.ts`).default();
-                    } catch (error) {
-                        manifest = require(`../../plugins/${pluginName}/manifest.json`);
-                    }
-
-                    if (manifest && manifest.active) {
-                        switch (type.toUpperCase()) {
-                            case "CLIENT":
-                            case "SERVER":
-                                const config = this.config.plugins[pluginName] && this.config.plugins[pluginName][type] ? this.config.plugins[pluginName][type] : {};
-
-                                if (manifest.plugins && manifest.plugins[type]) {
-                                    for (const file of manifest.plugins[type]) {
-                                        activePluginLists.push({ name: pluginName, file, config });
-                                    }
-                                }
-
-                                break;
-                            case "NUI":
-                                const resourcePath = path.join(pluginsFolderPath, pluginName);
-                                const resourceTypes = await readDirAsync(resourcePath);
-
-                                if (resourceTypes.includes("ui")) {
-                                    activePluginLists.push({ name: pluginName });
-                                }
-
-                                break;
-                        }
-                    }
-                } catch (error) {
-                    // Keep it empty to make sure the file finding process is still working on
-                }
-            }
-
-            return activePluginLists;
-        };
-
-        return this.plugins[type] || (this.plugins[type] = await getPlugins(type));
+        return plugins;
     };
 
     /**
@@ -332,19 +295,26 @@ export default class Server extends Events {
      * @description
      * This function is to init a plugin, differs from the client ones, it's triggered whenever the script was ready
      */
-    _initServerPlugins = async () => {
+    private _initServerPlugins = async () => {
         this._logger(`Intializing Server Plugins`);
-        const plugins = await this._getPlugins("server");
 
-        let count = 1; // Start from 1
-        for (const plugin of plugins) {
-            this._logger(`Ensuring Plugins: ${count}. ${plugin.name}`);
+        let count = 1;
+        for (const pluginName in this.plugins) {
+            const plugin = this.plugins[pluginName];
+            this._logger(`> Starting Plugins: \x1b[47m\x1b[2m\x1b[30m ${count}. ${pluginName} \x1b[0m`);
 
-            this.serverPlugins[plugin.name] = require(`../../plugins/${plugin.name}/server/${plugin.file}`);
-            this.serverPlugins[plugin.name]._handler(this, plugin.config);
+            for (let pluginFile of plugin.server.modules) {
+                const module = require(`../../plugins/${pluginName}/server/${pluginFile}`);
+
+                if (module && module.default && typeof module.default === "function") {
+                    this._logger(`  - Mounting Module: \x1b[32m${pluginFile}\x1b[0m`);
+                    module.default(this, plugin.server.config);
+                }
+            }
 
             count += 1;
         }
+
         this._logger("Server Plugins Ready!");
     };
 
@@ -355,7 +325,7 @@ export default class Server extends Events {
      * @description
      * Check package version and compare it to remote repository.
      */
-    _checkPackageVersion = () => {
+    private _checkPackageVersion = () => {
         return new Promise((resolve, reject) => {
             this._logger(`Welcome! Checking your version...`);
             this._logger(`You are currently using version ${pkg.version}.`);
@@ -499,19 +469,21 @@ export default class Server extends Events {
          * Listen on whenever a player requested plugins to be setup on their client
          */
         requestClientSettings: async () => {
-            const pluginLists = await this._getPlugins("client");
-            const nuiLists = await this._getPlugins("nui");
+            let clientPlugins = { ...this.plugins };
 
-            return {
-                pluginLists,
-                nuiLists,
-                discordRPC: this.config.core.discordRPC,
-                game: this.config.core.game,
-                nui: this.config.core.nui,
+            for (const plugins in clientPlugins) {
+                delete clientPlugins[plugins].server;
+            }
+
+            return JSON.stringify({
+                plugins: clientPlugins,
                 config: {
-                    locationUpdateInterval: this.config.core.players.locationUpdateInterval,
+                    players: this.config.core.players,
+                    discordRPC: this.config.core.discordRPC,
+                    nui: this.config.core.nui,
+                    game: this.config.core.game,
                 },
-            };
+            });
         },
 
         /**
@@ -536,6 +508,7 @@ export default class Server extends Events {
                 this.triggerServerEvent("natuna:server:initializing");
 
                 this._logger("Starting Server...");
+                this.plugins = await this._getPlugins();
                 await this._initServerPlugins();
 
                 // Ready
