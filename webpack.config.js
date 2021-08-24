@@ -57,7 +57,21 @@ const server = {
         poll: true,
         ignored: ["**/node_modules", "**/ui"],
     },
-    externals: [nodeExternals()],
+    externals: [
+        nodeExternals(),
+        ({ context, request }, callback) => {
+            const moduleList = {
+                "@/natuna.config.js": "./natuna.config.js",
+                "@/package.json": "./package.json",
+            };
+
+            if (moduleList[request]) {
+                return callback(null, "commonjs " + moduleList[request]);
+            }
+
+            return callback();
+        },
+    ],
 };
 
 const client = {
