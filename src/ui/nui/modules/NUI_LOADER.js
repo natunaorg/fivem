@@ -165,7 +165,7 @@ window.addEventListener("message", (event) => {
 });
 
 window.on("natuna:nui:retrievePluginList", (data) => {
-    return new NUILoader(data.name, data.debug || false);
+    return new NUILoader(data.name);
 });
 
 window.on("natuna:nui:debugHTML", () => {
