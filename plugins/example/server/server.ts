@@ -1,7 +1,7 @@
 // Used only for typings reference. DO NOT DECLARE THIS CLASS.
-import Server from "@server/index";
+import Server from "@server";
 
-class Module {
+const Module = class {
     client: Server;
     config: any;
 
@@ -23,7 +23,14 @@ class Module {
             console.log(`My user id is: ${id}`);
         });
     }
-}
+};
 
-// Always use "_handler" for the function name as it'd be the default handler the framework used.
-export const _handler = (client: Server, config: any) => new Module(client, config);
+/**
+ * Any Typescript files inside this folder with default export would be imported as active plugin
+ * MAKE SURE IT'S A FUNCTION, OTHERWISE IT WOULDN'T BE IMPORTED!
+ *
+ * If you wanted to make a sub-module file (Example: function list, variable list, etc), please ensure you only export what you need and don't use default export
+ *
+ * This framework also support globbing
+ */
+export default (client: Server, config: any) => new Module(client, config);

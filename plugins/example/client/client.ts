@@ -1,11 +1,6 @@
 // Used only for typings reference. DO NOT DECLARE THIS CLASS.
 import Client from "@client/index";
 
-/**
- * This file below is not a starting point, which may contain like list of functions or variable, you SHOULD NOT add this file below to manifest.
- */
-import { someFunction } from "./SomeOtherScript";
-
 class Module {
     client: Client;
     config: any;
@@ -17,8 +12,6 @@ class Module {
         console.log(this.config.someExampleClientConfig); // true
         console.log(this.config.someExampleSecondClientConfig); // [1, 2, 3, 4, 5, 6]
         console.log(this.config.someExampleThirdClientConfig); // { example: true }
-
-        someFunction(); // Hello World!
 
         // Show a notification showing your server id
         this.client.registerCommand("myid", (src) => {
@@ -61,5 +54,14 @@ class Module {
     }
 }
 
-// Always use "_handler" for the function name as it'd be the default handler the framework used.
-export const _handler = (client: Client, config: any) => new Module(client, config);
+/**
+ * Any Typescript files inside this folder with default export would be imported as active plugin
+ * MAKE SURE IT'S A FUNCTION, OTHERWISE IT WOULDN'T BE IMPORTED!
+ *
+ * If you wanted to make a sub-module file (Example: function list, variable list, etc), please ensure you only export what you need and don't use default export
+ *
+ * Note:
+ * 1. Check server folder too for more example
+ * 2. This framework also support globbing
+ */
+export default (client: Client, config: any) => new Module(client, config);
