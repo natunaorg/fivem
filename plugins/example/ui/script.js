@@ -1,3 +1,5 @@
+/* global $ */
+
 // ⛔ You might wanna see the 'dumping.html' file to learn how the files built.
 
 /**

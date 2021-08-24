@@ -1,3 +1,5 @@
+/* global $, GetParentResourceName */
+
 /**
  * @description
  * List of events registered

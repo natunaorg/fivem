@@ -1,3 +1,5 @@
+/* global $ */
+
 let JQueryReady = false;
 $(() => (JQueryReady = true));
 
@@ -8,7 +10,7 @@ class NUILoader {
 
         const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-        new Promise(async (resolve, reject) => {
+        (async () => {
             while (!JQueryReady) await wait(100);
 
             const html = await this.utils.getContent(`../../../plugins/${this.pluginName}/ui/index.html`);
@@ -20,8 +22,7 @@ class NUILoader {
             // Set the Z-Index of the NUI
             const zIndex = $(`#${this.nuiWrapperId} meta[name="nuiIndex"]`).attr("content") || 1;
             $(`#${this.nuiWrapperId}`).css("z-index", parseInt(zIndex));
-            return resolve(true);
-        });
+        })();
     }
 
     CSSParser = (content) => {
@@ -58,6 +59,7 @@ class NUILoader {
 
         for (const match of regexMatched2) {
             if (!match.startsWith(`getElementById`) && !match.match("(\"|'|`)")) {
+                // eslint-disable-next-line no-useless-escape
                 const string = match.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
                 const regex = new RegExp(`getElementById\\(("|'|\`)${string}("|'|\`)\\)`, "gm");
                 const newId = `${this.pluginName}-${match}`;
@@ -100,6 +102,7 @@ class NUILoader {
 
         for (const match of regexMatched2) {
             if (!match.startsWith(`id=`) && !match.match("(\"|'|`)")) {
+                // eslint-disable-next-line no-useless-escape
                 const string = match.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
                 const regex = new RegExp(`id=("|'|\`)${string}("|'|\`)`, "gm");
                 const newId = `${this.pluginName}-${match}`;

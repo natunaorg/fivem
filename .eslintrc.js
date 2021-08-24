@@ -12,4 +12,8 @@ module.exports = {
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
     },
+    env: {
+        browser: true,
+        node: true,
+    },
 };
