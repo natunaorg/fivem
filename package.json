@@ -9,8 +9,8 @@
         "build": "webpack --mode=production --progress",
         "build:dev": "webpack --mode=development --progress",
         "watch": "webpack --mode=development --watch --progress",
-        "lint": "eslint . --ext .ts",
-        "lint:fix": "eslint --fix . --ext .ts"
+        "lint": "eslint --ext .ts,.js src/",
+        "lint:fix": "eslint --fix --ext .ts,.js src/"
     },
     "license": "MIT",
     "private": false,
