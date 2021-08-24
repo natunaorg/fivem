@@ -27,6 +27,9 @@ import MongoDB from "@server/database/mongodb";
 
 import Events from "@server/events";
 
+/**
+ * @hidden
+ */
 // prettier-ignore
 export type SelectedDatabaseDriver = 
     typeof config.core.db extends "mysql" ? 

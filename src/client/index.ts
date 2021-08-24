@@ -254,6 +254,11 @@ export default class Client extends Events {
         }
     };
 
+    /**
+     * @hidden
+     * @description
+     * Handle client plugins
+     */
     private _initClientPlugins = async () => {
         this._logger(`Intializing Client Plugins`);
 

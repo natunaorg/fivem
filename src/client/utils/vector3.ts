@@ -1,3 +1,8 @@
+/**
+ * @module Client - Utility - Vector3
+ * @category Client
+ */
+
 export interface Quaternion {
     x: number;
     y: number;
@@ -11,6 +16,9 @@ export default class Vector3 implements Quaternion {
     z: number;
     w: number;
 
+    /**
+     * @hidden
+     */
     constructor(x: number, y: number, z: number = null, w: number = null) {
         this.x = x;
         this.y = y;

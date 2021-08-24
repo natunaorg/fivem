@@ -1,5 +1,5 @@
 /**
- * @module Server - Database
+ * @module Server - Database - MySQL
  * @category Server
  */
 

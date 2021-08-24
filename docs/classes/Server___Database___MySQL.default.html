@@ -55,10 +55,10 @@
 					<a href="../modules.html">Natuna Framework - v1.4.1</a>
 				</li>
 				<li>
-					<a href="../modules/Server___Database.html">Server - Database</a>
+					<a href="../modules/Server___Database___MySQL.html">Server - Database - MySQL</a>
 				</li>
 				<li>
-					<a href="Server___Database.default.html">default</a>
+					<a href="Server___Database___MySQL.default.html">default</a>
 				</li>
 			</ul>
 			<h1>Class default</h1>
@@ -83,18 +83,18 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server___Database.default.html#parser" class="tsd-kind-icon">parser</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server___Database.default.html#utils" class="tsd-kind-icon">utils</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#parser" class="tsd-kind-icon">parser</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#utils" class="tsd-kind-icon">utils</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database.default.html#delete" class="tsd-kind-icon">delete</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database.default.html#find" class="tsd-kind-icon">find</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database.default.html#findFirst" class="tsd-kind-icon">find<wbr>First</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database.default.html#update" class="tsd-kind-icon">update</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database.default.html#write" class="tsd-kind-icon">write</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#delete" class="tsd-kind-icon">delete</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#find" class="tsd-kind-icon">find</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#findFirst" class="tsd-kind-icon">find<wbr>First</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#update" class="tsd-kind-icon">update</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="Server___Database___MySQL.default.html#write" class="tsd-kind-icon">write</a></li>
 							</ul>
 						</section>
 					</div>
@@ -108,7 +108,7 @@
 					<div class="tsd-signature tsd-kind-icon">parser<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">; </span>keyVal<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>dataObj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L181">server/database/mysql.ts:181</a></li>
+							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L181">server/database/mysql.ts:181</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -184,7 +184,7 @@
 					<div class="tsd-signature tsd-kind-icon">utils<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{ </span>executeQuery<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>query<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>validateQueryObject<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>obj<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span>, requiredKey<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">; </span>validateQueryObjectData<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, data<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol"> = ...</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L199">server/database/mysql.ts:199</a></li>
+							<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L199">server/database/mysql.ts:199</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -300,7 +300,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L171">server/database/mysql.ts:171</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L171">server/database/mysql.ts:171</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -348,7 +348,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L69">server/database/mysql.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L69">server/database/mysql.ts:69</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -396,7 +396,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L97">server/database/mysql.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L97">server/database/mysql.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -444,7 +444,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L134">server/database/mysql.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L134">server/database/mysql.ts:134</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -517,7 +517,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/3b095e6e/src/server/database/mysql.ts#L41">server/database/mysql.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/natuna-framework/fivem/blob/86605492/src/server/database/mysql.ts#L41">server/database/mysql.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -567,6 +567,9 @@
 						<a href="../modules/Client.html">Client</a>
 					</li>
 					<li class=" tsd-kind-module">
+						<a href="../modules/Client___Events.html">Client -<wbr> <wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-module">
 						<a href="../modules/Client___Game.html">Client -<wbr> <wbr>Game</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -574,6 +577,9 @@
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/Client___Utility.html">Client -<wbr> <wbr>Utility</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/Client___Utility___Vector3.html">Client -<wbr> <wbr>Utility -<wbr> <wbr>Vector3</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/NUI.html">NUI</a>
@@ -587,26 +593,20 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/Server___Crypter.html">Server -<wbr> <wbr>Crypter</a>
 					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/Server___Database___Cassandra.html">Server -<wbr> <wbr>Database -<wbr> <wbr>Cassandra</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/Server___Database___MongoDB.html">Server -<wbr> <wbr>Database -<wbr> <wbr>MongoDB</a>
+					</li>
 					<li class="current tsd-kind-module">
-						<a href="../modules/Server___Database.html">Server -<wbr> <wbr>Database</a>
+						<a href="../modules/Server___Database___MySQL.html">Server -<wbr> <wbr>Database -<wbr> <wbr>MySQL</a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/Server___Events.html">Server -<wbr> <wbr>Events</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="../modules/Server___Players.html">Server -<wbr> <wbr>Players</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/client_events.html">client/events</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/client_utils_vector3.html">client/utils/vector3</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/server_database_cassandra.html">server/database/cassandra</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/server_database_mongodb.html">server/database/mongodb</a>
-					</li>
-					<li class=" tsd-kind-module">
-						<a href="../modules/server_events.html">server/events</a>
 					</li>
 				</ul>
 			</nav>
@@ -615,28 +615,28 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-parent-kind-module">
-						<a href="Server___Database.default.html" class="tsd-kind-icon">default</a>
+						<a href="Server___Database___MySQL.default.html" class="tsd-kind-icon">default</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="Server___Database.default.html#parser" class="tsd-kind-icon">parser</a>
+								<a href="Server___Database___MySQL.default.html#parser" class="tsd-kind-icon">parser</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
-								<a href="Server___Database.default.html#utils" class="tsd-kind-icon">utils</a>
+								<a href="Server___Database___MySQL.default.html#utils" class="tsd-kind-icon">utils</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="Server___Database.default.html#delete" class="tsd-kind-icon">delete</a>
+								<a href="Server___Database___MySQL.default.html#delete" class="tsd-kind-icon">delete</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="Server___Database.default.html#find" class="tsd-kind-icon">find</a>
+								<a href="Server___Database___MySQL.default.html#find" class="tsd-kind-icon">find</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="Server___Database.default.html#findFirst" class="tsd-kind-icon">find<wbr>First</a>
+								<a href="Server___Database___MySQL.default.html#findFirst" class="tsd-kind-icon">find<wbr>First</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="Server___Database.default.html#update" class="tsd-kind-icon">update</a>
+								<a href="Server___Database___MySQL.default.html#update" class="tsd-kind-icon">update</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="Server___Database.default.html#write" class="tsd-kind-icon">write</a>
+								<a href="Server___Database___MySQL.default.html#write" class="tsd-kind-icon">write</a>
 							</li>
 						</ul>
 					</li>

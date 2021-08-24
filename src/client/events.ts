@@ -1,3 +1,8 @@
+/**
+ * @module Client - Events
+ * @category Client
+ */
+
 "use strict";
 import uniqid from "uniqid";
 
