@@ -13,7 +13,6 @@ import * as Command from "@server/command";
 import Events from "@client/events";
 
 import figlet from "figlet";
-import Doom from "figlet/importable-fonts/Doom";
 
 export default class Client extends Events {
     /**
@@ -30,7 +29,18 @@ export default class Client extends Events {
      * @description
      * List of Client Plugins
      */
-    private clientPlugins: any;
+    private plugins: {
+        [key: string]: {
+            path: string;
+            client?: {
+                modules: Array<string>;
+                config: {
+                    [key: string]: any;
+                };
+            };
+            nui?: boolean;
+        };
+    };
 
     /**
      * @hidden
@@ -66,7 +76,7 @@ export default class Client extends Events {
     constructor() {
         super();
         this.config;
-        this.clientPlugins = {};
+        this.plugins = {};
         this.commands = {};
 
         this.utils = new UtilsWrapper(this);
@@ -185,33 +195,33 @@ export default class Client extends Events {
      * @param settings Client settings
      */
     private _initClientSettings = async (settings: any) => {
-        if (settings.pluginLists) {
-            this._initClientPlugins(settings.pluginLists);
-        }
+        this.plugins = settings.plugins;
+        this.config = settings.config;
 
         setTick(() => {
-            if (settings.game.noDispatchService) {
+            if (this.config.game.noDispatchService) {
                 this.game.disableDispatchService();
             }
 
-            if (settings.game.noWantedLevel) {
+            if (this.config.game.noWantedLevel) {
                 this.game.resetWantedLevel();
             }
         });
 
-        if (settings.game.pauseMenuTitle) {
-            AddTextEntry("FE_THDR_GTAO", settings.game.pauseMenuTitle);
+        if (this.config.game.pauseMenuTitle) {
+            AddTextEntry("FE_THDR_GTAO", this.config.game.pauseMenuTitle);
         }
 
-        if (settings.discordRPC) {
+        if (this.config.discordRPC) {
             const players = await this.players.list();
-            const rpc = settings.discordRPC;
+            const rpc = this.config.discordRPC;
+
+            SetDiscordAppId(rpc.appId);
 
             const parseRPCString = (string: string) => {
-                // prettier-ignore
                 return string
-                    .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId()))
-                    .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(players.length));
+                    .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId())) // Player Name
+                    .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(players.length)); // Total Active Player
             };
 
             const setRPC = () => {
@@ -232,21 +242,33 @@ export default class Client extends Events {
                 }
             };
 
-            SetDiscordAppId(rpc.appId);
             setRPC();
             setInterval(setRPC, rpc.refreshInterval);
         }
     };
 
-    private _initClientPlugins = async (plugins: Array<{ name: string; file: string; config: any }>) => {
+    private _initClientPlugins = async () => {
         this._logger(`Intializing Client Plugins`);
 
-        let count = 1; // Start from 1
-        for (const plugin of plugins) {
-            this._logger(`Ensuring Plugins: ${count}. ${plugin.name}`);
+        let count = 1;
+        for (const pluginName in this.plugins) {
+            const plugin = this.plugins[pluginName];
+            this._logger(`> Starting Plugins: \x1b[47m\x1b[2m\x1b[30m ${count}. ${pluginName} \x1b[0m`);
 
-            this.clientPlugins[plugin.name] = await import(`../../plugins/${plugin.name}/client/${plugin.file}`);
-            this.clientPlugins[plugin.name]._handler(this, plugin.config);
+            if (plugin.nui) {
+                this.triggerNUIEvent("natuna:nui:retrievePluginList", {
+                    name: pluginName,
+                });
+            }
+
+            for (let pluginFile of plugin.client.modules) {
+                const module = await import(`../../plugins/${pluginName}/client/${pluginFile}`);
+
+                if (module && module.default && typeof module.default === "function") {
+                    this._logger(`  - Mounting Module: \x1b[32m${pluginFile}\x1b[0m`);
+                    module.default(this, plugin.client.config);
+                }
+            }
 
             count += 1;
         }
@@ -270,8 +292,12 @@ export default class Client extends Events {
                 this.triggerClientEvent("natuna:client:starting");
                 this.triggerSharedEvent("natuna:client:starting");
 
-                figlet.parseFont("Standard", Doom);
-                figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
+                await new Promise((resolve) => {
+                    figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
+                        console.log(result);
+                        resolve(true);
+                    });
+                });
 
                 // Initializing
                 this.triggerClientEvent("natuna:client:initializing");
@@ -281,7 +307,8 @@ export default class Client extends Events {
                 this.triggerSharedEvent("natuna:server:addPlayerData");
                 await new Promise((resolve, reject) => {
                     this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", async (settings) => {
-                        await this._initClientSettings(settings);
+                        await this._initClientSettings(JSON.parse(settings));
+                        await this._initClientPlugins();
                         return resolve(true);
                     });
                 });
