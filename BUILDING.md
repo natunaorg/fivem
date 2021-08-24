@@ -13,9 +13,8 @@ Natuna Framework are made using webpack which compiles all file together in 1 fi
 
 
 - ### **❌ You DON'T need to build the files when:**
-    1. After editing non-typescript files (Javascript [.js], HTML [.html], etc)
-    2. After editing UI files or files under UI folder.
-    3. After editing the `natuna.config.js` file (Why? Because this files are included on the core with FiveM NodeJS export-import method).
+    1. After editing UI files or files under UI folder.
+    2. After editing the `natuna.config.js` file (Why? Because this files are included on the core with FiveM NodeJS export-import method).
 
 ---
 
