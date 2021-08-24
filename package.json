@@ -7,6 +7,7 @@
     "author": "Rafly Maulana",
     "scripts": {
         "build": "webpack --mode=production --progress",
+        "build:dev": "webpack --mode=development --progress",
         "watch": "webpack --mode=development --watch --progress",
         "lint": "eslint . --ext .ts",
         "lint:fix": "eslint --fix . --ext .ts",
