@@ -1,10 +1,9 @@
 /**
  * [IMPORTANT NOTES!]
- * 1. This config SHOULDN'T BE used directly through client script and not recommended to import it outside the core of Natuna Framework.
- * 2. Remove the ".example" from this file name before using it!
+ * This config SHOULDN'T BE used directly through client script and not recommended to import it outside the core of Natuna Framework.
  */
 
-const config = {
+module.exports = {
     /**
      * @description
      * Natuna Framework core configuration settings.
@@ -21,9 +20,15 @@ const config = {
 
         /**
          * @description
-         * I'm using MYSQL because it provides more persistent data type and had a nice control panel like PHPMYADMIN, also this Database gives more security rather than using MONGODB.
+         * **CHANGE THE TYPE BELOW TO CONFIGURE THE DATABASE**
+         * (Currently only MySQL is supported)
          *
-         * **[IMPORTANT] If your server has high traffic, i'd recommend you to use a fast SQL Database like PostgreSQL, but you would need to configure some script first.**
+         * @variation
+         * - MySQL: "mysql" (default)
+         * - Cassandra: "cassandra"
+         * - MongoDB: "mongodb"
+         *
+         * @type {"mysql"} (CASE SENSITIVE)
          */
         db: {
             /**
@@ -191,5 +196,3 @@ const config = {
         },
     },
 };
-
-exports("config", () => config);

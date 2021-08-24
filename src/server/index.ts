@@ -5,7 +5,9 @@
 
 "use strict";
 
+import config from "@/natuna.config.js";
 import pkg from "@/package.json";
+
 import fs from "fs";
 import path from "path";
 import util from "util";
@@ -13,7 +15,6 @@ import util from "util";
 import mysql from "mysql2";
 import fetch from "node-fetch";
 import figlet from "figlet";
-import Doom from "figlet/importable-fonts/Doom";
 import glob from "tiny-glob";
 
 import CrypterWrapper from "@server/crypter";
@@ -21,16 +22,22 @@ import PlayersWrapper from "@server/players";
 import CommandWrapper, * as Command from "@server/command";
 
 import MySQL from "@server/database/mysql";
+import Cassandra from "@server/database/cassandra";
+import MongoDB from "@server/database/mongodb";
 
 import Events from "@server/events";
 
-export default class Server extends Events {
-    /**
-     * @description
-     * Database wrapper
-     */
-    db: (table: string) => MySQL;
+// prettier-ignore
+export type SelectedDatabaseDriver = 
+    typeof config.core.db extends "mysql" ? 
+        MySQL : 
+        typeof config.core.db extends "cassandra" ?
+            Cassandra : 
+            typeof config.core.db extends "mongodb" ? 
+                MongoDB : 
+                MySQL;
 
+export default class Server extends Events {
     /**
      * @description
      * Database function to execute classic SQL query
@@ -62,7 +69,7 @@ export default class Server extends Events {
      * @description
      * Configurations
      */
-    private config: any;
+    private config: typeof config;
 
     /**
      * @hidden
@@ -93,12 +100,11 @@ export default class Server extends Events {
      */
     constructor() {
         super();
-        this.config = (global as any).exports[GetCurrentResourceName()].config();
+        this.config = config;
         this.plugins = {};
         this.serverPlugins = {};
         this.commands = {};
 
-        this.db = (table: string) => new MySQL(mysql.createConnection(this.config.core.db), table);
         this.dbQuery = this.db("").utils.executeQuery;
         this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new CrypterWrapper(algorithm, secretKey);
         this.players = new PlayersWrapper(this, this.config);
@@ -111,8 +117,32 @@ export default class Server extends Events {
         this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
 
         // Test database connection (on startup) <-- check if connection success or not, also executing default SQL 👍
-        this.dbQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db.database}\``);
+        this.dbQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db}\``);
     }
+
+    /**
+     * @description
+     * Database wrapper
+     */
+    db = (table: string): SelectedDatabaseDriver => {
+        switch (typeof config.core.db) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            case "cassandra":
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                return new Cassandra();
+
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            case "mysql":
+            default:
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                return new MySQL(mysql.createConnection(this.config.core.db), table);
+        }
+    };
+
     /**
      * @description
      * Use this function to hold next script below this from executing before it finish the timeout itself
@@ -198,6 +228,45 @@ export default class Server extends Events {
      * @param type Type of the plugin (Client or Server)
      */
     _getPlugins = async (type: string) => {
+        let plugins: {
+            [key: string]: {
+                client?: Array<string>;
+                server?: Array<string>;
+                nui?: boolean;
+            };
+        } = {};
+
+        const basePath = GetResourcePath(GetCurrentResourceName());
+
+        let pluginList = await glob("plugins/*", {
+            cwd: basePath,
+        });
+
+        for (const pluginPath of pluginList) {
+            const pluginFullPath = path.join(basePath, pluginPath);
+
+            if (fs.lstatSync(pluginFullPath).isDirectory()) {
+                const pluginName = path.basename(pluginPath);
+                const moduleTypeList = await glob("*", {
+                    cwd: pluginFullPath,
+                });
+
+                plugins[pluginName] = {};
+
+                for (const moduleType of moduleTypeList) {
+                    const moduleTypePath = path.join(basePath, pluginPath, moduleType);
+
+                    if (fs.lstatSync(moduleTypePath).isDirectory()) {
+                        const modules = await glob("**/*.ts", {
+                            cwd: moduleTypePath,
+                        });
+
+                        console.log(modules);
+                    }
+                }
+            }
+        }
+
         const getPlugins = async (type: string) => {
             const activePluginLists: Array<{
                 name: string;
@@ -454,8 +523,13 @@ export default class Server extends Events {
                 // Starting
                 this.triggerServerEvent("natuna:server:starting");
 
-                figlet.parseFont("Standard", Doom);
-                figlet.text("Natuna Framework", { font: "Standard" }, (err: Error, result: string) => console.log(result));
+                await new Promise((resolve) => {
+                    figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
+                        console.log(result);
+                        resolve(true);
+                    });
+                });
+
                 await this._checkPackageVersion();
 
                 // Initializing
