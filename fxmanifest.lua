@@ -8,8 +8,6 @@ version '1.4.0'
 ui_page 'src/ui/nui/nui.html'
 loadscreen 'src/ui/loading_screen/index.html'
 
-files {"**/ui/**/*"}
-
-client_script {'dist/src/client/**/*.js', 'dist/plugins/**/client/**/*.js'}
-
-server_script {'natuna.config.js', 'dist/package.json', 'dist/src/server/**/*.js', 'dist/plugins/**/server/**/*.js'}
+files "**/ui/**/*"
+client_script 'dist/client/**/*.js'
+server_script 'dist/server/**/*.js'
