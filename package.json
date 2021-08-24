@@ -10,8 +10,7 @@
         "build:dev": "webpack --mode=development --progress",
         "watch": "webpack --mode=development --watch --progress",
         "lint": "eslint . --ext .ts",
-        "lint:fix": "eslint --fix . --ext .ts",
-        "generate-docs": "typedoc"
+        "lint:fix": "eslint --fix . --ext .ts"
     },
     "license": "MIT",
     "private": false,
