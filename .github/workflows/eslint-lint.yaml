@@ -1,27 +1,2 @@
-name: Eslint - Lint Check
-
-on:
-    pull_request:
-
-jobs:
-    lint:
-        runs-on: ubuntu-latest
-
-        strategy:
-            matrix:
-                node-version: [14.x]
-
-        steps:
-            - uses: actions/checkout@v1
-            
-            - name: Use Node.js ${{ matrix.node-version }}
-              uses: actions/setup-node@v1
-              with:
-                  node-version: ${{ matrix.node-version }}
-
-            - name: yarn install and lint
-              run: |
-                  yarn install
-                  yarn run lint
-              env:
-                  CI: true
+- name: Run ESLint
+  uses: stefanoeb/eslint-action@1.0.2
