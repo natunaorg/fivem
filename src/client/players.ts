@@ -43,22 +43,18 @@ export default class Players {
      * await list();
      * ```
      */
-    list = async () => {
-        const data = () => {
-            return new Promise((resolve, reject) => {
-                this.client.triggerSharedCallbackEvent("natuna:server:getPlayerList", (data: { [key: string]: string }) => {
-                    let playerList: Array<Data> = [];
+    list = async (): Promise<Data[]> => {
+        return new Promise((resolve, reject) => {
+            this.client.triggerSharedCallbackEvent("natuna:server:getPlayerList", (data: { [key: string]: string }) => {
+                let playerList: Array<Data> = [];
 
-                    for (const player of Object.values(data)) {
-                        playerList.push(JSON.parse(player));
-                    }
+                for (const player of Object.values(data)) {
+                    playerList.push(JSON.parse(player));
+                }
 
-                    return resolve(playerList);
-                });
+                return resolve(playerList);
             });
-        };
-
-        return (await data()) as Array<Data>;
+        });
     };
 
     /**
@@ -78,14 +74,10 @@ export default class Players {
      * });
      * ```
      */
-    get = async (obj: { where: Requirements }) => {
-        const data = () => {
-            return new Promise((resolve, reject) => {
-                this.client.triggerSharedCallbackEvent("natuna:server:getPlayerData", (data) => resolve(data), obj);
-            });
-        };
-
-        return (await data()) as Data;
+    get = async (obj: { where: Requirements }): Promise<Data> => {
+        return new Promise((resolve, reject) => {
+            this.client.triggerSharedCallbackEvent("natuna:server:getPlayerData", (data) => resolve(data), obj);
+        });
     };
 
     /**
@@ -108,13 +100,9 @@ export default class Players {
      * });
      * ```
      */
-    update = async (obj: { data: Data; where: Requirements }) => {
-        const data = () => {
-            return new Promise((resolve, reject) => {
-                this.client.triggerSharedCallbackEvent("natuna:server:updatePlayerData", (data) => resolve(data), obj);
-            });
-        };
-
-        return (await data()) as Data;
+    update = async (obj: { data: Data; where: Requirements }): Promise<Data> => {
+        return new Promise((resolve, reject) => {
+            this.client.triggerSharedCallbackEvent("natuna:server:updatePlayerData", (data) => resolve(data), obj);
+        });
     };
 }
