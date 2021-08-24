@@ -1,9 +1,9 @@
-name: Eslint - Lint
+name: ESLint
 
 on: [push, pull_request]
 
 jobs:
-    build:
+    lint:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
