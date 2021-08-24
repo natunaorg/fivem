@@ -76,7 +76,7 @@ export default class Client extends Events {
     constructor() {
         super();
         this.config;
-        this.plugins = {};
+        this.plugins;
         this.commands = {};
 
         this.utils = new UtilsWrapper(this);
@@ -197,6 +197,13 @@ export default class Client extends Events {
     private _initClientSettings = async (settings: any) => {
         this.plugins = settings.plugins;
         this.config = settings.config;
+        this.players = new PlayersWrapper(this, this.config);
+
+        if (settings.figletText) {
+            console.log(settings.figletText);
+        }
+
+        this._logger("Starting Client...");
 
         setTick(() => {
             if (this.config.game.noDispatchService) {
@@ -253,7 +260,7 @@ export default class Client extends Events {
         let count = 1;
         for (const pluginName in this.plugins) {
             const plugin = this.plugins[pluginName];
-            this._logger(`> Starting Plugins: \x1b[47m\x1b[2m\x1b[30m ${count}. ${pluginName} \x1b[0m`);
+            this._logger(`> Starting Plugins: ${count}. ${pluginName}`);
 
             if (plugin.nui) {
                 this.triggerNUIEvent("natuna:nui:retrievePluginList", {
@@ -265,7 +272,7 @@ export default class Client extends Events {
                 const module = await import(`../../plugins/${pluginName}/client/${pluginFile}`);
 
                 if (module && module.default && typeof module.default === "function") {
-                    this._logger(`  - Mounting Module: \x1b[32m${pluginFile}\x1b[0m`);
+                    this._logger(`  - Mounting Module: ${pluginFile}`);
                     module.default(this, plugin.client.config);
                 }
             }
@@ -292,18 +299,10 @@ export default class Client extends Events {
                 this.triggerClientEvent("natuna:client:starting");
                 this.triggerSharedEvent("natuna:client:starting");
 
-                await new Promise((resolve) => {
-                    figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
-                        console.log(result);
-                        resolve(true);
-                    });
-                });
-
                 // Initializing
                 this.triggerClientEvent("natuna:client:initializing");
                 this.triggerSharedEvent("natuna:client:initializing");
 
-                this._logger("Starting Client...");
                 this.triggerSharedEvent("natuna:server:addPlayerData");
                 await new Promise((resolve, reject) => {
                     this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", async (settings) => {

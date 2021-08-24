@@ -118,11 +118,11 @@ export default class Server extends Events {
         this.players = new PlayersWrapper(this, this.config);
 
         this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
+        this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
+
         this.addServerEventHandler("playerConnecting", this._events.playerConnecting);
         this.addServerEventHandler("onServerResourceStart", this._events.onServerResourceStart);
         this.addServerEventHandler("onServerResourceStop", this._events.onServerResourceStop);
-
-        this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
 
         // Test database connection (on startup) <-- check if connection success or not, also executing default SQL 👍
         this.dbQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db}\``);
@@ -468,14 +468,25 @@ export default class Server extends Events {
          * @description
          * Listen on whenever a player requested plugins to be setup on their client
          */
-        requestClientSettings: async () => {
+        requestClientSettings: async (source: number) => {
+            while (Object.keys(this.plugins).length == 0) await this.wait(500);
+
+            let figletText: string;
             let clientPlugins = { ...this.plugins };
 
             for (const plugins in clientPlugins) {
                 delete clientPlugins[plugins].server;
             }
 
+            await new Promise((resolve) => {
+                figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
+                    figletText = result;
+                    resolve(true);
+                });
+            });
+
             return JSON.stringify({
+                figletText,
                 plugins: clientPlugins,
                 config: {
                     players: this.config.core.players,
