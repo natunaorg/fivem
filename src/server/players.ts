@@ -277,6 +277,8 @@ export default class Players {
          * ```
          */
         getIdentifiers: (playerServerId: number) => {
+            const fxdkMode = GetConvarInt('sv_fxdkMode', 0);
+            
             const identifiers: {
                 steam?: string;
                 license?: string;
@@ -284,7 +286,9 @@ export default class Players {
                 discord?: string;
                 ip?: string;
                 [key: string]: any;
-            } = {};
+            } = {
+                license: fxdkMode ? 'fxdk_license' : undefined
+            };
 
             for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
                 const id = GetPlayerIdentifier(String(playerServerId), i).split(":");
