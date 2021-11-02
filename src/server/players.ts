@@ -286,7 +286,7 @@ export default class Players {
                 ip?: string;
                 [key: string]: any;
             } = {
-                license: fxdkMode ? "fxdk_license" : undefined
+                license: fxdkMode ? "fxdk_license" : undefined,
             };
 
             for (let i = 0; i < GetNumPlayerIdentifiers(String(playerServerId)); i++) {
