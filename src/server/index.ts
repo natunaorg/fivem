@@ -464,7 +464,7 @@ export default class Server extends Events {
                 });
             }
 
-            return deferrals.done();
+            setImmediate(() => deferrals.done());
         },
 
         /**
