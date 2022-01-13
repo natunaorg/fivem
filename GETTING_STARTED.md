@@ -44,7 +44,7 @@ Interested using and developing this framework? Let's begin...
     Which means you have to wait it build process on FiveM until complete. Wait until the build process is completed and `Started resource natuna` text is logged to the console.
 
 8. **Rebuild the files** \
-    Once the build process on the FiveM is completed, you much rebuild the files by doing the same as steps number 3.
+    Once the build process on the FiveM is completed, you must rebuild the files by doing the same as steps number 3.
 
     > Why must rebuild the files? Because the FiveM webpack build is different than the webpack on this resource, resulting to an error on the compiled files.
 
