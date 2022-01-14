@@ -3,7 +3,7 @@
 ![Github Repository Project Funding](https://img.shields.io/badge/Project%20Funding-%240.0-orange) ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg) ![Github Repository Issues Tracking](https://img.shields.io/bitbucket/issues-raw/natuna-framework/natuna)
 
 # **Natuna Framework**
-#### FiveM TypeScript/JavaScript Bundled Framework with single module engine that runs on JavaScript runtime. Powered with NodeJS.  
+#### FiveM TypeScript/JavaScript Bundled Framework with single module engine that runs on the JavaScript runtime. Powered by [NodeJS](https://nodejs.org/en/).  
 
 &nbsp;
 
@@ -24,15 +24,14 @@
 This project was created with the intention of enlivening the FiveM Javascript community. Most people use other frameworks like ESX or QB-Framework but most of them are written in LUA language, so because of that, I was interested in making something completely different from the community.
 
 **Before You Start,**
-This framework is not created for people who do not understand programming languages. This framework was created for programmers who at least master the basics of the following:
-1. Know how to operate/use command line as well as running commands inside it.
-2. Know how to use TypeScript / JavaScript and how it works.
-3. Know how to use script builder/compiler such as Webpack, and how it works.
-4. Know how to use package manager such as NPM, YARN, and how it works.
-5. Know how to self-start and self-learning the framework.
-6. Know to not ask the Developer(s) for support if the instructions were clearly stated in the Documentation.
-7. Know how the framework code works
-8. **Know how TO RESPECT OTHER PEOPLE WORKS AND NOT STEALING IT.** 
+This framework is not created for people who do not understand programming languages. There are a few skill requirements including:
+1. Command line usage
+2. JavaScript/TypeScript
+3. Understanding module bundlers (Webpack)
+4. Node.JS Package Managers (e.g. [npm](https://www.npmjs.com/) / [yarn](https://yarnpkg.com)
+5. Being confident in your learning / reach in order to understand how this framework is working
+6. Know to not ask the developer(s) for support if the instructions were clearly stated in the documentation.
+7. **Know TO RESPECT OTHER PEOPLE'S HARD WORK & TO NOT STEAL!** 
 
 As you have read above, you will have to do some general programming and requirements above to fully understand what this script has to offer. This script also does not contain like 100% fully featured functions from FiveM, as this framework is aims to provide the bare minimum necessary to help you developing your server.
 
