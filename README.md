@@ -84,7 +84,7 @@ Learn more about [JSDoc](https://jsdoc.app/)
 TypeScript can help us to write more reliable, bug free software.
 As mentioned above with regards to IntelliSense, it also allowed us to provide types, making code easier to write.
 
-Learn more about [Why Should We Use TypeScript?](https://dev.to/mistval/type-safe-typescript-4a6f) to know why using TypeScript is more better and safer.
+Learn more about [why should we use typeScript](https://dev.to/mistval/type-safe-typescript-4a6f)
 
 ### 6 | **Command Wrapper**
 You may registering command using `RegisterCommand` FiveM native, but for me that is boring. So instead using that, I have created a way more advance and safe command system, why more safe? because all of the commands are registered and validated on server instead of client.
@@ -152,7 +152,6 @@ Hate to see unstructured files? same. See how the structure of this framework be
 +-- natuna.config.js
 +-- (Other files...)
 ```
-
 
 ### 9 | **Event Wrapper**
 If `on`, `onNet`, `emit`, and `emitNet` is not enough for you or too complicated to understand, then we create a nice wrapper for you, even for NUI too. See all the available event functions below:
