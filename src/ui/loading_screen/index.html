@@ -1,10 +1,41 @@
 <!-- Put your loading screen on this folder with index.html as the main html file -->
 <html lang="en">
     <head>
-        <title>Example Loading Screen</title>
+        <title>Natuna Indonesia</title>
+        <link rel="stylesheet" href="./stylesheet.css" />
     </head>
 
     <body>
-        <h1>Loading . . .</h1>
+        <header class="blocker"></header>
+
+        <main>
+            <img class="logo" src="./assets/logo.png" />
+            <p class="subtitle">Temukan berbagai cerita menarik dan ciptakan perjalananmu disini!</p>
+        </main>
+
+        <footer class="blocker">
+            <section class="loader">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink"
+                    style="margin: auto; display: block; shape-rendering: auto"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="xMidYMid"
+                >
+                    <circle cx="50" cy="50" fill="none" stroke="#333333" stroke-width="10" r="35" stroke-dasharray="164.93361431346415 56.97787143782138">
+                        <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"></animateTransform>
+                    </circle>
+                </svg>
+                <p class="progress-text">Loading</p>
+                <div class="progress-bar"><div class="progress-bar-filled"></div></div>
+            </section>
+
+            <section class="credits">
+                <p>Natuna © 2021 by Rafly Maulana.</p>
+                <a>Any trademarks used belong to their respective owners.</a>
+            </section>
+        </footer>
+
+        <script type="text/javascript" src="./script.js"></script>
     </body>
 </html>

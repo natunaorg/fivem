@@ -1,0 +1,8 @@
+{
+    "active": true,
+    "plugins": {
+        "client": ["index.ts"],
+        "server": ["index.ts"]
+    },
+    "test": true
+}
