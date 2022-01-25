@@ -1,0 +1,19 @@
+{
+    "plugins": ["prettier"],
+    "extends": ["eslint:recommended", "prettier"],
+    "parserOptions": {
+        "sourceType": "module",
+        "ecmaVersion": 2020
+    },
+    "env": {
+        "browser": true,
+        "node": true
+    },
+    "rules": {
+        "no-case-declarations": "off",
+        "no-empty-function": "off",
+        "prefer-const": "off",
+        "prettier/prettier": "error",
+        "react/no-unescaped-entities": "off"
+    }
+}
