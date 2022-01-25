@@ -8,7 +8,7 @@
             "@client": ["src/client/index.ts"],
             "@client/*": ["src/client/*"],
             "@plugins/*": ["plugins/*"],
-            "@/*": ["./*"],
+            "@/*": ["./*"]
         },
         "outDir": "dist",
         "noImplicitAny": true,
@@ -16,27 +16,15 @@
         "target": "es6",
         "allowJs": true,
         "lib": ["es2017"],
-        "types": [
-            "@citizenfx/client",
-            "@citizenfx/server",
-            "@types/node",
-        ],
+        "types": [],
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "esModuleInterop": true,
-        "declaration": false,
-        "emitDeclarationOnly": false,
         "alwaysStrict": true,
         "skipLibCheck": true,
         "removeComments": true,
         "pretty": true
     },
-    "include": [
-        "src/**/*", 
-        "plugins/**/*",
-    ],
-    "exclude": [
-        "**/node_modules",
-        "**/__tests__/*",
-    ]
+    "include": ["src/**/*", "plugins/**/*"],
+    "exclude": ["**/node_modules", "**/__tests__/*"]
 }
