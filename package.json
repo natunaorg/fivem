@@ -6,9 +6,9 @@
     "repository": "https://github.com/natuna-framework/natuna",
     "author": "Rafly Maulana",
     "scripts": {
-        "build": "webpack --mode=production --progress",
-        "build:dev": "webpack --mode=development --progress",
-        "watch": "webpack --mode=development --watch --progress",
+        "build": "node esbuild.config.js --mode=production",
+        "build:dev": "node esbuild.config.js --mode=development",
+        "watch": "node esbuild.config.js --mode=development --watch",
         "lint": "eslint --ext .ts,.js .",
         "lint:fix": "eslint --fix --ext .ts,.js ."
     },
@@ -18,24 +18,21 @@
         "@citizenfx/client": "^2.0.4358-1",
         "@citizenfx/server": "^2.0.4249-1",
         "@prisma/client": "^3.8.1",
-        "@types/figlet": "^1.5.4",
-        "@types/node": "^16.4.1",
-        "@types/uniqid": "^5.3.1",
+        "esbuild": "^0.14.12",
         "figlet": "^1.5.0",
-        "mysql2": "^2.2.5",
         "node-fetch": "^2.6.1",
         "tiny-glob": "^0.2.9",
-        "typedoc": "^0.21.5",
-        "uniqid": "^5.3.0"
+        "typedoc": "^1.0.0-dev.4"
     },
     "devDependencies": {
+        "@types/figlet": "^1.5.4",
+        "@types/node": "^17.0.10",
         "@types/node-fetch": "^2.5.12",
+        "eslint": "^8.7.0",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-plugin-prettier": "^4.0.0",
+        "prettier": "^2.5.1",
         "prisma": "^3.8.1",
-        "remove-files-webpack-plugin": "^1.4.3",
-        "ts-loader": "9.2.3",
-        "typescript": "^4.3.5",
-        "webpack": "5.46.0",
-        "webpack-cli": "^4.7.2",
-        "webpack-node-externals": "^3.0.0"
+        "typescript": "^4.6.0-dev.20220121"
     }
 }
