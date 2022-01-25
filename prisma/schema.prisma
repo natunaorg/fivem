@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ban_lists {
+  license String @id @db.VarChar(255)
+  reason  String @db.LongText
+}
+
+model characters {
+  id                                          Int     @id @default(autoincrement())
+  user_id                                     Int
+  first_name                                  String  @db.VarChar(255)
+  last_name                                   String  @db.VarChar(255)
+  last_position                               String? @db.LongText
+  skin                                        String? @db.LongText
+  health                                      Int?
+  armour                                      Int?
+  users_characters_user_idTousers             users   @relation("characters_user_idTousers", fields: [user_id], references: [id], onDelete: Cascade, map: "characters_ibfk_1")
+  users_charactersTousers_active_character_id users[] @relation("charactersTousers_active_character_id")
+
+  @@index([user_id], map: "user_id")
+}
+
+model users {
+  id                                               Int          @id @default(autoincrement())
+  license                                          String       @db.VarChar(255)
+  active_character_id                              Int?
+  last_ip                                          String?      @db.VarChar(255)
+  last_login                                       String?      @db.VarChar(255)
+  characters_charactersTousers_active_character_id characters?  @relation("charactersTousers_active_character_id", fields: [active_character_id], references: [id], onDelete: Cascade, map: "users_ibfk_1")
+  characters_characters_user_idTousers             characters[] @relation("characters_user_idTousers")
+
+  @@index([active_character_id], map: "active_character_id")
+}
+
+model whitelist_lists {
+  license String @id @db.VarChar(255)
+}
