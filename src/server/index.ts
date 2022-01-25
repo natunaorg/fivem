@@ -4,75 +4,214 @@
  */
 
 "use strict";
+import "@citizenfx/server";
 
 import config from "@/natuna.config.js";
 import pkg from "@/package.json";
 
-import fs from "fs";
-import path from "path";
-import util from "util";
+import { lstatSync } from "fs";
+import { basename, join, normalize } from "path";
 
-import mysql from "mysql2";
 import fetch from "node-fetch";
 import figlet from "figlet";
 import glob from "tiny-glob";
 
 import CrypterWrapper from "@server/crypter";
 import PlayersWrapper from "@server/players";
-import CommandWrapper, * as Command from "@server/command";
-
-import MySQL from "@server/database/mysql";
-import Cassandra from "@server/database/cassandra";
-import MongoDB from "@server/database/mongodb";
+import CommandWrapper, { Config, Handler } from "@server/command";
 
 import Events from "@server/events";
+import prisma from "@server/lib/prisma";
 
-/**
- * @hidden
- */
-// prettier-ignore
-export type SelectedDatabaseDriver = 
-    typeof config.core.db extends "mysql" ? 
-        MySQL : 
-        typeof config.core.db extends "cassandra" ?
-            Cassandra : 
-            typeof config.core.db extends "mongodb" ? 
-                MongoDB : 
-                MySQL;
+export type PluginManifest = {
+    active: boolean;
+    dirname?: string;
+    client: {
+        configs: {
+            [key: string]: string;
+        };
+        modules: string[];
+    };
+    server: {
+        configs: {
+            [key: string]: string;
+        };
+        modules: string[];
+    };
+};
 
 export default class Server extends Events {
     /**
-     * @description
-     * Database function to execute classic SQL query
-     *
-     * @param query SQL query string to execute
-     *
-     * @example
-     * ```ts
-     * dbQuery('CREATE DATABASE IF NOT EXISTS databaseName');
-     * ```
-     */
-    dbQuery: MySQL["utils"]["executeQuery"];
-
-    /**
-     * @description
-     * Crypter to Encrypt or Decrypt your secret data
-     */
-    crypter: (algorithm: string, secretKey: string) => CrypterWrapper;
-
-    /**
-     * @description
-     * Players wrapper
-     */
-    players: PlayersWrapper;
-
-    /**
      * @hidden
-     *
-     * @description
-     * Configurations
      */
-    private config: typeof config;
+    constructor() {
+        super();
+
+        prisma.$connect().catch((err) => {
+            throw new Error(err);
+        });
+
+        this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
+
+        this.addSharedEventHandler("natuna:server:requestClientSettings", async (source: number) => {
+            while (Object.keys(this.plugins).length == 0) await this.wait(500);
+
+            let figletText: string;
+            let clientPlugins = { ...this.plugins };
+
+            for (const plugins in clientPlugins) {
+                delete clientPlugins[plugins].server;
+            }
+
+            await new Promise((resolve) => {
+                figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
+                    figletText = result;
+                    resolve(true);
+                });
+            });
+
+            return JSON.stringify({
+                figletText,
+                plugins: clientPlugins,
+                config: {
+                    players: this.config.core.players,
+                    discordRPC: this.config.core.discordRPC,
+                    nui: this.config.core.nui,
+                    game: this.config.core.game,
+                },
+            });
+        });
+
+        this.addServerEventHandler("playerConnecting", async (name: string, setKickReason: (reason: string) => any, deferrals: { [key: string]: any }) => {
+            /**
+             * @description
+             * Getting player
+             */
+            deferrals.defer();
+            const player = (global as any).source;
+
+            deferrals.update(`[🏝 Natuna] Hello ${name}! Please wait until we verify your account.`);
+
+            /**
+             * @description
+             * Checking License
+             */
+            const playerIds = this.players.utils.getIdentifiers(player);
+
+            if (!playerIds.license || typeof playerIds.license == "undefined") {
+                return deferrals.done("[🏝 Natuna] Your game license is invalid!");
+            }
+
+            this._logger(`Player ${name} Joining the server. (License ID: ${playerIds.license})`);
+
+            /**
+             * @description
+             * Checking Whitelist Status
+             */
+            if (this.config.core.isWhitelisted) {
+                const checkWhitelistStatus = await prisma.whitelist_lists.findFirst({
+                    where: {
+                        license: playerIds.license,
+                    },
+                });
+
+                if (!checkWhitelistStatus) {
+                    return deferrals.done("[🏝 Natuna] You are not whitelisted!");
+                }
+            }
+
+            /**
+             * @description
+             * Checking Account
+             */
+            deferrals.update(`[🏝 Natuna] Finding your account in our database.`);
+
+            const user = await prisma.users.findFirst({
+                where: {
+                    license: playerIds.license,
+                },
+            });
+
+            const newCheckpointData = {
+                last_ip: playerIds.ip.toString(),
+                last_login: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }).toString(),
+            };
+
+            /**
+             * @description
+             * Handling when account does not exist
+             */
+            // If account does not exist
+            if (!user) {
+                await prisma.users.create({
+                    data: {
+                        license: playerIds.license,
+                        ...newCheckpointData,
+                    },
+                });
+            }
+
+            // If account exist
+            else {
+                // If user was banned
+                const checkBanStatus = await prisma.ban_lists.findFirst({
+                    where: {
+                        license: playerIds.license,
+                    },
+                });
+
+                if (checkBanStatus) {
+                    return deferrals.done(checkBanStatus.reason);
+                }
+
+                // If not
+                await prisma.users.updateMany({
+                    data: {
+                        ...newCheckpointData,
+                    },
+                    where: {
+                        license: playerIds.license,
+                    },
+                });
+            }
+
+            setImmediate(() => deferrals.done());
+        });
+
+        this.addServerEventHandler("onServerResourceStart", async (resourceName: string) => {
+            if (GetCurrentResourceName() == resourceName) {
+                // Starting
+                this.triggerServerEvent("natuna:server:starting");
+
+                await new Promise((resolve) => {
+                    figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
+                        console.log(result);
+                        resolve(true);
+                    });
+                });
+
+                await this._checkPackageVersion();
+
+                // Initializing
+                this.triggerServerEvent("natuna:server:initializing");
+
+                this._logger("Starting Server...");
+                await this._initServerPlugins();
+
+                // Ready
+                this.triggerServerEvent("natuna:server:ready");
+
+                this._logger("Server Ready!");
+            }
+        });
+
+        this.addServerEventHandler("onServerResourceStop", (resourceName: string) => {
+            if (GetCurrentResourceName() == resourceName) {
+                // Stopping
+                this.triggerServerEvent("natuna:server:stopped");
+            }
+        });
+    }
 
     /**
      * @hidden
@@ -80,24 +219,15 @@ export default class Server extends Events {
      * @description
      * List of All Plugins
      */
-    private plugins: {
-        [key: string]: {
-            path: string;
-            client?: {
-                modules: Array<string>;
-                config: {
-                    [key: string]: any;
-                };
-            };
-            server?: {
-                modules: Array<string>;
-                config: {
-                    [key: string]: any;
-                };
-            };
-            nui?: boolean;
-        };
-    };
+    private plugins: Record<string, PluginManifest> = {};
+
+    /**
+     * @hidden
+     *
+     * @description
+     * Configurations
+     */
+    private config = config;
 
     /**
      * @hidden
@@ -105,54 +235,19 @@ export default class Server extends Events {
      * @description
      * List of Registered Commands
      */
-    private commands: { [key: string]: CommandWrapper };
-
-    /**
-     * @hidden
-     */
-    constructor() {
-        super();
-        this.config = config;
-        this.plugins = {};
-        this.commands = {};
-
-        this.dbQuery = this.db("").utils.executeQuery;
-        this.crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new CrypterWrapper(algorithm, secretKey);
-        this.players = new PlayersWrapper(this, this.config);
-
-        this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
-        this.addSharedCallbackEventHandler("natuna:server:requestClientSettings", this._events.requestClientSettings);
-
-        this.addServerEventHandler("playerConnecting", this._events.playerConnecting);
-        this.addServerEventHandler("onServerResourceStart", this._events.onServerResourceStart);
-        this.addServerEventHandler("onServerResourceStop", this._events.onServerResourceStop);
-
-        // Test database connection (on startup) <-- check if connection success or not, also executing default SQL 👍
-        this.dbQuery(`CREATE DATABASE IF NOT EXISTS \`${this.config.core.db}\``);
-    }
+    private commands: Record<string, CommandWrapper> = {};
 
     /**
      * @description
-     * Database wrapper
+     * Players wrapper
      */
-    db = (table: string): SelectedDatabaseDriver => {
-        switch (typeof config.core.db) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            case "cassandra":
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                return new Cassandra();
+    players = new PlayersWrapper(this, this.config);
 
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            case "mysql":
-            default:
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                return new MySQL(mysql.createConnection(this.config.core.db), table);
-        }
-    };
+    /**
+     * @description
+     * Crypter to Encrypt or Decrypt your secret data
+     */
+    crypter = (algorithm: string = this.config.core.crypter.algorithm, secretKey: string = this.config.core.crypter.secretKey) => new CrypterWrapper(algorithm, secretKey);
 
     /**
      * @description
@@ -194,7 +289,7 @@ export default class Server extends Events {
      * });
      * ```
      */
-    registerCommand = (name: string | Array<string>, handler: Command.Handler, config: Command.Config = {}, isClientCommand = false) => {
+    registerCommand = (name: string | Array<string>, handler: Handler, config: Config = {}, isClientCommand = false) => {
         const addCommand = (name: string) => {
             // Throws an error when same server command was registered twice
             if (this.commands[name] && !isClientCommand) throw new Error(`Command "${name}" had already been registered before!`);
@@ -234,68 +329,6 @@ export default class Server extends Events {
      * @readonly
      *
      * @description
-     * Loops through folder and retrieve every plugins file
-     *
-     * @param type Type of the plugin (Client or Server)
-     */
-    private _getPlugins = async () => {
-        let plugins: Server["plugins"] = {};
-
-        const basePath = GetResourcePath(GetCurrentResourceName());
-
-        let pluginList = await glob("plugins/*", {
-            cwd: basePath,
-        });
-
-        for (const pluginPath of pluginList) {
-            const pluginFullPath = path.join(basePath, pluginPath);
-
-            if (fs.lstatSync(pluginFullPath).isDirectory()) {
-                const pluginName = path.basename(pluginPath);
-                const moduleTypeList = await glob("*", {
-                    cwd: pluginFullPath,
-                });
-
-                plugins[pluginName] = {
-                    path: path.normalize(pluginPath),
-                    client: {
-                        modules: [],
-                        config: this.config.plugins[pluginName]?.client || {},
-                    },
-                    server: {
-                        modules: [],
-                        config: this.config.plugins[pluginName]?.server || {},
-                    },
-                    nui: false,
-                };
-
-                for (const moduleType of moduleTypeList) {
-                    const moduleTypePath = path.join(pluginFullPath, moduleType);
-
-                    if (moduleType === "ui") {
-                        plugins[pluginName].nui = true;
-                    } else if (fs.lstatSync(moduleTypePath).isDirectory()) {
-                        const modules = await glob("**/*.{ts,js}", {
-                            cwd: moduleTypePath,
-                        });
-
-                        for (let module of modules) {
-                            module = path.normalize(module).replace(/\\/g, "/");
-                            plugins[pluginName][moduleType as "client" | "server"].modules.push(module);
-                        }
-                    }
-                }
-            }
-        }
-
-        return plugins;
-    };
-
-    /**
-     * @hidden
-     * @readonly
-     *
-     * @description
      * This function is to init a plugin, differs from the client ones, it's triggered whenever the script was ready
      */
     private _initServerPlugins = async () => {
@@ -307,11 +340,11 @@ export default class Server extends Events {
             this._logger(`> Starting Plugins: \x1b[47m\x1b[2m\x1b[30m ${count}. ${pluginName} \x1b[0m`);
 
             for (let pluginFile of plugin.server.modules) {
-                const module = require(`../../plugins/${pluginName}/server/${pluginFile}`);
+                const module = require(pluginFile);
 
                 if (module && module.default && typeof module.default === "function") {
                     this._logger(`  - Mounting Module: \x1b[32m${pluginFile}\x1b[0m`);
-                    module.default(this, plugin.server.config);
+                    module.default(this, plugin.server.configs);
                 }
             }
 
@@ -353,195 +386,6 @@ export default class Server extends Events {
                     return resolve(true);
                 });
         });
-    };
-
-    /**
-     * @hidden
-     * @readonly
-     *
-     * @description
-     * List of events on server
-     */
-    private _events = {
-        /**
-         * @description
-         * Listen on whenever a player joining a session also validating that player before joining the session
-         *
-         * @param name The display name of the player connecting
-         * @param setKickReason A function used to set a reason message for when the event is canceled.
-         * @param deferrals An object to control deferrals.
-         */
-        playerConnecting: async (name: string, setKickReason: (reason: string) => any, deferrals: { [key: string]: any }) => {
-            /**
-             * @description
-             * Getting player
-             */
-            deferrals.defer();
-            const player = (global as any).source;
-
-            deferrals.update(`[🏝 Natuna] Hello ${name}! Please wait until we verify your account.`);
-
-            /**
-             * @description
-             * Checking License
-             */
-            const playerIds = this.players.utils.getIdentifiers(player);
-
-            if (!playerIds.license || typeof playerIds.license == "undefined") {
-                return deferrals.done("[🏝 Natuna] Your game license is invalid!");
-            }
-
-            this._logger(`Player ${name} Joining the server. (License ID: ${playerIds.license})`);
-
-            /**
-             * @description
-             * Checking Whitelist Status
-             */
-            if (this.config.core.isWhitelisted) {
-                const checkWhitelistStatus = await this.db("whitelist_lists").findFirst({
-                    where: {
-                        license: playerIds.license,
-                    },
-                });
-
-                if (!checkWhitelistStatus) {
-                    return deferrals.done("[🏝 Natuna] You are not whitelisted!");
-                }
-            }
-
-            /**
-             * @description
-             * Checking Account
-             */
-            deferrals.update(`[🏝 Natuna] Finding your account in our database.`);
-
-            const user = await this.db("users").findFirst({
-                where: {
-                    license: playerIds.license,
-                },
-            });
-
-            const newCheckpointData = {
-                last_ip: playerIds.ip.toString(),
-                last_login: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }).toString(),
-            };
-
-            /**
-             * @description
-             * Handling when account does not exist
-             */
-            // If account does not exist
-            if (!user) {
-                await this.db("users").write({
-                    data: {
-                        license: playerIds.license,
-                        ...newCheckpointData,
-                    },
-                });
-            }
-
-            // If account exist
-            else {
-                // If user was banned
-                const checkBanStatus = await this.db("ban_lists").findFirst({
-                    where: {
-                        license: playerIds.license,
-                    },
-                });
-
-                if (checkBanStatus) {
-                    return deferrals.done(checkBanStatus.reason);
-                }
-
-                // If not
-                await this.db("users").update({
-                    data: {
-                        ...newCheckpointData,
-                    },
-                    where: {
-                        license: playerIds.license,
-                    },
-                });
-            }
-
-            setImmediate(() => deferrals.done());
-        },
-
-        /**
-         * @description
-         * Listen on whenever a player requested plugins to be setup on their client
-         */
-        requestClientSettings: async (source: number) => {
-            while (Object.keys(this.plugins).length == 0) await this.wait(500);
-
-            let figletText: string;
-            let clientPlugins = { ...this.plugins };
-
-            for (const plugins in clientPlugins) {
-                delete clientPlugins[plugins].server;
-            }
-
-            await new Promise((resolve) => {
-                figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
-                    figletText = result;
-                    resolve(true);
-                });
-            });
-
-            return JSON.stringify({
-                figletText,
-                plugins: clientPlugins,
-                config: {
-                    players: this.config.core.players,
-                    discordRPC: this.config.core.discordRPC,
-                    nui: this.config.core.nui,
-                    game: this.config.core.game,
-                },
-            });
-        },
-
-        /**
-         * @description
-         * Listen when Natuna Framework is starting
-         */
-        onServerResourceStart: async (resourceName: string) => {
-            if (GetCurrentResourceName() == resourceName) {
-                // Starting
-                this.triggerServerEvent("natuna:server:starting");
-
-                await new Promise((resolve) => {
-                    figlet.text("Natuna Framework", {}, (err: Error, result: string) => {
-                        console.log(result);
-                        resolve(true);
-                    });
-                });
-
-                await this._checkPackageVersion();
-
-                // Initializing
-                this.triggerServerEvent("natuna:server:initializing");
-
-                this._logger("Starting Server...");
-                this.plugins = await this._getPlugins();
-                await this._initServerPlugins();
-
-                // Ready
-                this.triggerServerEvent("natuna:server:ready");
-
-                this._logger("Server Ready!");
-            }
-        },
-
-        /**
-         * @description
-         * Listen when Natuna Framework is stopping
-         */
-        onServerResourceStop: (resourceName: string) => {
-            if (GetCurrentResourceName() == resourceName) {
-                // Stopping
-                this.triggerServerEvent("natuna:server:stopped");
-            }
-        },
     };
 }
 
