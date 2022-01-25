@@ -4,7 +4,9 @@
  */
 
 "use strict";
+import "@citizenfx/server";
 import Server from "@server";
+import prisma from "@server/lib/prisma";
 
 export type Requirements = {
     user_id?: number;
@@ -51,10 +53,6 @@ export default class Players {
         this.client = client;
         this.playerList = {};
         this.config = config.core.players;
-
-        this.client.addSharedCallbackEventHandler("natuna:server:getPlayerData", this.get);
-        this.client.addSharedCallbackEventHandler("natuna:server:updatePlayerData", this.update);
-        this.client.addSharedCallbackEventHandler("natuna:server:getPlayerList", () => this.playerList);
 
         this.client.addServerEventHandler("playerJoining", async () => {
             return await this._add({
@@ -191,7 +189,7 @@ export default class Players {
         }
 
         if (license) {
-            const user = await this.client.db("users").findFirst({ where: { license: license } });
+            const user = await prisma.users.findFirst({ where: { license: license } });
 
             const data: Data = {
                 user_id: user.id,

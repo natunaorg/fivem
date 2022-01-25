@@ -4,7 +4,7 @@
  */
 
 "use strict";
-import uniqid from "uniqid";
+import "@citizenfx/client";
 
 export default class Events {
     //  _   _ _   _ _____   _____                _
@@ -111,58 +111,6 @@ export default class Events {
         }
     };
 
-    //  _____ _ _            _     _____       _ _ _                _      _____                _
-    // /  __ \ (_)          | |   /  __ \     | | | |              | |    |  ___|              | |
-    // | /  \/ |_  ___ _ __ | |_  | /  \/ __ _| | | |__   __ _  ___| | __ | |____   _____ _ __ | |_
-    // | |   | | |/ _ \ '_ \| __| | |    / _` | | | '_ \ / _` |/ __| |/ / |  __\ \ / / _ \ '_ \| __|
-    // | \__/\ | |  __/ | | | |_  | \__/\ (_| | | | |_) | (_| | (__|   <  | |___\ V /  __/ | | | |_
-    //  \____/_|_|\___|_| |_|\__|  \____/\__,_|_|_|_.__/ \__,_|\___|_|\_\ \____/ \_/ \___|_| |_|\__|
-
-    /**
-     * @description
-     * Listen for triggerSharedCallbackEvent
-     *
-     * @param name Name of the event
-     * @param handler Handler of the received arguments
-     *
-     * @example
-     * ```ts
-     * addServerCallbackEventHandler('getPlayerName', (id) => getName(id));
-     * ```
-     */
-    addClientCallbackEventHandler = (name: string, handler: (...args: any) => any) => {
-        this.addClientEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
-            this.triggerClientEvent(temporalEventName, await handler(...args));
-        });
-    };
-
-    /**
-     * @description
-     * Trigger shared event between client and server
-     *
-     * **[IMPORTANT]** Only can be triggered an event that has been registered with addSharedCallbackEventHandler;
-     *
-     * @param name Name of the event
-     * @param callbackHandler Function to Handle Callback Data
-     * @param args Arguments to send
-     *
-     * @example
-     * ```ts
-     * triggerSharedCallbackEvent('getPlayerName', (data) => console.log(name), 1);
-     * ```
-     */
-    triggerClientCallbackEvent = (name: string, callbackHandler: (data: any) => any, ...args: any) => {
-        const temporalEventName = uniqid("cbtemp-");
-
-        this.addClientEventHandler(temporalEventName, (data: any) => {
-            callbackHandler(data);
-            removeEventListener(temporalEventName, () => false);
-        });
-
-        // Prevent triggering normal shared event
-        this.triggerClientEvent(`cb-${name}`, temporalEventName, ...args);
-    };
-
     //  _____ _                        _   _____                _
     // /  ___| |                      | | |  ___|              | |
     // \ `--.| |__   __ _ _ __ ___  __| | | |____   _____ _ __ | |_
@@ -217,57 +165,5 @@ export default class Events {
         } else {
             throw new Error(`Invalid Shared Trigger Name Properties for ${name}`);
         }
-    };
-
-    //  _____ _                        _   _____       _ _ _                _      _____                _
-    // /  ___| |                      | | /  __ \     | | | |              | |    |  ___|              | |
-    // \ `--.| |__   __ _ _ __ ___  __| | | /  \/ __ _| | | |__   __ _  ___| | __ | |____   _____ _ __ | |_
-    //  `--. \ '_ \ / _` | '__/ _ \/ _` | | |    / _` | | | '_ \ / _` |/ __| |/ / |  __\ \ / / _ \ '_ \| __|
-    // /\__/ / | | | (_| | | |  __/ (_| | | \__/\ (_| | | | |_) | (_| | (__|   <  | |___\ V /  __/ | | | |_
-    // \____/|_| |_|\__,_|_|  \___|\__,_|  \____/\__,_|_|_|_.__/ \__,_|\___|_|\_\ \____/ \_/ \___|_| |_|\__|
-
-    /**
-     * @description
-     * Listen for triggerSharedCallbackEvent
-     *
-     * @param name Name of the event
-     * @param handler Handler of the received arguments
-     *
-     * @example
-     * ```ts
-     * addSharedCallbackEventHandler('getPlayerName', (id) => getName(id));
-     * ```
-     */
-    addSharedCallbackEventHandler = (name: string, handler: (...args: any) => any) => {
-        this.addSharedEventHandler(`cb-${name}`, async (temporalEventName: string, ...args: any) => {
-            this.triggerSharedEvent(temporalEventName, await handler(...args));
-        });
-    };
-
-    /**
-     * @description
-     * Trigger shared event between client and server
-     *
-     * **[IMPORTANT]** Only can be triggered an event that has been registered with addSharedCallbackEventHandler;
-     *
-     * @param name Name of the event
-     * @param callbackHandler Function to Handle Callback Data
-     * @param args Arguments to send
-     *
-     * @example
-     * ```ts
-     * triggerSharedCallbackEvent('getPlayerName', (data) => console.log(name), 1);
-     * ```
-     */
-    triggerSharedCallbackEvent = (name: string, callbackHandler: (data: any) => any, ...args: any) => {
-        const temporalEventName = uniqid("cbtemp-");
-
-        this.addSharedEventHandler(temporalEventName, (data: any) => {
-            callbackHandler(data);
-            removeEventListener(temporalEventName, () => false);
-        });
-
-        // Prevent triggering normal shared event
-        this.triggerSharedEvent(`cb-${name}`, temporalEventName, ...args);
     };
 }
