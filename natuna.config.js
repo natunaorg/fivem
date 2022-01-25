@@ -73,7 +73,7 @@ module.exports = {
              * [IMPORTANT] KEEP IT SECRET, SAVE IT, you don't wanna leak or lose this key. Once it's gone missing, you're done.
              * @example someStrongPassword123
              */
-            secretKey: "vOVH6sdmpNWjRRIqCc7rdxs01lwHzfr3",
+            secretKey: "akusayangsemuanyamuach1324656769420",
         },
 
         /**
@@ -172,18 +172,6 @@ module.exports = {
              * Set pause menu title
              */
             pauseMenuTitle: "Natuna Indonesia | discord.gg/kGPHBvXzGM",
-        },
-    },
-
-    /**
-     * @description
-     * You might wanna put your plugin configuration in here.
-     */
-    plugins: {
-        "raflymln-vehicletransmission": {
-            client: {
-                carWithManualTransmissions: ["lynx", "jb700", "dominator"],
-            },
         },
     },
 };
