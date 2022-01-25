@@ -295,27 +295,28 @@ export default class Game {
          * @description
          * Get Nearest player from a coords. Returning list of player ids if found.
          *
-         * @param coords Coordinates of the location to find the player
+         * @param _coords Coordinates of the location to find the player
          *
          * @example
          * ```ts
          * getNearestOneIn({ 100, 300, 400, 5.0 });
          * ```
          */
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         getNearestOneIn: async (coords: { x: number; y: number; z: number; radius?: number }) => {
-            const players = await this.client.players.list();
-            let playerList = [];
+            // const players = await this.client.players.list();
+            let playerList: any[] = [];
 
-            for (const player of players) {
-                const playerId = GetPlayerFromServerId(player.server_id);
-                const ped = GetPlayerPed(playerId);
-                const playerCoords = this.entity.getCoords(ped);
-                const distance = GetDistanceBetweenCoords(coords.x, coords.y, coords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
+            // for (const player of players) {
+            //     const playerId = GetPlayerFromServerId(player.server_id);
+            //     const ped = GetPlayerPed(playerId);
+            //     const playerCoords = this.entity.getCoords(ped);
+            //     const distance = GetDistanceBetweenCoords(coords.x, coords.y, coords.z, playerCoords.x, playerCoords.y, playerCoords.z, true);
 
-                if (distance <= (coords.radius || 5.0)) {
-                    playerList.push(player.server_id);
-                }
-            }
+            //     if (distance <= (coords.radius || 5.0)) {
+            //         playerList.push(player.server_id);
+            //     }
+            // }
 
             return playerList;
         },
@@ -412,7 +413,6 @@ export default class Game {
          * ```
          */
         getNearestOneIn: (coords: { x: number; y: number; z: number; radius?: number }) => {
-            let vehicleList = [];
             const vehicleFlags = [0, 2, 4, 6, 7, 23, 127, 260, 2146, 2175, 12294, 16384, 16386, 20503, 32768, 67590, 67711, 98309, 100359];
 
             for (const flag of vehicleFlags) {

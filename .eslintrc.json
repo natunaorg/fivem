@@ -1,6 +1,7 @@
 {
-    "plugins": ["prettier"],
-    "extends": ["eslint:recommended", "prettier"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint", "prettier"],
+    "extends": ["eslint:recommended", "prettier", "plugin:@typescript-eslint/recommended"],
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2020
@@ -14,6 +15,7 @@
         "no-empty-function": "off",
         "prefer-const": "off",
         "prettier/prettier": "error",
-        "react/no-unescaped-entities": "off"
+        "react/no-unescaped-entities": "off",
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }

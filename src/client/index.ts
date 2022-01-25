@@ -13,8 +13,6 @@ import * as Command from "@server/command";
 
 import Events from "@client/events";
 
-import figlet from "figlet";
-
 export default class Client extends Events {
     /**
      * @hidden
@@ -221,7 +219,7 @@ export default class Client extends Events {
         }
 
         if (this.config.discordRPC) {
-            const players = await this.players.list();
+            // const players = await this.players.list();
             const rpc = this.config.discordRPC;
 
             SetDiscordAppId(rpc.appId);
@@ -309,13 +307,13 @@ export default class Client extends Events {
                 this.triggerSharedEvent("natuna:client:initializing");
 
                 this.triggerSharedEvent("natuna:server:addPlayerData");
-                await new Promise((resolve, reject) => {
-                    // this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", async (settings) => {
-                    //     await this._initClientSettings(JSON.parse(settings));
-                    //     await this._initClientPlugins();
-                    //     return resolve(true);
-                    // });
-                });
+                // await new Promise((resolve, reject) => {
+                //     this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", async (settings) => {
+                //         await this._initClientSettings(JSON.parse(settings));
+                //         await this._initClientPlugins();
+                //         return resolve(true);
+                //     });
+                // });
 
                 // Ready
                 this.triggerClientEvent("natuna:client:ready");

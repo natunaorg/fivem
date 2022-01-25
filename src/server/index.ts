@@ -9,12 +9,12 @@ import "@citizenfx/server";
 import config from "@/natuna.config.js";
 import pkg from "@/package.json";
 
-import { lstatSync } from "fs";
-import { basename, join, normalize } from "path";
+// import { lstatSync } from "fs";
+// import { basename, join, normalize } from "path";
 
 import fetch from "node-fetch";
 import figlet from "figlet";
-import glob from "tiny-glob";
+// import glob from "tiny-glob";
 
 import CrypterWrapper from "@server/crypter";
 import PlayersWrapper from "@server/players";
@@ -53,7 +53,7 @@ export default class Server extends Events {
 
         this.addSharedEventHandler("natuna:server:registerCommand", this.registerCommand);
 
-        this.addSharedEventHandler("natuna:server:requestClientSettings", async (source: number) => {
+        this.addSharedEventHandler("natuna:server:requestClientSettings", async () => {
             while (Object.keys(this.plugins).length == 0) await this.wait(500);
 
             let figletText: string;
@@ -336,17 +336,17 @@ export default class Server extends Events {
 
         let count = 1;
         for (const pluginName in this.plugins) {
-            const plugin = this.plugins[pluginName];
+            // const plugin = this.plugins[pluginName];
             this._logger(`> Starting Plugins: \x1b[47m\x1b[2m\x1b[30m ${count}. ${pluginName} \x1b[0m`);
 
-            for (let pluginFile of plugin.server.modules) {
-                const module = require(pluginFile);
+            // for (let pluginFile of plugin.server.modules) {
+            //     const module = require(pluginFile);
 
-                if (module && module.default && typeof module.default === "function") {
-                    this._logger(`  - Mounting Module: \x1b[32m${pluginFile}\x1b[0m`);
-                    module.default(this, plugin.server.configs);
-                }
-            }
+            //     if (module && module.default && typeof module.default === "function") {
+            //         this._logger(`  - Mounting Module: \x1b[32m${pluginFile}\x1b[0m`);
+            //         module.default(this, plugin.server.configs);
+            //     }
+            // }
 
             count += 1;
         }
@@ -362,7 +362,7 @@ export default class Server extends Events {
      * Check package version and compare it to remote repository.
      */
     private _checkPackageVersion = () => {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this._logger(`Welcome! Checking your version...`);
             this._logger(`You are currently using version ${pkg.version}.`);
 

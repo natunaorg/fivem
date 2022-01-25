@@ -7,7 +7,7 @@
 const esbuild = require("esbuild");
 const glob = require("tiny-glob");
 const path = require("path");
-const fs = require("fs");
+// const fs = require("fs");
 
 const isProduction = process.argv.findIndex((argItem) => argItem === "--mode=production") >= 0;
 const isWatch = process.argv.findIndex((argItem) => argItem === "--watch") >= 0;

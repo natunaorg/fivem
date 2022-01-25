@@ -19,7 +19,7 @@ class Module {
         });
 
         // Spawn a Player
-        this.client.registerCommand("spawn", (src, args) => {
+        this.client.registerCommand("spawn", () => {
             (global as any).exports.spawnmanager.spawnPlayer(
                 {
                     x: 686.245,
@@ -42,7 +42,7 @@ class Module {
             iconId: 61,
             location: {
                 x: 310.5168151855469,
-                y: -591.2456665039062,
+                y: -591.245666503906,
                 z: 43.29185485839844,
             },
         });
@@ -51,6 +51,8 @@ class Module {
         const position = this.client.utils.vector3(1.0, 1.0, 1.0);
         const position2 = this.client.utils.vector3(4.0, 3.0, 1.0);
         const distance = position.distance(position2);
+
+        console.log(distance);
     }
 }
 
