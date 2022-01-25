@@ -4,6 +4,7 @@
  */
 
 "use strict";
+import "@citizenfx/client";
 import Client from "@client";
 
 export default class Game {

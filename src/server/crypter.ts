@@ -4,6 +4,7 @@
  */
 
 "use strict";
+import "@citizenfx/server";
 import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
 
 export default class Crypter {

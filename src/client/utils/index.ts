@@ -4,6 +4,7 @@
  */
 
 "use strict";
+import "@citizenfx/client";
 import Client from "@client";
 import Vector3 from "@client/utils/vector3";
 

@@ -4,6 +4,7 @@
  */
 
 "use strict";
+import "@citizenfx/client";
 
 import UtilsWrapper from "@client/utils";
 import GameWrapper from "@client/game";
@@ -226,9 +227,8 @@ export default class Client extends Events {
             SetDiscordAppId(rpc.appId);
 
             const parseRPCString = (string: string) => {
-                return string
-                    .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId())) // Player Name
-                    .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(players.length)); // Total Active Player
+                return string.replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId())); // Player Name
+                // .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(players.length)); // Total Active Player
             };
 
             const setRPC = () => {
@@ -310,11 +310,11 @@ export default class Client extends Events {
 
                 this.triggerSharedEvent("natuna:server:addPlayerData");
                 await new Promise((resolve, reject) => {
-                    this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", async (settings) => {
-                        await this._initClientSettings(JSON.parse(settings));
-                        await this._initClientPlugins();
-                        return resolve(true);
-                    });
+                    // this.triggerSharedCallbackEvent("natuna:server:requestClientSettings", async (settings) => {
+                    //     await this._initClientSettings(JSON.parse(settings));
+                    //     await this._initClientPlugins();
+                    //     return resolve(true);
+                    // });
                 });
 
                 // Ready

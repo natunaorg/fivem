@@ -4,6 +4,7 @@
  */
 
 "use strict";
+import "@citizenfx/server";
 import Server from "@server";
 
 /**

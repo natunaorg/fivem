@@ -2,6 +2,8 @@
  * @module Client - Utility - Vector3
  * @category Client
  */
+"use strict";
+import "@citizenfx/client";
 
 export interface Quaternion {
     x: number;

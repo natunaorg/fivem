@@ -4,6 +4,7 @@
  */
 
 "use strict";
+import "@citizenfx/client";
 import Client from "@client";
 import { Data, Requirements } from "@server/players";
 
@@ -43,19 +44,7 @@ export default class Players {
      * await list();
      * ```
      */
-    list = async (): Promise<Data[]> => {
-        return new Promise((resolve, reject) => {
-            this.client.triggerSharedCallbackEvent("natuna:server:getPlayerList", (data: { [key: string]: string }) => {
-                let playerList: Array<Data> = [];
-
-                for (const player of Object.values(data)) {
-                    playerList.push(JSON.parse(player));
-                }
-
-                return resolve(playerList);
-            });
-        });
-    };
+    list = async () => {};
 
     /**
      * @description
@@ -74,11 +63,7 @@ export default class Players {
      * });
      * ```
      */
-    get = async (obj: { where: Requirements }): Promise<Data> => {
-        return new Promise((resolve, reject) => {
-            this.client.triggerSharedCallbackEvent("natuna:server:getPlayerData", (data) => resolve(data), obj);
-        });
-    };
+    get = async (obj: { where: Requirements }) => {};
 
     /**
      * @description
@@ -100,9 +85,5 @@ export default class Players {
      * });
      * ```
      */
-    update = async (obj: { data: Data; where: Requirements }): Promise<Data> => {
-        return new Promise((resolve, reject) => {
-            this.client.triggerSharedCallbackEvent("natuna:server:updatePlayerData", (data) => resolve(data), obj);
-        });
-    };
+    update = async (obj: { data: Data; where: Requirements }) => {};
 }
