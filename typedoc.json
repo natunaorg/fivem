@@ -1,10 +1,10 @@
 {
-    "includes": "src/ui/nui",
+    "includes": ["README.md"],
     "entryPoints": ["src/client/", "src/server/", "src/ui/nui/types.d.ts"],
-    "out": "docs",
+    "out": "typedoc",
     "name": "Natuna Framework",
-    "theme": "./node_modules/@natuna-framework/typedoc-theme",
-    "highlightTheme": "nord",
+    "theme": "default",
     "categoryOrder": ["Client", "Server", "NUI", "*"],
-    "includeVersion": true
+    "includeVersion": true,
+    "externalPattern": "plugins/**/*.ts"
 }
