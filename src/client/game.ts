@@ -1,24 +1,13 @@
-/**
- * @module Client - Game
- * @category Client
- */
-
 "use strict";
 import "@citizenfx/client";
-import Client from "@client";
+
+import type Utils from "@client/utils";
 
 export default class Game {
     /**
      * @hidden
      */
-    client: Client;
-
-    /**
-     * @hidden
-     */
-    constructor(client: Client) {
-        this.client = client;
-    }
+    constructor(private utils: Utils) {}
 
     /**
      * @description
@@ -143,7 +132,7 @@ export default class Game {
 
                 this.ped.teleportToCoordinates(ped, { x: coords[0], y: coords[1], z: height });
 
-                await this.client.wait(5);
+                await this.utils.sleep(5);
                 if (groundZ) return true;
             }
 
@@ -230,7 +219,7 @@ export default class Game {
             const ped = PlayerPedId();
             const entity = IsPedInAnyVehicle(ped, false) ? GetVehiclePedIsUsing(ped) : ped;
 
-            let camHeading = this.client.utils.getCamDirection();
+            let camHeading = this.utils.game.getCamDirection();
             let { x, y, z, heading } = this.entity.getCoords(entity);
 
             // INPUT_MOVE_UP_ONLY (W)
@@ -279,7 +268,7 @@ export default class Game {
             SetEntityHeading(entity, heading);
             SetEntityCoordsNoOffset(entity, x, y, z, true, true, true);
 
-            await this.client.utils.drawInstructionalButtons([
+            await this.utils.game.drawInstructionalButtons([
                 { controlType: 0, controlId: 32, message: "Move Forward" },
                 { controlType: 0, controlId: 33, message: "Move Backward" },
                 { controlType: 0, controlId: 34, message: "Rotate Left" },
@@ -368,7 +357,7 @@ export default class Game {
 
             RequestModel(hash);
             while (!HasModelLoaded(hash)) {
-                await this.client.wait(500);
+                await this.utils.sleep(500);
             }
 
             const vehicle = CreateVehicle(hash, coords.x, coords.y, coords.z, coords.heading || 0, true, false);
