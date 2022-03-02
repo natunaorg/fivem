@@ -1,4 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+const Prisma = new PrismaClient();
 
-export default prisma;
+// Check first connection
+Prisma.$connect().catch((err) => {
+    throw new Error(err);
+});
+
+export default Prisma;
