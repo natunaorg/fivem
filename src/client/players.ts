@@ -1,39 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-empty-function */
-/**
- * @module Client - Players
- * @category Client
- */
-
 "use strict";
 import "@citizenfx/client";
-import Client from "@client";
-import { Data, Requirements } from "@server/players";
+
+import type Events from "@client/events";
+import type Game from "@client/game";
+import type { Query, Data } from "@server/players";
+
+import { EventType } from "@server/players";
 
 export default class Players {
-    /**
-     * @hidden
-     */
-    client: Client;
-
-    /**
-     * @hidden
-     */
-    constructor(client: Client, config: any) {
-        this.client = client;
-
-        setInterval(async () => {
-            const playerId = GetPlayerServerId(PlayerId());
-            await this.update({
-                data: {
-                    last_position: this.client.game.entity.getCoords(playerId),
-                },
-                where: {
-                    server_id: playerId,
-                },
-            });
-        }, config.locationUpdateInterval);
+    /** @hidden */
+    constructor(private events: Events, private game: Game) {
+        this.events.shared.listen(EventType.UPDATED_DATA_BROADCAST, async (players: Data[]) => {
+            this.#list = players;
+        });
     }
+
+    #list: Data[] = [];
 
     /**
      * @description
@@ -46,7 +28,17 @@ export default class Players {
      * await list();
      * ```
      */
-    list = async () => {};
+    listAll = () => {
+        // reduce is fast rather than for loop or map
+        return this.#list.reduce((data, player) => {
+            const ped = GetPlayerPed(GetPlayerFromServerId(player.server_id));
+
+            player.last_position = this.game.entity.getCoords(ped);
+            data.push(player);
+
+            return data;
+        }, []);
+    };
 
     /**
      * @description
@@ -65,7 +57,19 @@ export default class Players {
      * });
      * ```
      */
-    get = async (obj: { where: Requirements }) => {};
+    get = (query: Query) => {
+        const data = this.listAll().find((player: Data) => {
+            if (query.license) {
+                return player.license === query.license;
+            } else if (query.server_id) {
+                return player.server_id === query.server_id;
+            } else if (query.user_id) {
+                return player.user_id === query.user_id;
+            }
+        });
+
+        return data;
+    };
 
     /**
      * @description
@@ -73,7 +77,7 @@ export default class Players {
      *
      * **[IMPORTANT]** Don't use this function on Tick/Interval!
      *
-     * @param obj Data object to input
+     * @param data Data object to input
      *
      * @example
      * ```ts
@@ -87,5 +91,7 @@ export default class Players {
      * });
      * ```
      */
-    update = async (obj: { data: Data; where: Requirements }) => {};
+    update = async (data: Data) => {
+        return await this.events.shared.emit(EventType.CURRENT_PLAYER_UPDATE, [data]);
+    };
 }

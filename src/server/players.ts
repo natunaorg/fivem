@@ -1,23 +1,17 @@
-/**
- * @module Server - Players
- * @category Server
- */
-
 "use strict";
 import "@citizenfx/server";
-import Server from "@server";
-import prisma from "@server/lib/prisma";
 
-export type Requirements = {
+import Server from "@server";
+import Events from "@server/events";
+
+export type Query = {
     user_id?: number;
     server_id?: number;
     license?: string;
 };
 
-export type Data = {
-    user_id?: number;
-    server_id?: number;
-    license?: string;
+export type Data = Query & {
+    $index?: number;
     updated_at?: number;
     last_position?: {
         x: number;
@@ -25,51 +19,36 @@ export type Data = {
         z: number;
         heading: number;
     };
-    [key: string]: any;
 };
+
+export enum EventType {
+    CURRENT_PLAYER_UPDATE = "natuna:server:players:currentPlayerUpdate",
+    UPDATED_DATA_BROADCAST = "natuna:client:players:updatedDataBroadcast",
+}
 
 export default class Players {
     /**
      * @hidden
      */
-    client: Server;
-
-    /**
-     * @hidden
-     */
-    config: any;
-
-    /**
-     * @hidden
-     */
-    private playerList: {
-        [key: string]: string;
-    };
-
-    /**
-     * @hidden
-     */
-    constructor(client: Server, config: any) {
-        this.client = client;
-        this.playerList = {};
-        this.config = config.core.players;
-
-        this.client.addServerEventHandler("playerJoining", async () => {
-            return await this._add({
-                where: {
-                    server_id: (global as any).source,
-                },
+    constructor(private db: Server["db"], private events: Events) {
+        on("playerJoining", async () => {
+            return await this.#add({
+                server_id: globalThis.source,
             });
         });
 
-        this.client.addServerEventHandler("playerDropped", () => {
-            return this._delete({
-                where: {
-                    server_id: (global as any).source,
-                },
+        on("playerDropped", () => {
+            return this.#delete({
+                server_id: globalThis.source,
             });
+        });
+
+        this.events.shared.listen(EventType.CURRENT_PLAYER_UPDATE, async (source, data: Data) => {
+            return await this.update(data);
         });
     }
+
+    #list: Data[] = [];
 
     /**
      * @description
@@ -82,21 +61,15 @@ export default class Players {
      * list();
      * ```
      */
-    list = () => {
-        let playerList: Array<Data> = [];
-
-        for (const player of Object.values(this.playerList)) {
-            playerList.push(JSON.parse(player));
-        }
-
-        return playerList;
+    listAll = () => {
+        return this.#list;
     };
 
     /**
      * @description
      * Received current data of a player
      *
-     * @param obj Data object to input
+     * @param query Data object to input
      *
      * @example
      * ```ts
@@ -107,24 +80,25 @@ export default class Players {
      * });
      * ```
      */
-    get = (obj: { where: Requirements }) => {
-        const license = this.utils._parseId(obj);
+    get = (query: Query) => {
+        const license = this.#getLicenseId(query);
+        const dataIndex = this.#list.findIndex((player) => player.license === license);
 
-        if (license) {
-            // prettier-ignore
-            return this.playerList[license] 
-                ? JSON.parse(this.playerList[license]) as Data
-                : false;
+        if (dataIndex !== -1) {
+            return {
+                ...this.#list[dataIndex],
+                $index: dataIndex,
+            };
         }
 
-        return false;
+        return undefined;
     };
 
     /**
      * @description
      * Update current data of a player
      *
-     * @param obj Data object to input
+     * @param data Data object to input
      *
      * @example
      * ```ts
@@ -138,130 +112,108 @@ export default class Players {
      * });
      * ```
      */
-    update = async (obj: { data: Data; where: Requirements }) => {
-        let currentData = this.get(obj);
+    update = async (data: Data) => {
+        const currentData = this.get(data);
 
         if (!currentData) {
-            if (typeof obj.where.server_id === "number" || typeof obj.where.license === "string") {
-                const newData = await this._add(obj as any);
+            if (typeof data.server_id === "number" || typeof data.license === "string") {
+                const newData = await this.#add(data as any);
 
-                if (newData) {
-                    currentData = newData;
-                } else {
-                    throw new Error("No Data Available");
+                if (!newData) {
+                    throw new Error("No player data available, tried to add new player but failed.");
                 }
             } else {
-                throw new Error("No Data Available");
+                throw new Error("No player data available, data not found and can't create a new one since no server_id or license was provided.");
             }
         }
 
-        const data: Data = {
-            ...currentData, // Copy From Origin
-            ...obj.data, // Overwrites any differences
+        this.#list[currentData.$index] = {
+            ...currentData,
+            ...data,
             updated_at: Date.now(),
         };
 
-        this.playerList[data.license] = JSON.stringify(data);
-        return data;
+        this.#updateToClient();
+
+        return true;
     };
 
-    /**
-     * @readonly
-     * @hidden
-     *
-     * @description
-     * Add a new player data when playerJoining event received.
-     *
-     * @param obj Data object to input
-     */
-    private _add = async (obj: { where: { server_id?: number; license?: string } }) => {
-        if (this.get(obj)) return;
+    /** @hidden */
+    #add = async (data: Data) => {
+        if (!this.get(data)) {
+            const license = this.#getLicenseId(data);
 
-        let license;
+            if (license) {
+                const user = await this.db.users.findFirst({
+                    where: {
+                        license,
+                    },
+                });
 
-        if (obj.where.license) {
-            license = obj.where.license;
-        } else if (obj.where.server_id) {
-            const identifiers = this.utils.getIdentifiers(obj.where.server_id);
-            if (identifiers.license) {
-                license = identifiers.license;
+                this.#list.push({
+                    license,
+                    user_id: user.id,
+                    server_id: data.server_id,
+                    updated_at: Date.now(),
+                });
+
+                this.#updateToClient();
+
+                return true;
             }
-        }
 
-        if (license) {
-            const user = await prisma.users.findFirst({ where: { license: license } });
-
-            const data: Data = {
-                user_id: user.id,
-                license: user.license,
-                server_id: obj.where.server_id,
-                updated_at: Date.now(),
-            };
-
-            this.playerList[license] = JSON.stringify(data);
-
-            return data;
+            return false;
         }
 
         return false;
     };
 
-    /**
-     * @readonly
-     * @hidden
-     *
-     * @description
-     * Delete a data of player.
-     *
-     * @param obj Data object to input
-     */
-    private _delete = (obj: { where: Requirements }) => {
-        const license = this.utils._parseId(obj);
-        return license ? delete this.playerList[license] : false;
+    /** @hidden */
+    #delete = (data: Data) => {
+        const currentData = this.get(data);
+
+        if (currentData) {
+            this.#list.splice(currentData.$index, 1);
+            return true;
+        }
+
+        return false;
+    };
+
+    /** @hidden */
+    #getLicenseId = (query: Query) => {
+        const keysLength = Object.keys(query).length;
+
+        if (keysLength === 0) {
+            throw new Error("No 'where' option available");
+        }
+
+        if (keysLength > 1) {
+            throw new Error("'where' option on the configuration can only contains 1 key");
+        }
+
+        switch (true) {
+            case typeof query.server_id !== "undefined":
+                const identifiers = this.utils.getIdentifiers(query.server_id);
+                return String(identifiers.license);
+
+            case typeof query.license !== "undefined":
+                return query.license;
+
+            case typeof query.user_id !== "undefined":
+                const player = this.#list.find((player) => player.user_id === query.user_id);
+                return player ? player.license : null;
+        }
+
+        return false;
+    };
+
+    /** @hidden */
+    #updateToClient = () => {
+        this.events.shared.emit(EventType.UPDATED_DATA_BROADCAST, -1, [this.#list]);
     };
 
     utils = {
-        /**
-         * @readonly
-         * @hidden
-         *
-         * @description
-         * Parse a given id to return license ID
-         *
-         * @param id Id of the player
-         */
-        _parseId: (obj: { where: Requirements }) => {
-            const keysLength = Object.keys(obj.where).length;
-
-            if (keysLength === 0) {
-                throw new Error("No 'where' option available");
-            }
-
-            if (keysLength > 1) {
-                throw new Error("'where' option on the configuration can only contains 1 key");
-            }
-
-            switch (true) {
-                case typeof obj.where.server_id !== "undefined":
-                    const identifiers = this.utils.getIdentifiers(obj.where.server_id);
-                    return String(identifiers.license);
-
-                case typeof obj.where.license !== "undefined":
-                    return obj.where.license;
-
-                case typeof obj.where.user_id !== "undefined":
-                    for (const rawData of Object.values(this.playerList)) {
-                        const data: Data = JSON.parse(rawData);
-
-                        if (data.user_id === obj.where.user_id) {
-                            return data.license;
-                        }
-                    }
-            }
-
-            return false;
-        },
-
         /**
          * @description
          * Get all set of player ID and return it on JSON format
@@ -275,15 +227,17 @@ export default class Players {
          * ```
          */
         getIdentifiers: (playerServerId: number) => {
-            const fxdkMode = GetConvarInt("sv_fxdkMode", 0);
-            const identifiers: {
+            type Identifiers = {
                 steam?: string;
                 license?: string;
                 fivem?: string;
                 discord?: string;
                 ip?: string;
                 [key: string]: any;
-            } = {
+            };
+
+            const fxdkMode = GetConvarInt("sv_fxdkMode", 0);
+            const identifiers: Identifiers = {
                 license: fxdkMode ? "fxdk_license" : undefined,
             };
 
