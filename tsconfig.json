@@ -7,6 +7,8 @@
             "@server/*": ["src/server/*"],
             "@client": ["src/client/index.ts"],
             "@client/*": ["src/client/*"],
+            "@shared": ["src/shared/index.ts"],
+            "@shared/*": ["src/shared/*"],
             "@plugins/*": ["plugins/*"],
             "@/*": ["./*"]
         },
