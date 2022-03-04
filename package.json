@@ -2,16 +2,27 @@
     "name": "@natuna-framework/fivem",
     "version": "1.5.0",
     "description": "FiveM Typescript/Javascript Bundled Framework with single module engine that runs on Javascript runtime. Powered with NodeJS.",
+    "homepage": "https://fivem.natuna.runes.asia",
+    "license": "MIT",
+    "private": false,
     "main": "src/",
+    "packageManager": "yarn@1.22.17",
     "repository": {
         "url": "https://github.com/natuna-framework/natuna",
         "type": "git"
     },
     "author": {
-        "name": "Rafly Maulana",
-        "email": "me@raflymaulana.me",
-        "url": "https://raflymaulana.me"
+        "name": "Runes",
+        "email": "team@runes.asia",
+        "url": "https://runes.asia"
     },
+    "maintainers": [
+        {
+            "name": "Rafly Maulana",
+            "email": "me@raflymaulana.me",
+            "url": "https://raflymaulana.me"
+        }
+    ],
     "scripts": {
         "build": "node esbuild.config.js --mode=production",
         "build:dev": "node esbuild.config.js --mode=development",
@@ -19,17 +30,15 @@
         "lint": "eslint --ext .ts,.js .",
         "lint:fix": "eslint --fix --ext .ts,.js ."
     },
-    "license": "MIT",
-    "private": false,
     "dependencies": {
         "@citizenfx/client": "^2.0.4358-1",
         "@citizenfx/server": "^2.0.4249-1",
         "@prisma/client": "^3.8.1",
+        "dotenv": "^16.0.0",
         "esbuild": "^0.14.12",
         "figlet": "^1.5.0",
         "node-fetch": "^2.6.1",
-        "tiny-glob": "^0.2.9",
-        "typedoc": "^0.22.12"
+        "tiny-glob": "^0.2.9"
     },
     "devDependencies": {
         "@types/figlet": "^1.5.4",
@@ -43,5 +52,54 @@
         "prettier": "^2.5.1",
         "prisma": "^3.8.1",
         "typescript": "^4.5.5"
+    },
+    "optionalDependencies": {
+        "typedoc": "^0.22.12",
+        "typedoc-plugin-mdn-links": "^1.0.5",
+        "typedoc-plugin-merge-modules": "^3.1.0",
+        "typedoc-plugin-reference-excluder": "^1.0.0"
+    },
+    "prettier": {
+        "trailingComma": "es5",
+        "bracketSpacing": true,
+        "arrowParens": "always",
+        "endOfLine": "auto",
+        "htmlWhitespaceSensitivity": "css",
+        "bracketSameLine": true,
+        "jsxSingleQuote": false,
+        "printWidth": 200,
+        "semi": true,
+        "tabWidth": 4
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "plugins": [
+            "@typescript-eslint",
+            "prettier"
+        ],
+        "extends": [
+            "eslint:recommended",
+            "prettier",
+            "plugin:@typescript-eslint/recommended"
+        ],
+        "parserOptions": {
+            "sourceType": "module",
+            "ecmaVersion": 2020
+        },
+        "env": {
+            "browser": true,
+            "node": true
+        },
+        "rules": {
+            "no-case-declarations": "off",
+            "no-empty-function": "off",
+            "prefer-const": "off",
+            "prettier/prettier": "error",
+            "react/no-unescaped-entities": "off",
+            "@typescript-eslint/no-explicit-any": "off"
+        }
+    },
+    "prisma": {
+        "schema": "src/schema.prisma"
     }
 }

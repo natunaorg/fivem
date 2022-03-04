@@ -326,6 +326,11 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
+dotenv@^16.0.0:
+  version "16.0.0"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.0.0.tgz#c619001253be89ebb638d027b609c75c26e47411"
+  integrity sha512-qD9WU0MPM4SWLPJy/r2Be+2WgQj8plChsyrCNQzW/0WjvcJQiKQJ9mH3ZgB3fxbUUxgc/11ZJ0Fi5KiimWGz2Q==
+
 esbuild-android-arm64@0.14.13:
   version "0.14.13"
   resolved "https://registry.yarnpkg.com/esbuild-android-arm64/-/esbuild-android-arm64-0.14.13.tgz#a5c8cb275dc6dcaf2390abb639791ffc4aa6ead1"
@@ -1086,6 +1091,21 @@ type-fest@^0.20.2:
   version "0.20.2"
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
   integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
+
+typedoc-plugin-mdn-links@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/typedoc-plugin-mdn-links/-/typedoc-plugin-mdn-links-1.0.5.tgz#4445f1b26fb3796f86584ff558df0ab43511dde7"
+  integrity sha512-zAw2XBJx4i3aWBz/BkKNLsKpYzFcJYRM2GGafFmPvUTPi3yOXvCW4IjeiSvjEk17kSiYHspKSZ486zS5lCPkqQ==
+
+typedoc-plugin-merge-modules@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/typedoc-plugin-merge-modules/-/typedoc-plugin-merge-modules-3.1.0.tgz#60dbdbd2196c1bded8c9f0ff70c59ff34b4b7f80"
+  integrity sha512-DAHDZD+KG3mRm+hJFAMh/pO98CQ3W/BFA81FzWpc1kos66mLRIa7QVO30yBREkZNZMsTA7fgGEjEN2GO2cgi3A==
+
+typedoc-plugin-reference-excluder@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/typedoc-plugin-reference-excluder/-/typedoc-plugin-reference-excluder-1.0.0.tgz#a7b03669449249f449c0d4f30024df7acae2088b"
+  integrity sha512-M09tKr9/9+IWm2jWr2a7gdAuoB0OapfEqxlXt1I1PH8cL0cN0XuZ722oUlx+wYbQOfy5JDE+xza48iDAKYOQew==
 
 typedoc@^0.22.12:
   version "0.22.12"
