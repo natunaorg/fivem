@@ -4,10 +4,9 @@ import "@citizenfx/client";
 import type Utils from "@client/utils";
 
 export default class Game {
-    /**
-     * @hidden
-     */
-    constructor(private utils: Utils) {}
+    constructor(
+        private utils: Utils //
+    ) {}
 
     /**
      * @description

@@ -13,12 +13,12 @@ export default class LocalEvent extends EventBase {
         super();
 
         on(EventType.EVENT_HANDLER, (props: EmitData) => {
-            const listeners = this.listeners.filter((listener) => listener.name === props.name);
+            const listeners = this._listeners.filter((listener) => listener.name === props.name);
 
             for (const listener of listeners) {
                 const value = listener.handler(props.args);
 
-                this.callbackValues.push({
+                this._callbackValues.push({
                     uniqueId: props.uniqueId,
                     values: value ?? null,
                 });
@@ -32,7 +32,7 @@ export default class LocalEvent extends EventBase {
      */
     emit = <T>(name: string | string[], args?: NoFunction<T>[]) => {
         return new Promise((resolve) => {
-            name = this.__validateEventName(name);
+            name = this._validateEventName(name);
             const uniqueId = Math.random().toString(36).substring(2);
 
             for (const alias of name) {
@@ -45,11 +45,11 @@ export default class LocalEvent extends EventBase {
                 emit(EventType.EVENT_HANDLER, emitData);
             }
 
-            const callbackValues = this.callbackValues.findIndex((data) => data.uniqueId === uniqueId);
-            const returnValue = this.callbackValues[callbackValues].values;
+            const callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
+            const returnValue = this._callbackValues[callbackValues].values;
 
             // Remove the callback values from the array
-            this.callbackValues.splice(callbackValues, 1);
+            this._callbackValues.splice(callbackValues, 1);
 
             return resolve(returnValue);
         });
@@ -60,19 +60,19 @@ export default class LocalEvent extends EventBase {
      * Listen from a local event
      */
     listen = (name: string | string[], handler: (...args: any) => any) => {
-        name = this.__validateEventName(name);
+        name = this._validateEventName(name);
         let ids: number[] = [];
 
         for (const alias of name) {
-            this.listeners.push({
-                id: this.listenerCounter,
+            this._listeners.push({
+                id: this._listenerCounter,
                 name: alias,
                 handler,
             });
 
-            ids.push(this.listenerCounter);
+            ids.push(this._listenerCounter);
 
-            this.listenerCounter++;
+            this._listenerCounter++;
         }
 
         return ids;

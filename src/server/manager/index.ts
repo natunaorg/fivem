@@ -9,7 +9,11 @@ import TickManager from "@shared/manager/tick";
 import Utils from "@server/utils";
 
 export default class Manager {
-    constructor(private events: Events, private players: Players, private utils: Utils) {}
+    constructor(
+        private events: Events, //
+        private players: Players,
+        private utils: Utils
+    ) {}
 
     tick = new TickManager();
     command = new CommandManager(this.events, this.players, this.utils);

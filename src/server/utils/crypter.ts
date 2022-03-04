@@ -1,16 +1,12 @@
 "use strict";
 import "@citizenfx/server";
-import Server from "@server";
 
 import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
 
 export default class Crypter {
-    /** @hidden */
-    constructor(private clientConfig: Server["config"]) {}
-
     #iv: Buffer = randomBytes(16);
-    #algorithm = this.clientConfig.core.crypter.algorithm;
-    #secretKey = this.clientConfig.core.crypter.secretKey;
+    #algorithm = process.env.CRYPTER_ALGORITHM;
+    #secretKey = process.env.CRYPTER_SECRET_KEY;
 
     /**
      * @description

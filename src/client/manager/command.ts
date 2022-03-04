@@ -7,7 +7,9 @@ import type { Handler, Config } from "@server/lib/commandHandler";
 import { EventType } from "@server/lib/commandHandler";
 
 export default class CommandManager {
-    constructor(private events: Events) {
+    constructor(
+        private events: Events //
+    ) {
         this.events.shared.listen(EventType.SET_COMMAND_DESCRIPTION, this.setDescription);
         this.events.shared.listen(EventType.CLIENT_EXECUTE_COMMAND, (name: string, args: Array<any>, raw: string) => {
             const src = GetPlayerServerId(PlayerId());

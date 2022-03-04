@@ -4,7 +4,14 @@ import Server from "@server";
 import Players from "@server/players";
 
 export default class DeferralsChecker {
-    constructor(private source: number, private db: Server["db"], private config: Server["config"], private players: Players, private name: string, private deferrals: Record<string, any>) {
+    constructor(
+        private source: number, //
+        private db: Server["db"],
+        private isWhitelisted: boolean,
+        private players: Players,
+        private name: string,
+        private deferrals: Record<string, any>
+    ) {
         (async () => {
             this.deferrals.defer();
             deferrals.update(`[🏝 Natuna] Hello ${this.name}! Please wait until we verify your account.`);
@@ -19,19 +26,16 @@ export default class DeferralsChecker {
         })();
     }
 
-    /** @hidden */
     #playerIds = this.players.utils.getIdentifiers(this.source);
 
-    /** @hidden */
     #checkLicense = () => {
         if (!this.#playerIds.license || typeof this.#playerIds.license == "undefined") {
             return this.deferrals.done("[🏝 Natuna] Your game license is invalid!");
         }
     };
 
-    /** @hidden */
     #checkWhitelist = async () => {
-        if (this.config.core.isWhitelisted) {
+        if (this.isWhitelisted) {
             const checkWhitelistStatus = await this.db.whitelist_lists.findFirst({
                 where: {
                     license: this.#playerIds.license,
@@ -44,7 +48,6 @@ export default class DeferralsChecker {
         }
     };
 
-    /** @hidden */
     #checkAccount = async () => {
         const user = await this.db.users.findFirst({
             where: {

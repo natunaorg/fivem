@@ -8,9 +8,11 @@ import type { Query, Data } from "@server/players";
 import { EventType } from "@server/players";
 
 export default class Players {
-    /** @hidden */
-    constructor(private events: Events, private game: Game) {
-        this.events.shared.listen(EventType.UPDATED_DATA_BROADCAST, async (players: Data[]) => {
+    constructor(
+        private events: Events, //
+        private game: Game
+    ) {
+        this.events.shared.listen(EventType.UPDATED_DATA_BROADCAST, (players: Data[]) => {
             this.#list = players;
         });
     }

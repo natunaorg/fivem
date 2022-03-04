@@ -19,11 +19,11 @@ export type EmitData = {
 };
 
 export default class EventBase {
-    protected listenerCounter = 1;
-    protected listeners: Listeners[] = [];
-    protected callbackValues: CallbackValueData[] = [];
+    protected _listenerCounter = 1;
+    protected _listeners: Listeners[] = [];
+    protected _callbackValues: CallbackValueData[] = [];
 
-    protected __validateEventName = (name: string | string[]) => {
+    protected _validateEventName = (name: string | string[]) => {
         // Check if the name is an array or string
         if ((typeof name == "object" && Array.isArray(name)) || typeof name !== "string") {
             throw new Error(`Invalid Event Name Properties for ${name}`);

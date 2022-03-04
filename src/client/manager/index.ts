@@ -9,7 +9,10 @@ import KeyBindManager from "@client/manager/keybind";
 import TickManager from "@shared/manager/tick";
 
 export default class Manager {
-    constructor(private events: Events, private utils: Utils) {}
+    constructor(
+        private events: Events, //
+        private utils: Utils
+    ) {}
 
     tick = new TickManager();
     command = new CommandManager(this.events);

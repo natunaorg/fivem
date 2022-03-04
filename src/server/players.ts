@@ -27,10 +27,10 @@ export enum EventType {
 }
 
 export default class Players {
-    /**
-     * @hidden
-     */
-    constructor(private db: Server["db"], private events: Events) {
+    constructor(
+        private db: Server["db"], //
+        private events: Events
+    ) {
         on("playerJoining", async () => {
             return await this.#add({
                 server_id: globalThis.source,
@@ -138,7 +138,6 @@ export default class Players {
         return true;
     };
 
-    /** @hidden */
     #add = async (data: Data) => {
         if (!this.get(data)) {
             const license = this.#getLicenseId(data);
@@ -168,7 +167,6 @@ export default class Players {
         return false;
     };
 
-    /** @hidden */
     #delete = (data: Data) => {
         const currentData = this.get(data);
 
@@ -180,7 +178,6 @@ export default class Players {
         return false;
     };
 
-    /** @hidden */
     #getLicenseId = (query: Query) => {
         const keysLength = Object.keys(query).length;
 
@@ -208,7 +205,6 @@ export default class Players {
         return false;
     };
 
-    /** @hidden */
     #updateToClient = () => {
         this.events.shared.emit(EventType.UPDATED_DATA_BROADCAST, -1, [this.#list]);
     };

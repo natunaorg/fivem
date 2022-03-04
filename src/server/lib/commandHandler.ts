@@ -71,32 +71,41 @@ export enum EventType {
  * Use it if you know what you're doing.
  */
 export default class Command {
-    handler: Handler;
-    config: Config;
-
-    /**
-     * @hidden
-     */
-    constructor(private events: Events, private players: Players, private utils: Utils, private name: string, handler: Handler, config: Config, private isClientCommand: boolean) {
-        this.isClientCommand = isClientCommand;
-        this.config = this.#parseConfig(config);
-        this.handler = (src, args, raw) => (this.isClientCommand ? this.events.shared.emit(EventType.CLIENT_EXECUTE_COMMAND, src, [this.name, args, raw]) : handler);
+    constructor(
+        private events: Events, //
+        private players: Players,
+        private utils: Utils,
+        private name: string,
+        private rawHandler: Handler,
+        private rawConfig: Config,
+        private isClientCommand: boolean
+    ) {
+        this.#config = this.#parseConfig(this.rawConfig);
 
         RegisterCommand(
             name,
             (src: number, args: string[], raw: string) => {
                 const validation = this.#validateExecution(src, args, raw);
                 if (validation) {
-                    return this.handler(src, args, raw);
+                    return this.#handler(src, args, raw);
                 } else if (typeof validation === "string") {
                     return console.log(validation);
                 }
             },
-            this.config.restricted
+            this.#config.restricted
         );
     }
 
+    #config: Config = {};
     #cooldownList: Record<number, number> = {};
+
+    #handler = (src: number, args: string[], raw: string) => {
+        if (this.isClientCommand) {
+            return this.events.shared.emit(EventType.CLIENT_EXECUTE_COMMAND, src, [this.name, args, raw]);
+        }
+
+        return this.rawHandler;
+    };
 
     /**
      * @description
@@ -139,11 +148,11 @@ export default class Command {
      * @param raw Raw command output
      */
     #validateExecution = (src: number, args: string[], raw: string) => {
-        if (this.config.argsRequired && args.length <= this.config.argsRequired) {
+        if (this.#config.argsRequired && args.length <= this.#config.argsRequired) {
             return "Not enough arguments passed.";
         }
 
-        if (this.config.consoleOnly && src !== 0) {
+        if (this.#config.consoleOnly && src !== 0) {
             return "This command can only be executed from console!";
         }
 
@@ -152,9 +161,9 @@ export default class Command {
         });
 
         if (user) {
-            const cooldown = this.config.cooldown;
+            const cooldown = this.#config.cooldown;
             const cooldownList = this.#cooldownList;
-            const cooldownExclusions = this.config.cooldownExclusions;
+            const cooldownExclusions = this.#config.cooldownExclusions;
 
             if (cooldown && cooldownList[src] && Date.now() - cooldownList[src] <= cooldown) {
                 if (
@@ -165,7 +174,7 @@ export default class Command {
                 }
             }
 
-            const requirements = this.config.requirements;
+            const requirements = this.#config.requirements;
 
             if (requirements) {
                 switch (true) {
@@ -175,7 +184,7 @@ export default class Command {
                 }
             }
 
-            if (this.config.caseInsensitive && this.name !== raw) {
+            if (this.#config.caseInsensitive && this.name !== raw) {
                 return false;
             }
 

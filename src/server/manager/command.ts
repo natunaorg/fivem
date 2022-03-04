@@ -9,14 +9,16 @@ import type Utils from "@server/utils";
 import Command, { EventType } from "@server/lib/commandHandler";
 
 export default class CommandManager {
-    constructor(private events: Events, private players: Players, private utils: Utils) {
+    constructor(
+        private events: Events, //
+        private players: Players,
+        private utils: Utils
+    ) {
         this.events.shared.listen(EventType.REGISTER_COMMAND, this.register);
     }
 
-    /** @hidden */
     #commands: Record<string, Command> = {};
 
-    /** @hidden */
     #addCommand = (source: number, name: string, handler: Handler, config: Config = {}, isClientCommand = false) => {
         if (this.#commands[name]) {
             if (!isClientCommand) {
