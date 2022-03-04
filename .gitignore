@@ -6,7 +6,11 @@
 # production
 /dist
 
+# typedoc
+/public/docs
+
 # misc
+.env
 .DS_Store
 .yarn.installed
 *.pem
