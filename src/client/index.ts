@@ -1,7 +1,7 @@
 "use strict";
 import "@citizenfx/client";
 
-import { GAME_CONFIG, DISCORD_RPC_CONFIG } from "@/natuna.config";
+import type { Config } from "@server";
 
 import Utils from "@client/utils";
 import Game from "@client/game";
@@ -9,11 +9,17 @@ import Players from "@client/players";
 import Events from "@client/events";
 import Manager from "@client/manager";
 
+import { EventType } from "@server";
+
 export default class Client {
     constructor() {
         on("onClientResourceStart", this.#onClientResourceStart);
+        this.events.shared.emit(EventType.GET_CLIENT_CONFIG).then((config) => {
+            this.config = config;
+        });
     }
 
+    config: Config = {};
     utils = new Utils();
     events = new Events();
     game = new Game(this.utils);
@@ -23,8 +29,8 @@ export default class Client {
     #onClientResourceStart = async (resourceName: string) => {
         if (resourceName == GetCurrentResourceName()) {
             console.log("Starting Client...");
-            this.events.shared.emit("natuna:server:addPlayerData");
 
+            console.log(this.utils.asciiArt);
             this.#setGameSettings();
             this.#setDiscordRPC();
 
@@ -33,29 +39,31 @@ export default class Client {
     };
 
     #setGameSettings = async () => {
+        const GAME = this.config.game;
+
         this.manager.tick.set(() => {
-            if (GAME_CONFIG.noDispatchService) {
+            if (GAME.noDispatchService) {
                 this.game.disableDispatchService();
             }
 
-            if (GAME_CONFIG.noWantedLevel) {
+            if (GAME.noWantedLevel) {
                 this.game.resetWantedLevel();
             }
         });
 
-        if (GAME_CONFIG.pauseMenuTitle) {
-            AddTextEntry("FE_THDR_GTAO", GAME_CONFIG.pauseMenuTitle);
+        if (GAME.pauseMenuTitle) {
+            AddTextEntry("FE_THDR_GTAO", GAME.pauseMenuTitle);
         }
     };
 
     #setDiscordRPC = () => {
-        const RPC = DISCORD_RPC_CONFIG;
+        const RPC = this.config.discordRPC;
         SetDiscordAppId(RPC.appId);
 
         const parseRPCString = (string: string) => {
             return string
                 .replace(/{{PLAYER_NAME}}/g, GetPlayerName(PlayerId())) // Player Name
-                .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, () => String(this.players.listAll().length)); // Total Active Player
+                .replace(/{{TOTAL_ACTIVE_PLAYERS}}/g, String(this.players.listAll().length)); // Total Active Player
         };
 
         const setRPC = () => {
@@ -77,7 +85,7 @@ export default class Client {
         };
 
         setRPC();
-        setInterval(setRPC, RPC.refreshInterval);
+        setInterval(setRPC, RPC.refreshInterval * 1000);
     };
 }
 
