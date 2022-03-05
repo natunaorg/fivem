@@ -1,0 +1,126 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "required": ["natuna"],
+    "definitions": {
+        "image": {
+            "type": "object",
+            "required": ["hoverText", "assetName"],
+            "properties": {
+                "hoverText": {
+                    "type": "string",
+                    "description": "Text to display while hovering over the image",
+                    "default": "Hi There!",
+                    "minLength": 5
+                },
+                "assetName": {
+                    "type": "string",
+                    "description": "Discord Rich Presence Art Asset Name",
+                    "default": "logo",
+                    "minLength": 1
+                }
+            }
+        }
+    },
+    "properties": {
+        "natuna": {
+            "title": "Natuna Framework",
+            "description": "Settings for Natuna Framework",
+            "type": "object",
+            "required": ["whitelisted", "game", "discordRPC"],
+            "properties": {
+                "whitelisted": {
+                    "description": "Is the server whitelisted? (Configure who can bypass the whitelist in the Database)",
+                    "type": "boolean",
+                    "default": false
+                },
+                "game": {
+                    "description": "Game Settings",
+                    "type": "object",
+                    "required": ["noDispatchService", "noWantedLevel", "autoRespawnDisabled", "pauseMenuTitle"],
+                    "properties": {
+                        "noDispatchService": {
+                            "type": "boolean",
+                            "description": "Disable Emergency Service like Police, Ambulance, Firefighters, etc?",
+                            "default": false
+                        },
+                        "noWantedLevel": {
+                            "type": "boolean",
+                            "description": "Disable Wanted Level?",
+                            "default": false
+                        },
+                        "autoRespawnDisabled": {
+                            "type": "boolean",
+                            "description": "Set whether auto respawn is disabled if player dies, requires \"spawnmanager\" script to be activated",
+                            "default": false
+                        },
+                        "pauseMenuTitle": {
+                            "type": "string",
+                            "description": "Set the title of the pause menu",
+                            "default": "Natuna Indonesia | discord.gg/kGPHBvXzGM",
+                            "minLength": 1
+                        }
+                    }
+                },
+                "discordRPC": {
+                    "description": "Discord Rich Presence Settings",
+                    "type": "object",
+                    "required": ["appId", "refreshInterval", "text", "largeImage", "smallImage", "buttons"],
+                    "properties": {
+                        "appId": {
+                            "type": "string",
+                            "description": "Discord App ID",
+                            "default": "866690121485910017",
+                            "minLength": 12
+                        },
+                        "refreshInterval": {
+                            "type": "number",
+                            "description": "Discord Rich Presence refresh interval (in seconds).",
+                            "default": 30,
+                            "minimum": 5
+                        },
+                        "text": {
+                            "type": "string",
+                            "description": "Text to display",
+                            "default": "Playing on Natuna Indonesia",
+                            "minLength": 5
+                        },
+                        "largeImage": {
+                            "description": "Large Image",
+                            "$ref": "#/definitions/image"
+                        },
+                        "smallImage": {
+                            "description": "Small Image",
+                            "$ref": "#/definitions/image"
+                        },
+                        "buttons": {
+                            "type": "array",
+                            "description": "Buttons displayed on the Discord Rich Presence",
+                            "minItems": 1,
+                            "maxItems": 2,
+                            "items": {
+                                "type": "object",
+                                "description": "Button",
+                                "required": ["label", "url"],
+                                "properties": {
+                                    "label": {
+                                        "type": "string",
+                                        "description": "Text to display",
+                                        "default": "Some Link",
+                                        "minLength": 5
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "description": "The URL to open when clicking the button. This has to start with fivem://connect/ or https://.",
+                                        "default": "https://example.com",
+                                        "minLength": 10,
+                                        "pattern": "^(fivem://connect/|https://)"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

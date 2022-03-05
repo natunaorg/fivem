@@ -1,0 +1,8 @@
+{
+    "json.schemas": [
+        {
+            "fileMatch": ["package.json"],
+            "url": ".natuna/package.schema.json"
+        }
+    ]
+}
