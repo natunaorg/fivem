@@ -14,6 +14,7 @@
 .DS_Store
 .yarn.installed
 *.pem
+/.natuna/logs
 
 # debug
 npm-debug.log*
