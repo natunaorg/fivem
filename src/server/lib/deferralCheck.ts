@@ -10,7 +10,8 @@ export default class DeferralsChecker {
         private isWhitelisted: boolean,
         private players: Players,
         private name: string,
-        private deferrals: Record<string, any>
+        private deferrals: Record<string, any>,
+        private logger: Server["logger"]
     ) {
         (async () => {
             this.deferrals.defer();
@@ -18,7 +19,7 @@ export default class DeferralsChecker {
             this.#checkLicense();
             await this.#checkWhitelist();
 
-            console.log(`Player ${this.name} Joining the server. (License ID: ${this.#playerIds.license})`);
+            this.logger.debug(`Player ${this.name} Joining the server. (License ID: ${this.#playerIds.license})`);
             deferrals.update(`[🏝 Natuna] Finding your account in our database.`);
             await this.#checkAccount();
 
