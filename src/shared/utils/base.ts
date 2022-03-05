@@ -3,6 +3,18 @@ export type NoFunction<T> = T extends (...args: any) => any ? never : T;
 export default class UtilsBase {
     /**
      * @description
+     * Cool Natuna Ascii Art
+     */
+    asciiArt = [
+        "░░░    ░░  ░░░░░  ░░░░░░░░ ░░    ░░ ░░░    ░░  ░░░░░ ",
+        "▒▒▒▒   ▒▒ ▒▒   ▒▒    ▒▒    ▒▒    ▒▒ ▒▒▒▒   ▒▒ ▒▒   ▒▒",
+        "▒▒ ▒▒  ▒▒ ▒▒▒▒▒▒▒    ▒▒    ▒▒    ▒▒ ▒▒ ▒▒  ▒▒ ▒▒▒▒▒▒▒",
+        "▓▓  ▓▓ ▓▓ ▓▓   ▓▓    ▓▓    ▓▓    ▓▓ ▓▓  ▓▓ ▓▓ ▓▓   ▓▓",
+        "██   ████ ██   ██    ██     ██████  ██   ████ ██   ██",
+    ].join("\n");
+
+    /**
+     * @description
      * Uppercase first letter of each words
      *
      * @example
