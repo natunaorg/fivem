@@ -1,8 +1,3 @@
-/**
- * @readonly
- * @typedef {import('./src/server/index').PluginManifest} PluginManifest
- */
-
 "use strict";
 const esbuild = require("esbuild");
 
@@ -21,7 +16,7 @@ const isWatch = process.argv.findIndex((argItem) => argItem === "--watch") >= 0;
             platform: "node",
             entryPoints: ["./src/server/index.ts"],
             target: ["node16"],
-            external: ["./node_modules/*", "@/package.json", "@/natuna.config.js"],
+            external: ["./node_modules/*", "@/*"],
             format: "cjs",
         },
         {
