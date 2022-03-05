@@ -24,24 +24,23 @@
         }
     ],
     "scripts": {
-        "build": "node esbuild.config.js --mode=production",
-        "build:dev": "node esbuild.config.js --mode=development",
-        "watch": "node esbuild.config.js --mode=development --watch",
+        "build": "node .natuna/esbuild.js",
+        "build:dev": "yarn build --mode=development",
+        "dev": "yarn build --mode=development --watch",
         "lint": "eslint --ext .ts,.js .",
-        "lint:fix": "eslint --fix --ext .ts,.js ."
+        "lint:fix": "yarn lint --fix"
     },
     "dependencies": {
         "@citizenfx/client": "^2.0.4358-1",
         "@citizenfx/server": "^2.0.4249-1",
         "@prisma/client": "^3.8.1",
+        "@ptkdev/logger": "^1.8.0",
         "dotenv": "^16.0.0",
         "esbuild": "^0.14.12",
-        "figlet": "^1.5.0",
         "node-fetch": "^2.6.1",
         "tiny-glob": "^0.2.9"
     },
     "devDependencies": {
-        "@types/figlet": "^1.5.4",
         "@types/node": "^17.0.10",
         "@types/node-fetch": "^2.5.12",
         "@typescript-eslint/eslint-plugin": "^5.10.1",
@@ -101,5 +100,37 @@
     },
     "prisma": {
         "schema": "src/schema.prisma"
+    },
+    "natuna": {
+        "whitelisted": true,
+        "game": {
+            "autoRespawnDisabled": false,
+            "noDispatchService": false,
+            "noWantedLevel": true,
+            "pauseMenuTitle": "Natuna Indonesia | discord.gg/kGPHBvXzGM"
+        },
+        "discordRPC": {
+            "text": "Playing on Natuna Indonesia",
+            "appId": "866690121485910017",
+            "refreshInterval": 30,
+            "largeImage": {
+                "assetName": "logo",
+                "hoverText": "Natuna Framework"
+            },
+            "smallImage": {
+                "assetName": "indonesia",
+                "hoverText": "Made in Indonesia"
+            },
+            "buttons": [
+                {
+                    "label": "Discord",
+                    "url": "https://discord.gg/kGPHBvXzGM"
+                },
+                {
+                    "label": "GitHub",
+                    "url": "fivem://connect/aasd.com/asdasd"
+                }
+            ]
+        }
     }
 }
