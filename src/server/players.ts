@@ -219,7 +219,6 @@ export default class Players {
          * @example
          * ```ts
          * const license = getIdentifiers(1).license;
-         * console.log(license)
          * ```
          */
         getIdentifiers: (playerServerId: number) => {
@@ -242,8 +241,9 @@ export default class Players {
                 identifiers[id[0]] = id[1];
             }
 
-            // prettier-ignore
-            identifiers.steam = (!identifiers.steam || typeof identifiers.steam == "undefined") ? "" : BigInt(`0x${identifiers.steam}`).toString();
+            if (identifiers.steam && typeof identifiers.steam !== "undefined") {
+                identifiers.steam = BigInt(`0x${identifiers.steam}`).toString();
+            }
 
             return identifiers;
         },
