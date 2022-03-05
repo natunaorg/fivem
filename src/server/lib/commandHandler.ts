@@ -86,6 +86,7 @@ export default class Command {
             name,
             (src: number, args: string[], raw: string) => {
                 const validation = this.#validateExecution(src, args, raw);
+
                 if (validation) {
                     return this.#handler(src, args, raw);
                 } else if (typeof validation === "string") {
