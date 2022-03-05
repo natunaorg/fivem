@@ -31,7 +31,7 @@
     "typedocOptions": {
         "name": "Natuna Framework",
         "theme": "default",
-        "out": "public/docs",
+        "out": "public/fivem",
         "entryPoints": ["src/client", "src/server", "src/shared"],
         "entryPointStrategy": "expand",
         "includeVersion": true,
