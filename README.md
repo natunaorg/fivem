@@ -12,10 +12,10 @@
 ---
 
 ## Links:
-1. [Getting Started](GETTING_STARTED.md) (Installing, Updating, FAQ, etc.)
-2. [Building Documentation](BUILDING.md) (See how to build to framework)
+1. [Getting Started](docs/GETTING_STARTED.md) (Installing, Updating, FAQ, etc.)
+2. [Building Documentation](docs/BUILDING.md) (See how to build to framework)
 3. [Code Documentation](https://developer.natuna.asia/fivem) (Functions, Variable, Classes, Interface, Type, etc.)
-4. [Contributing Guide](CONTRIBUTING.md)
+4. [Contributing Guide](docs/CONTRIBUTING.md)
 5. [Discord Server](https://discord.gg/kGPHBvXzGM) (Need Help?)
 6. [Donation, Additional Informations](#interested-with-this-framework) (Feeling Generous?)
 ---

@@ -30,7 +30,7 @@
     },
     "typedocOptions": {
         "name": "Natuna Framework",
-        "theme": "default",
+        "theme": "natuna",
         "out": "public/fivem",
         "entryPoints": ["src/client", "src/server", "src/shared"],
         "entryPointStrategy": "expand",
@@ -39,6 +39,72 @@
         "mergeModulesMergeMode": "project",
         "excludeConstructors": true,
         "excludePrivate": true,
-        "excludeProtected": true
+        "excludeProtected": true,
+        "staticMarkdownDocs": [
+            {
+                "label": "Getting Started",
+                "pageUrl": "docs/getting-started",
+                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\GETTING_STARTED.md"
+            },
+            {
+                "label": "Building Files",
+                "pageUrl": "docs/building-files",
+                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\BUILDING.md"
+            },
+            {
+                "label": "Code of Conduct",
+                "pageUrl": "docs/code-of-conduct",
+                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\CODE_OF_CONDUCT.md"
+            },
+            {
+                "label": "Contributing to The Project",
+                "pageUrl": "docs/contributing",
+                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\CONTRIBUTING.md"
+            }
+        ],
+        "customNavigations": [
+            {
+                "title": "Navigations",
+                "links": [
+                    {
+                        "label": "🏠 Home",
+                        "href": "/"
+                    },
+                    {
+                        "label": "Client Functions",
+                        "href": "/classes/Client.html"
+                    },
+                    {
+                        "label": "Server Functions",
+                        "href": "/classes/Server.html"
+                    },
+                    {
+                        "label": "All Exports List",
+                        "href": "/modules.html"
+                    }
+                ]
+            },
+            {
+                "title": "Documentations",
+                "links": [
+                    {
+                        "label": "Getting Started",
+                        "href": "/docs/getting-started.html"
+                    },
+                    {
+                        "label": "Building Files",
+                        "href": "/docs/building-files.html"
+                    },
+                    {
+                        "label": "Code of Conduct",
+                        "href": "/docs/code-of-conduct.html"
+                    },
+                    {
+                        "label": "Contributing to The Project",
+                        "href": "/docs/contributing.html"
+                    }
+                ]
+            }
+        ]
     }
 }

@@ -56,7 +56,11 @@
         "typedoc": "^0.22.12",
         "typedoc-plugin-mdn-links": "^1.0.5",
         "typedoc-plugin-merge-modules": "^3.1.0",
-        "typedoc-plugin-reference-excluder": "^1.0.0"
+        "typedoc-plugin-reference-excluder": "^1.0.0",
+        "typedoc-theme-natuna": "https://github.com/natunaorg/typedoc-theme-natuna.git"
+    },
+    "peerDependencies": {
+        "typedoc": "^0.22.12"
     },
     "prettier": {
         "trailingComma": "es5",
