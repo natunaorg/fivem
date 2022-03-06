@@ -41,10 +41,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.1.tgz#b520529ec21d8e5945a1851dfd1c32e94e39ff45"
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
-"@natunaorg/typedoc-theme-natuna@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@natunaorg/typedoc-theme-natuna/-/typedoc-theme-natuna-1.0.0.tgz#dd9fca4038e423ca9dd01fb1852dcd99dbd64d02"
-  integrity sha512-v9CjqICUpJTw+/o5cSI1Zuj4wKSPn9Rc4fz9rxb0S/B5vCLV2cpdpLlSvkZvM9x4CI/H1HeRXet8PIyr2aI2LQ==
+"@natunaorg/typedoc-plugin@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@natunaorg/typedoc-plugin/-/typedoc-plugin-1.0.1.tgz#b952bbde0c113116afd89a0afee6cc7f3f025ce6"
+  integrity sha512-YetcNUfbg5zhZHUdaFGrm7MzFiC7no6dU8MOxog7AC6of9B7K1FH4GZwOvqB7YwI9Y4gvNWLeKuacHQwfOUwdg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

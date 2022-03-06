@@ -30,7 +30,7 @@
     },
     "typedocOptions": {
         "name": "Natuna Framework",
-        "theme": "natuna",
+        "theme": "default",
         "out": "public/fivem",
         "entryPoints": ["src/client", "src/server", "src/shared"],
         "entryPointStrategy": "expand",
@@ -40,66 +40,86 @@
         "excludeConstructors": true,
         "excludePrivate": true,
         "excludeProtected": true,
+        "removePrimaryNavigation": true,
+        "removeSecondaryNavigation": false,
         "staticMarkdownDocs": [
             {
-                "pageUrl": "docs/getting-started",
-                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\GETTING_STARTED.md"
+                "pageUrl": "/docs/getting-started",
+                "filePath": "./docs/GETTING_STARTED.md"
             },
             {
-                "pageUrl": "docs/building-files",
-                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\BUILDING.md"
+                "pageUrl": "/docs/building-files",
+                "filePath": "./docs/BUILDING.md"
             },
             {
-                "pageUrl": "docs/code-of-conduct",
-                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\CODE_OF_CONDUCT.md"
+                "pageUrl": "/docs/code-of-conduct",
+                "filePath": "./docs/CODE_OF_CONDUCT.md"
             },
             {
-                "pageUrl": "docs/contributing",
-                "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\CONTRIBUTING.md"
+                "pageUrl": "/docs/contributing",
+                "filePath": "./docs/CONTRIBUTING.md"
             }
         ],
         "customNavigations": [
             {
-                "title": "Navigations",
+                "title": "🔗 Navigations",
                 "links": [
                     {
                         "label": "🏠 Home",
-                        "href": "/fivem/index.html"
+                        "href": "/index.html"
                     },
                     {
-                        "label": "Client Functions",
-                        "href": "/fivem/classes/client.Client.html"
+                        "label": "⛺ Client Functions",
+                        "href": "/classes/client.Client.html"
                     },
                     {
-                        "label": "Server Functions",
-                        "href": "/fivem/classes/server.Server.html"
+                        "label": "💻 Server Functions",
+                        "href": "/classes/server.Server.html"
                     },
                     {
-                        "label": "All Exports List",
-                        "href": "/fivem/modules.html"
+                        "label": "📦 All Exports List",
+                        "href": "/modules.html"
                     }
                 ]
             },
             {
-                "title": "Documentations",
+                "title": "📚 Documentations",
                 "links": [
                     {
-                        "label": "Getting Started",
-                        "href": "/fivem/docs/getting-started.html"
+                        "label": "💪 Getting Started",
+                        "href": "/docs/getting-started.html"
                     },
                     {
-                        "label": "Building Files",
-                        "href": "/fivem/docs/building-files.html"
+                        "label": "🔧 Building Files",
+                        "href": "/docs/building-files.html"
                     },
                     {
-                        "label": "Code of Conduct",
-                        "href": "/fivem/docs/code-of-conduct.html"
+                        "label": "🤵 Code of Conduct",
+                        "href": "/docs/code-of-conduct.html"
                     },
                     {
-                        "label": "Contributing to The Project",
-                        "href": "/fivem/docs/contributing.html"
+                        "label": "🎁 Contributing to The Project",
+                        "href": "/docs/contributing.html"
                     }
                 ]
+            }
+        ],
+        "markdownFilesContentReplacement": [
+            {
+                "content": "BUILDING.md",
+                "replacement": "building-files.html"
+            },
+            {
+                "content": "CODE_OF_CONDUCT.md",
+                "replacement": "code-of-conduct.html"
+            },
+            {
+                "content": "CONTRIBUTING.md",
+                "replacement": "contributing.html"
+            },
+            {
+                "content": "GETTING_STARTED.md",
+                "replacement": "getting-started.html"
             }
         ]
     }
