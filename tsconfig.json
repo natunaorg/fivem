@@ -64,19 +64,19 @@
                 "links": [
                     {
                         "label": "🏠 Home",
-                        "href": "/fivem"
+                        "href": "/fivem/index.html"
                     },
                     {
                         "label": "Client Functions",
-                        "href": "/fivem/classes/Client"
+                        "href": "/fivem/classes/client.Client.html"
                     },
                     {
                         "label": "Server Functions",
-                        "href": "/fivem/classes/Server"
+                        "href": "/fivem/classes/server.Server.html"
                     },
                     {
                         "label": "All Exports List",
-                        "href": "/fivem/modules"
+                        "href": "/fivem/modules.html"
                     }
                 ]
             },
@@ -85,19 +85,19 @@
                 "links": [
                     {
                         "label": "Getting Started",
-                        "href": "/fivem/docs/getting-started"
+                        "href": "/fivem/docs/getting-started.html"
                     },
                     {
                         "label": "Building Files",
-                        "href": "/fivem/docs/building-files"
+                        "href": "/fivem/docs/building-files.html"
                     },
                     {
                         "label": "Code of Conduct",
-                        "href": "/fivem/docs/code-of-conduct"
+                        "href": "/fivem/docs/code-of-conduct.html"
                     },
                     {
                         "label": "Contributing to The Project",
-                        "href": "/fivem/docs/contributing"
+                        "href": "/fivem/docs/contributing.html"
                     }
                 ]
             }
