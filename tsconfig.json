@@ -42,22 +42,18 @@
         "excludeProtected": true,
         "staticMarkdownDocs": [
             {
-                "label": "Getting Started",
                 "pageUrl": "docs/getting-started",
                 "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\GETTING_STARTED.md"
             },
             {
-                "label": "Building Files",
                 "pageUrl": "docs/building-files",
                 "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\BUILDING.md"
             },
             {
-                "label": "Code of Conduct",
                 "pageUrl": "docs/code-of-conduct",
                 "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\CODE_OF_CONDUCT.md"
             },
             {
-                "label": "Contributing to The Project",
                 "pageUrl": "docs/contributing",
                 "filePath": "D:\\Servers\\NatunaIndonesia\\txData\\CFX\\resources\\[local]\\natuna\\docs\\CONTRIBUTING.md"
             }
@@ -68,19 +64,19 @@
                 "links": [
                     {
                         "label": "🏠 Home",
-                        "href": "/"
+                        "href": "/fivem"
                     },
                     {
                         "label": "Client Functions",
-                        "href": "/classes/Client.html"
+                        "href": "/fivem/classes/Client"
                     },
                     {
                         "label": "Server Functions",
-                        "href": "/classes/Server.html"
+                        "href": "/fivem/classes/Server"
                     },
                     {
                         "label": "All Exports List",
-                        "href": "/modules.html"
+                        "href": "/fivem/modules"
                     }
                 ]
             },
@@ -89,19 +85,19 @@
                 "links": [
                     {
                         "label": "Getting Started",
-                        "href": "/docs/getting-started.html"
+                        "href": "/fivem/docs/getting-started"
                     },
                     {
                         "label": "Building Files",
-                        "href": "/docs/building-files.html"
+                        "href": "/fivem/docs/building-files"
                     },
                     {
                         "label": "Code of Conduct",
-                        "href": "/docs/code-of-conduct.html"
+                        "href": "/fivem/docs/code-of-conduct"
                     },
                     {
                         "label": "Contributing to The Project",
-                        "href": "/docs/contributing.html"
+                        "href": "/fivem/docs/contributing"
                     }
                 ]
             }
