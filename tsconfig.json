@@ -36,7 +36,7 @@
         "entryPointStrategy": "expand",
         "includeVersion": true,
         "mergeModulesRenameDefaults": true,
-        "mergeModulesMergeMode": "project",
+        "mergeModulesMergeMode": "module",
         "excludeConstructors": true,
         "excludePrivate": true,
         "excludeProtected": true,
