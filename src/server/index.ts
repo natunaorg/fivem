@@ -23,10 +23,8 @@ export enum EventType {
     GET_CLIENT_CONFIG = "natuna:client:config",
 }
 
-export default class Server extends Events {
+export default class Server {
     constructor() {
-        super();
-
         this.events.shared.listen(EventType.GET_CLIENT_CONFIG, () => this.config);
 
         on("onServerResourceStart", this.#onServerResourceStart);
