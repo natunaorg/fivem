@@ -14,11 +14,6 @@ import { SharedEventType } from "@shared/events/type";
 class Client {
     constructor() {
         on("onClientResourceStart", this.#onClientResourceStart);
-        this.events.shared.emit(SharedEventType.GET_CLIENT_CONFIG).then((config) => {
-            this.config = config;
-            this.#setGameSettings();
-            this.#setDiscordRPC();
-        });
     }
 
     config: Config = {};
@@ -30,9 +25,16 @@ class Client {
 
     #onClientResourceStart = async (resourceName: string) => {
         if (resourceName == GetCurrentResourceName()) {
-            console.log("Starting Client...");
-            console.log(this.utils.asciiArt);
-            console.log("Client Ready!");
+            this.events.shared.emit(SharedEventType.GET_CLIENT_CONFIG).then((config) => {
+                console.log("Starting Client...");
+                console.log(this.utils.asciiArt);
+
+                this.config = config;
+                this.#setGameSettings();
+                this.#setDiscordRPC();
+
+                console.log("Client Ready!");
+            });
         }
     };
 
@@ -51,6 +53,20 @@ class Client {
 
         if (GAME.pauseMenuTitle) {
             AddTextEntry("FE_THDR_GTAO", GAME.pauseMenuTitle);
+        }
+
+        if (!GAME.autoRespawnDisabled) {
+            globalThis.exports.spawnmanager.setAutoSpawn(true);
+            globalThis.exports.spawnmanager.spawnPlayer({
+                x: 466.8401,
+                y: 197.7201,
+                z: 111.5291,
+                heading: 291.71,
+                model: "a_m_m_farmer_01",
+                skipFade: false,
+            });
+        } else {
+            globalThis.exports.spawnmanager.setAutoSpawn(false);
         }
     };
 
