@@ -3,42 +3,38 @@ import "@citizenfx/server";
 
 import path from "path";
 import * as dotenv from "dotenv";
-dotenv.config({ path: path.join(__dirname, "..", "..", ".env") });
+
+globalThis.__natunaDirname = GetResourcePath(GetCurrentResourceName());
+dotenv.config({
+    path: path.join(globalThis.__natunaDirname, ".env"),
+});
 
 import pkg from "@/package.json";
 import fetch from "node-fetch";
 import Logger from "@ptkdev/logger";
-import { PrismaClient } from "@prisma/client";
 
 import Players from "@server/players";
 import Events from "@server/events";
 import Utils from "@server/utils";
 import Manager from "@server/manager";
+import Database from "@server/database";
 
-import DeferralsChecker from "@server/lib/deferralCheck";
+import DeferralsManager from "@server/manager/deferralsManager";
+import { EventType } from "@client";
 
 export type Config = Partial<typeof pkg["natuna"]>;
 
-export enum EventType {
-    GET_CLIENT_CONFIG = "natuna:client:config",
-}
-
-export default class Server {
+class Server {
     constructor() {
-        this.events.shared.listen(EventType.GET_CLIENT_CONFIG, () => this.config);
+        this.events.shared.listen(EventType.GET_CLIENT_CONFIG, this.#sendClientConfig);
 
         on("onServerResourceStart", this.#onServerResourceStart);
         on("playerConnecting", (...args: any) => {
-            return new DeferralsChecker(globalThis.source, this.db, this.config.whitelisted, this.players, args[0], args[2], this.logger);
+            return new DeferralsManager(globalThis.source, this.db, this.config.whitelisted, this.players, args[0], args[2], this.logger);
         });
     }
 
     config: Config = pkg.natuna;
-    db = new PrismaClient();
-    events = new Events();
-    utils = new Utils();
-    players = new Players(this.db, this.events);
-    manager = new Manager(this.events, this.players, this.utils);
     logger = new Logger({
         language: "en",
         colors: true,
@@ -54,10 +50,16 @@ export default class Server {
             encoding: "utf8",
         },
         path: {
-            debug_log: path.posix.join("..", "..", ".natuna", "logs", "debug.log"),
-            error_log: path.posix.join("..", "..", ".natuna", "logs", "errors.log"),
+            debug_log: path.posix.join(GetResourcePath(GetCurrentResourceName()), ".natuna", "logs", "debug.log"),
+            error_log: path.posix.join(GetResourcePath(GetCurrentResourceName()), ".natuna", "logs", "errors.log"),
         },
     });
+
+    events = new Events();
+    utils = new Utils();
+    db = Database(this.config, this.logger);
+    players = new Players(this.db, this.events);
+    manager = new Manager(this.events, this.players, this.utils);
 
     #checkPackageVersion = () => {
         return new Promise((resolve) => {
@@ -98,6 +100,18 @@ export default class Server {
 
             this.logger.info("Server Ready!");
         }
+    };
+
+    #sendClientConfig = () => {
+        const config: Partial<Record<keyof Config, any>> = {};
+
+        for (const [key, value] of Object.entries(this.config)) {
+            if (!key.startsWith("#")) {
+                config[key as keyof Config] = value;
+            }
+        }
+
+        return config;
     };
 }
 
