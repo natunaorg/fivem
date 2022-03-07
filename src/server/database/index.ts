@@ -20,7 +20,7 @@ type DatabaseDriverUsed =
     : never;
 
 export default function Database(config: Config, logger: Logger): DatabaseDriverUsed {
-    switch (config["#database"].driver) {
+    switch (process.env.DATABASE_DRIVER) {
         case "mysql":
         default:
             return MySQL(config, logger) as any;
