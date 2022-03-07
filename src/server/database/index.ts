@@ -2,7 +2,6 @@
 import "@citizenfx/server";
 
 import type Logger from "@ptkdev/logger";
-import type { Config } from "@server";
 import type { MySQLDatabase } from "@server/database/mysql";
 import type { DatabaseDriver } from "@server/database/schema";
 
@@ -20,10 +19,10 @@ type DatabaseDriverUsed =
         ? never
     : never;
 
-export default function Database(config: Config, logger: Logger): DatabaseDriverUsed {
-    switch (process.env.DATABASE_DRIVER) {
-        case "mysql":
-        default:
-            return MySQL(config, logger) as any;
+export default function Database(logger: Logger): DatabaseDriverUsed {
+    if (process.env.DATABASE_DRIVER === "mysql") {
+        return MySQL(logger);
     }
+
+    return null;
 }

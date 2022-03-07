@@ -1,16 +1,14 @@
-const pkg = require("../../package.json");
 const path = require("path");
 const fs = require("fs");
 const dotenv = require("dotenv");
 
 const mysql = require("mysql2");
 
-const config = pkg.natuna["#database"];
 dotenv.config({
     path: path.join(process.cwd(), ".env"),
 });
 
-switch (config.driver) {
+switch (process.env.DATABASE_DRIVER) {
     case "mysql":
     default:
         const connection = mysql.createPool({
