@@ -5,6 +5,8 @@ export enum SharedEventType {
     CLIENT_EXECUTE_COMMAND = "natuna:client:command:execute",
     SET_COMMAND_DESCRIPTION = "natuna:client:command:setDescription",
     REGISTER_COMMAND = "natuna:server:command:register",
-    SHARED_EVENT_HANDLER = "natuna:shared:eventHandler",
-    SHARED_CALLBACK_RECEIVER = "natuna:shared:sendCallbackValues",
+    SHARED_SERVER_EVENT_HANDLER = "natuna:shared:server:eventHandler",
+    SHARED_SERVER_CALLBACK_RECEIVER = "natuna:shared:server:sendCallbackValues",
+    SHARED_CLIENT_EVENT_HANDLER = "natuna:shared:client:eventHandler",
+    SHARED_CLIENT_CALLBACK_RECEIVER = "natuna:shared:client:sendCallbackValues",
 }

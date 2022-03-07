@@ -11,20 +11,20 @@ export default class SharedEvent extends EventBase {
     constructor() {
         super();
 
-        onNet(SharedEventType.SHARED_EVENT_HANDLER, (props: EmitData) => {
+        onNet(SharedEventType.SHARED_SERVER_EVENT_HANDLER, (props: EmitData) => {
             const listeners = this._listeners.filter((listener) => listener.name === props.name);
 
             for (const listener of listeners) {
                 const value = listener.handler(globalThis.source, props.args);
 
-                emitNet(SharedEventType.SHARED_CALLBACK_RECEIVER, globalThis.source, {
+                emitNet(SharedEventType.SHARED_CLIENT_CALLBACK_RECEIVER, globalThis.source, {
                     uniqueId: props.uniqueId,
                     values: value ?? null,
                 });
             }
         });
 
-        onNet(SharedEventType.SHARED_CALLBACK_RECEIVER, (data: CallbackValueData) => {
+        onNet(SharedEventType.SHARED_SERVER_CALLBACK_RECEIVER, (data: CallbackValueData) => {
             this._callbackValues.push(data);
         });
     }
@@ -33,33 +33,37 @@ export default class SharedEvent extends EventBase {
      * @description
      * Emit an event from Server to Client
      */
-    emit = <T>(name: string | string[], target: number | "global", args?: NoFunction<T>[]) => {
-        return new Promise((resolve) => {
-            name = this._validateEventName(name);
-            const uniqueId = Math.random().toString(36).substring(2);
+    emit = async <T>(name: string | string[], target: number | "global", args?: NoFunction<T>[]) => {
+        name = this._validateEventName(name);
+        const uniqueId = Math.random().toString(36).substring(2);
 
-            if (target === "global") {
-                target = -1;
-            }
+        if (target === "global") {
+            target = -1;
+        }
 
-            for (const alias of name) {
-                const emitData: EmitData = {
-                    name: alias,
-                    uniqueId,
-                    args,
-                };
+        for (const alias of name) {
+            const emitData: EmitData = {
+                name: alias,
+                uniqueId,
+                args,
+            };
 
-                emitNet(SharedEventType.SHARED_EVENT_HANDLER, target, emitData);
-            }
+            emitNet(SharedEventType.SHARED_CLIENT_EVENT_HANDLER, target, emitData);
+        }
 
-            const callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
-            const returnValue = this._callbackValues[callbackValues].values;
+        let callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
 
-            // Remove the callback values from the array
-            this._callbackValues.splice(callbackValues, 1);
+        while (callbackValues === -1) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
+        }
 
-            return resolve(returnValue);
-        });
+        const returnValue = this._callbackValues[callbackValues].values;
+
+        // Remove the callback values from the array
+        this._callbackValues.splice(callbackValues, 1);
+
+        return returnValue;
     };
 
     /**
