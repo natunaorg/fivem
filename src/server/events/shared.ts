@@ -11,20 +11,20 @@ export default class SharedEvent extends EventBase {
     constructor() {
         super();
 
-        onNet(SharedEventType.SHARED_SERVER_EVENT_HANDLER, (props: EmitData) => {
+        onNet(SharedEventType.SERVER_EVENT_HANDLER, (props: EmitData) => {
             const listeners = this._listeners.filter((listener) => listener.name === props.name);
 
             for (const listener of listeners) {
                 const value = listener.handler(globalThis.source, props.args);
 
-                emitNet(SharedEventType.SHARED_CLIENT_CALLBACK_RECEIVER, globalThis.source, {
+                emitNet(SharedEventType.CLIENT_CALLBACK_RECEIVER, globalThis.source, {
                     uniqueId: props.uniqueId,
                     values: value ?? null,
                 });
             }
         });
 
-        onNet(SharedEventType.SHARED_SERVER_CALLBACK_RECEIVER, (data: CallbackValueData) => {
+        onNet(SharedEventType.SERVER_CALLBACK_RECEIVER, (data: CallbackValueData) => {
             this._callbackValues.push(data);
         });
     }
@@ -48,7 +48,7 @@ export default class SharedEvent extends EventBase {
                 args,
             };
 
-            emitNet(SharedEventType.SHARED_CLIENT_EVENT_HANDLER, target, emitData);
+            emitNet(SharedEventType.CLIENT_EVENT_HANDLER, target, emitData);
         }
 
         let callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);

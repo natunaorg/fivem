@@ -1,8 +1,11 @@
+"use strict";
 import "@citizenfx/client";
 import "@citizenfx/server";
 
-import EventBase, { EmitData } from "@shared/events/base";
-import { NoFunction } from "@shared/utils/base";
+import type { NoFunction } from "@shared/utils/base";
+import type { EmitData } from "@shared/events/base";
+
+import EventBase from "@shared/events/base";
 
 enum EventType {
     EVENT_HANDLER = "natuna:local:eventHandler",
@@ -30,29 +33,33 @@ export default class LocalEvent extends EventBase {
      * @description
      * Emit an event locally (Client to Client or Server to Server)
      */
-    emit = <T>(name: string | string[], args?: NoFunction<T>[]) => {
-        return new Promise((resolve) => {
-            name = this._validateEventName(name);
-            const uniqueId = Math.random().toString(36).substring(2);
+    emit = async <T>(name: string | string[], args?: NoFunction<T>[]) => {
+        name = this._validateEventName(name);
+        const uniqueId = Math.random().toString(36).substring(2);
 
-            for (const alias of name) {
-                const emitData: EmitData = {
-                    name: alias,
-                    uniqueId,
-                    args,
-                };
+        for (const alias of name) {
+            const emitData: EmitData = {
+                name: alias,
+                uniqueId,
+                args,
+            };
 
-                emit(EventType.EVENT_HANDLER, emitData);
-            }
+            emit(EventType.EVENT_HANDLER, emitData);
+        }
 
-            const callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
-            const returnValue = this._callbackValues[callbackValues].values;
+        let callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
 
-            // Remove the callback values from the array
-            this._callbackValues.splice(callbackValues, 1);
+        while (callbackValues === -1) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);
+        }
 
-            return resolve(returnValue);
-        });
+        const returnValue = this._callbackValues[callbackValues].values;
+
+        // Remove the callback values from the array
+        this._callbackValues.splice(callbackValues, 1);
+
+        return returnValue;
     };
 
     /**
