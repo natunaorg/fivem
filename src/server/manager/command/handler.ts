@@ -5,6 +5,8 @@ import type Events from "@server/events";
 import type Players from "@server/players";
 import type Utils from "@server/utils";
 
+import { SharedEventType } from "@shared/events/type";
+
 /**
  * @description
  * A Handler to execute function when called.
@@ -59,12 +61,6 @@ export type Config = {
     restricted?: boolean;
 };
 
-export enum EventType {
-    CLIENT_EXECUTE_COMMAND = "natuna:client:command:execute",
-    SET_COMMAND_DESCRIPTION = "natuna:client:command:setDescription",
-    REGISTER_COMMAND = "natuna:server:command:register",
-}
-
 /**
  * This class is included when registering a command on server with `registerCommand` function.
  *
@@ -102,7 +98,7 @@ export default class Command {
 
     #handler = (src: number, args: string[], raw: string) => {
         if (this.isClientCommand) {
-            return this.events.shared.emit(EventType.CLIENT_EXECUTE_COMMAND, src, [this.name, args, raw]);
+            return this.events.shared.emit(SharedEventType.CLIENT_EXECUTE_COMMAND, src, [this.name, args, raw]);
         }
 
         return this.rawHandler;

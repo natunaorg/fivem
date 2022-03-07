@@ -9,12 +9,12 @@ import Players from "@client/players";
 import Events from "@client/events";
 import Manager from "@client/manager";
 
-import { EventType } from "@server";
+import { SharedEventType } from "@shared/events/type";
 
-export default class Client {
+class Client {
     constructor() {
         on("onClientResourceStart", this.#onClientResourceStart);
-        this.events.shared.emit(EventType.GET_CLIENT_CONFIG).then((config) => {
+        this.events.shared.emit(SharedEventType.GET_CLIENT_CONFIG).then((config) => {
             this.config = config;
         });
     }

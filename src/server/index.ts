@@ -20,13 +20,13 @@ import Manager from "@server/manager";
 import Database from "@server/database";
 
 import DeferralsManager from "@server/manager/deferralsManager";
-import { EventType } from "@client";
+import { SharedEventType } from "@shared/events/type";
 
 export type Config = Partial<typeof pkg["natuna"]>;
 
 class Server {
     constructor() {
-        this.events.shared.listen(EventType.GET_CLIENT_CONFIG, () => this.config);
+        this.events.shared.listen(SharedEventType.GET_CLIENT_CONFIG, () => this.config);
 
         on("onServerResourceStart", this.#onServerResourceStart);
         on("playerConnecting", (...args: any) => {

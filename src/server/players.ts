@@ -1,8 +1,9 @@
 "use strict";
 import "@citizenfx/server";
 
-import Server from "@server";
+import Database from "@server/database";
 import Events from "@server/events";
+import { SharedEventType } from "@shared/events/type";
 
 export type Query = {
     user_id?: number;
@@ -21,14 +22,9 @@ export type Data = Query & {
     };
 };
 
-export enum EventType {
-    CURRENT_PLAYER_UPDATE = "natuna:server:players:currentPlayerUpdate",
-    UPDATED_DATA_BROADCAST = "natuna:client:players:updatedDataBroadcast",
-}
-
 export default class Players {
     constructor(
-        private db: Server["db"], //
+        private db: ReturnType<typeof Database>, //
         private events: Events
     ) {
         on("playerJoining", async () => {
@@ -43,7 +39,7 @@ export default class Players {
             });
         });
 
-        this.events.shared.listen(EventType.CURRENT_PLAYER_UPDATE, async (source, data: Data) => {
+        this.events.shared.listen(SharedEventType.CURRENT_PLAYER_UPDATE, async (source, data: Data) => {
             return await this.update(data);
         });
     }
@@ -206,7 +202,7 @@ export default class Players {
     };
 
     #updateToClient = () => {
-        this.events.shared.emit(EventType.UPDATED_DATA_BROADCAST, -1, [this.#list]);
+        this.events.shared.emit(SharedEventType.UPDATED_DATA_BROADCAST, -1, [this.#list]);
     };
 
     utils = {

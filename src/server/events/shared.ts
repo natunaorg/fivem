@@ -5,30 +5,26 @@ import type { NoFunction } from "@shared/utils/base";
 import type { CallbackValueData, EmitData } from "@shared/events/base";
 
 import EventBase from "@shared/events/base";
-
-export enum EventType {
-    EVENT_HANDLER = "natuna:shared:eventHandler",
-    CALLBACK_RECEIVER = "natuna:shared:sendCallbackValues",
-}
+import { SharedEventType } from "@shared/events/type";
 
 export default class SharedEvent extends EventBase {
     constructor() {
         super();
 
-        onNet(EventType.EVENT_HANDLER, (props: EmitData) => {
+        onNet(SharedEventType.SHARED_EVENT_HANDLER, (props: EmitData) => {
             const listeners = this._listeners.filter((listener) => listener.name === props.name);
 
             for (const listener of listeners) {
                 const value = listener.handler(globalThis.source, props.args);
 
-                emitNet(EventType.CALLBACK_RECEIVER, globalThis.source, {
+                emitNet(SharedEventType.SHARED_CALLBACK_RECEIVER, globalThis.source, {
                     uniqueId: props.uniqueId,
                     values: value ?? null,
                 });
             }
         });
 
-        onNet(EventType.CALLBACK_RECEIVER, (data: CallbackValueData) => {
+        onNet(SharedEventType.SHARED_CALLBACK_RECEIVER, (data: CallbackValueData) => {
             this._callbackValues.push(data);
         });
     }
@@ -53,7 +49,7 @@ export default class SharedEvent extends EventBase {
                     args,
                 };
 
-                emitNet(EventType.EVENT_HANDLER, target, emitData);
+                emitNet(SharedEventType.SHARED_EVENT_HANDLER, target, emitData);
             }
 
             const callbackValues = this._callbackValues.findIndex((data) => data.uniqueId === uniqueId);

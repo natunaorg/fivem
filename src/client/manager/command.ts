@@ -4,14 +4,14 @@ import "@citizenfx/client";
 import type Events from "@client/events";
 import type { Handler, Config } from "@server/manager/command/handler";
 
-import { EventType } from "@server/manager/command/handler";
+import { SharedEventType } from "@shared/events/type";
 
 export default class CommandManager {
     constructor(
         private events: Events //
     ) {
-        this.events.shared.listen(EventType.SET_COMMAND_DESCRIPTION, this.setDescription);
-        this.events.shared.listen(EventType.CLIENT_EXECUTE_COMMAND, (name: string, args: Array<any>, raw: string) => {
+        this.events.shared.listen(SharedEventType.SET_COMMAND_DESCRIPTION, this.setDescription);
+        this.events.shared.listen(SharedEventType.CLIENT_EXECUTE_COMMAND, (name: string, args: Array<any>, raw: string) => {
             const src = GetPlayerServerId(PlayerId());
             return this.#list[name](src, args, raw || name);
         });
@@ -38,7 +38,7 @@ export default class CommandManager {
     register = (name: string | Array<string>, handler: Handler, config: Config = {}): void => {
         const addCommand = (name: string) => {
             this.#list[name] = handler;
-            this.events.shared.emit(EventType.REGISTER_COMMAND, [name, {}, config, true]);
+            this.events.shared.emit(SharedEventType.REGISTER_COMMAND, [name, {}, config, true]);
         };
 
         if (Array.isArray(name)) {

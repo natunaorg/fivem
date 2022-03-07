@@ -6,7 +6,8 @@ import type Events from "@server/events";
 import type Players from "@server/players";
 import type Utils from "@server/utils";
 
-import Command, { EventType } from "@server/manager/command/handler";
+import Command from "@server/manager/command/handler";
+import { SharedEventType } from "@shared/events/type";
 
 export default class CommandManager {
     constructor(
@@ -14,7 +15,7 @@ export default class CommandManager {
         private players: Players,
         private utils: Utils
     ) {
-        this.events.shared.listen(EventType.REGISTER_COMMAND, this.register);
+        this.events.shared.listen(SharedEventType.REGISTER_COMMAND, this.register);
     }
 
     #commands: Record<string, Command> = {};
@@ -24,13 +25,13 @@ export default class CommandManager {
             if (!isClientCommand) {
                 throw new Error(`Command "${name}" had already been registered before!`);
             } else {
-                this.events.shared.emit(EventType.SET_COMMAND_DESCRIPTION, source, [name, config]);
+                this.events.shared.emit(SharedEventType.SET_COMMAND_DESCRIPTION, source, [name, config]);
                 return true;
             }
         }
 
         this.#commands[name] = new Command(this.events, this.players, this.utils, name, handler, config, isClientCommand);
-        this.events.shared.emit(EventType.SET_COMMAND_DESCRIPTION, source, [name, config]);
+        this.events.shared.emit(SharedEventType.SET_COMMAND_DESCRIPTION, source, [name, config]);
         return true;
     };
 

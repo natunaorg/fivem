@@ -5,14 +5,14 @@ import type Events from "@client/events";
 import type Game from "@client/game";
 import type { Query, Data } from "@server/players";
 
-import { EventType } from "@server/players";
+import { SharedEventType } from "@shared/events/type";
 
 export default class Players {
     constructor(
         private events: Events, //
         private game: Game
     ) {
-        this.events.shared.listen(EventType.UPDATED_DATA_BROADCAST, (players: Data[]) => {
+        this.events.shared.listen(SharedEventType.UPDATED_DATA_BROADCAST, (players: Data[]) => {
             this.#list = players;
         });
     }
@@ -94,6 +94,6 @@ export default class Players {
      * ```
      */
     update = async (data: Data) => {
-        return await this.events.shared.emit(EventType.CURRENT_PLAYER_UPDATE, [data]);
+        return await this.events.shared.emit(SharedEventType.CURRENT_PLAYER_UPDATE, [data]);
     };
 }
