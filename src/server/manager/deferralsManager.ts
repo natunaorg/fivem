@@ -8,7 +8,7 @@ import Players from "@server/players";
 
 export default class DeferralsManager {
     constructor(
-        private source: number, //
+        source: number, //
         private db: ReturnType<typeof Database>,
         private isWhitelisted: boolean,
         private players: Players,
@@ -16,6 +16,8 @@ export default class DeferralsManager {
         private deferrals: Record<string, any>,
         private logger: Logger
     ) {
+        this.#playerIds = this.players.utils.getIdentifiers(source);
+
         (async () => {
             this.deferrals.defer();
             deferrals.update(`[🏝 Natuna] Hello ${this.name}! Please wait until we verify your account.`);
@@ -30,7 +32,7 @@ export default class DeferralsManager {
         })();
     }
 
-    #playerIds = this.players.utils.getIdentifiers(this.source);
+    #playerIds: ReturnType<Players["utils"]["getIdentifiers"]>;
 
     #checkLicense = () => {
         if (!this.#playerIds.license || typeof this.#playerIds.license == "undefined") {
