@@ -26,7 +26,7 @@ export type Config = Partial<typeof pkg["natuna"]>;
 
 class Server {
     constructor() {
-        this.events.shared.listen(EventType.GET_CLIENT_CONFIG, this.#sendClientConfig);
+        this.events.shared.listen(EventType.GET_CLIENT_CONFIG, () => this.config);
 
         on("onServerResourceStart", this.#onServerResourceStart);
         on("playerConnecting", (...args: any) => {
@@ -100,18 +100,6 @@ class Server {
 
             this.logger.info("Server Ready!");
         }
-    };
-
-    #sendClientConfig = () => {
-        const config: Partial<Record<keyof Config, any>> = {};
-
-        for (const [key, value] of Object.entries(this.config)) {
-            if (!key.startsWith("#")) {
-                config[key as keyof Config] = value;
-            }
-        }
-
-        return config;
     };
 }
 
