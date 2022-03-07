@@ -113,7 +113,7 @@ export default class Players {
 
         if (!currentData) {
             if (typeof data.server_id === "number" || typeof data.license === "string") {
-                const newData = await this.#add(data as any);
+                const newData = await this.#add(data);
 
                 if (!newData) {
                     throw new Error("No player data available, tried to add new player but failed.");
