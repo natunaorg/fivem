@@ -1,17 +1,20 @@
 "use strict";
 import "@citizenfx/server";
-import Server from "@server";
+
+import type Logger from "@ptkdev/logger";
+
+import Database from "@server/database";
 import Players from "@server/players";
 
 export default class DeferralsManager {
     constructor(
         private source: number, //
-        private db: Server["db"],
+        private db: ReturnType<typeof Database>,
         private isWhitelisted: boolean,
         private players: Players,
         private name: string,
         private deferrals: Record<string, any>,
-        private logger: Server["logger"]
+        private logger: Logger
     ) {
         (async () => {
             this.deferrals.defer();
