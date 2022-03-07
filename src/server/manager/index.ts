@@ -4,7 +4,7 @@ import "@citizenfx/server";
 import type Events from "@server/events";
 import type Players from "@server/players";
 
-import CommandManager from "@server/manager/command";
+import CommandManager from "@server/manager/command/manager";
 import TickManager from "@shared/manager/tick";
 import Utils from "@server/utils";
 

@@ -2,9 +2,9 @@
 import "@citizenfx/client";
 
 import type Events from "@client/events";
-import type { Handler, Config } from "@server/lib/commandHandler";
+import type { Handler, Config } from "@server/manager/command/handler";
 
-import { EventType } from "@server/lib/commandHandler";
+import { EventType } from "@server/manager/command/handler";
 
 export default class CommandManager {
     constructor(
