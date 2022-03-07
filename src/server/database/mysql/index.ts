@@ -3,10 +3,12 @@ import "@citizenfx/server";
 
 import type { Config } from "@server";
 import type Logger from "@ptkdev/logger";
+import type { DatabaseSchema } from "@server/database/schema";
 
 import mysql from "mysql2";
 
 import MySQLHandler, { executeQuery } from "@server/database/mysql/handler";
+import { __mysqlTables } from "@server/database/schema";
 
 // In the future, we might expand this rather than just using MySQL
 export type MySQLDatabase = {
@@ -35,11 +37,11 @@ export default function MySQL(config: Config, logger: Logger): MySQLDatabase {
                 throw new Error(err);
             });
 
-            if (!config.__dbSchema__) {
+            if (!__mysqlTables) {
                 throw new Error("No database schema found! Please run `yarn run db:setup`");
             }
 
-            for (const key in config.__dbSchema__) {
+            for (const key in __mysqlTables) {
                 const tableName = key as keyof DatabaseSchema;
                 tables[tableName] = new MySQLHandler(connection, tableName);
             }

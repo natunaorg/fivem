@@ -1,9 +1,10 @@
 "use strict";
 import "@citizenfx/server";
 
-import type { MySQLDatabase } from "@server/database/mysql";
-import type { Config } from "@server";
 import type Logger from "@ptkdev/logger";
+import type { Config } from "@server";
+import type { MySQLDatabase } from "@server/database/mysql";
+import type { DatabaseDriver } from "@server/database/schema";
 
 import MySQL from "@server/database/mysql";
 

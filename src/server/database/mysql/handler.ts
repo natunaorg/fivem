@@ -2,6 +2,7 @@
 import "@citizenfx/server";
 
 import type mysql from "mysql2";
+import type { DatabaseSchema } from "@server/database/schema";
 
 type Query<K extends keyof DatabaseSchema> = Partial<DatabaseSchema[K]>;
 
