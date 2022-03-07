@@ -35,7 +35,11 @@ export default function MySQL(config: Config, logger: Logger): MySQLDatabase {
                 throw new Error(err);
             });
 
-            for (const key in config["#database"].schema) {
+            if (!config.__dbSchema__) {
+                throw new Error("No database schema found! Please run `yarn run db:setup`");
+            }
+
+            for (const key in config.__dbSchema__) {
                 const tableName = key as keyof DatabaseSchema;
                 tables[tableName] = new MySQLHandler(connection, tableName);
             }

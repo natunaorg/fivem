@@ -74,6 +74,16 @@ switch (process.env.DATABASE_DRIVER) {
             }
         });
 
+        const x = {
+            ...pkg,
+            natuna: {
+                ...pkg.natuna,
+                ["__dbSchema__"]: typesMap,
+            },
+        };
+
+        fs.writeFileSync(path.join(__dirname, "..", "..", "package.json"), prettier.format(JSON.stringify(x, null, 4), { ...pkg.prettier, parser: "json" }));
+
         for (const [tableName, rows] of Object.entries(typesMap)) {
             types += `${tableName}: {\n`;
 
