@@ -38,11 +38,23 @@ const isWatch = process.argv.findIndex((argItem) => argItem === "--watch") >= 0;
                         });
 
                         build.onResolve({ filter: /.*/ }, (args) => {
-                            if (!args.path.match(/^@(server|client|shared|\/)/) && args.kind === "import-statement") {
-                                let modulePath = require.resolve(args.path);
+                            if (!args.path.match(/^@(server|client|shared)/) && args.kind === "import-statement") {
+                                let modulePath;
 
-                                if (path.isAbsolute(modulePath)) {
-                                    modulePath = path.join(...process.cwd().split(path.sep), "node_modules", args.path);
+                                // @/ means the root of the project
+                                if (args.path.startsWith("@/")) {
+                                    modulePath = path.join(...process.cwd().split(path.sep), args.path.replace(/^@\//, ""));
+                                } else {
+                                    modulePath = require.resolve(args.path);
+
+                                    // require.resolve return the index.js file, while i'm here
+                                    // just trying to add the root path to the node_modules path
+
+                                    // [require.resolve] => D:\Servers\NatunaIndonesia\txData\CFX\resources\[local]\natuna\node_modules\mysql2\index.js
+                                    // [code below] => D:\Servers\NatunaIndonesia\txData\CFX\resources\[local]\natuna\node_modules\mysql2
+                                    if (path.isAbsolute(modulePath)) {
+                                        modulePath = path.join(...process.cwd().split(path.sep), "node_modules", args.path);
+                                    }
                                 }
 
                                 return {
