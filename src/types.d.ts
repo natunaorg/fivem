@@ -7,6 +7,7 @@ declare namespace NodeJS {
         DATABASE_PORT: string | undefined;
         DATABASE_NAME: string | undefined;
         DATABASE_USER: string | undefined;
+        DATABASE_DRIVER: string | undefined;
         DATABASE_PASSWORD: string | undefined;
         CRYPTER_SECRET_KEY: string | undefined;
         CRYPTER_ALGORITHM: string | undefined;
