@@ -1,12 +1,12 @@
 "use strict";
 import "@citizenfx/server";
 
-import type { Config, Handler } from "@server/lib/commandHandler";
+import type { Config, Handler } from "@server/manager/command/handler";
 import type Events from "@server/events";
 import type Players from "@server/players";
 import type Utils from "@server/utils";
 
-import Command, { EventType } from "@server/lib/commandHandler";
+import Command, { EventType } from "@server/manager/command/handler";
 
 export default class CommandManager {
     constructor(

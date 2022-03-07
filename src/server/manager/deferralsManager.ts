@@ -3,7 +3,7 @@ import "@citizenfx/server";
 import Server from "@server";
 import Players from "@server/players";
 
-export default class DeferralsChecker {
+export default class DeferralsManager {
     constructor(
         private source: number, //
         private db: Server["db"],
@@ -85,7 +85,7 @@ export default class DeferralsChecker {
                 }
 
                 // If not
-                await this.db.users.updateMany({
+                await this.db.users.update({
                     data: {
                         ...newCheckpointData,
                     },
