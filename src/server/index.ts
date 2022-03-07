@@ -57,7 +57,7 @@ class Server {
 
     events = new Events();
     utils = new Utils();
-    db = Database(this.config, this.logger);
+    db = Database(this.logger);
     players = new Players(this.db, this.events);
     manager = new Manager(this.events, this.players, this.utils);
 

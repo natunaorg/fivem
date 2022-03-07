@@ -15,7 +15,7 @@ type Query<K extends keyof DatabaseSchema> = Partial<DatabaseSchema[K]>;
  * executeQuery("SELECT * FROM `users`")
  * ```
  */
-export const executeQuery = async (connection: mysql.Connection, query: string) => {
+export const executeQuery = async (connection: mysql.Pool, query: string) => {
     return new Promise((resolve, reject) => {
         connection.execute(query, (err: string, result: any) => {
             if (err) {
@@ -23,14 +23,13 @@ export const executeQuery = async (connection: mysql.Connection, query: string) 
             }
 
             resolve(result);
-            connection.end();
         });
     }) as any;
 };
 
 export default class MySQLHandler<K extends keyof DatabaseSchema> {
     constructor(
-        private connection: mysql.Connection, //
+        private connection: mysql.Pool, //
         private table: K
     ) {}
 
