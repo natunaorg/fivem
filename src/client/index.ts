@@ -16,6 +16,8 @@ class Client {
         on("onClientResourceStart", this.#onClientResourceStart);
         this.events.shared.emit(SharedEventType.GET_CLIENT_CONFIG).then((config) => {
             this.config = config;
+            this.#setGameSettings();
+            this.#setDiscordRPC();
         });
     }
 
@@ -29,11 +31,7 @@ class Client {
     #onClientResourceStart = async (resourceName: string) => {
         if (resourceName == GetCurrentResourceName()) {
             console.log("Starting Client...");
-
             console.log(this.utils.asciiArt);
-            this.#setGameSettings();
-            this.#setDiscordRPC();
-
             console.log("Client Ready!");
         }
     };
