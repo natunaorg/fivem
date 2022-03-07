@@ -26,8 +26,24 @@
             "title": "Natuna Framework",
             "description": "Settings for Natuna Framework",
             "type": "object",
-            "required": ["whitelisted", "game", "discordRPC"],
+            "required": ["whitelisted", "game", "discordRPC", "#database"],
             "properties": {
+                "#database": {
+                    "description": "Natuna Framework Database Schema",
+                    "type": "object",
+                    "properties": {
+                        "driver": {
+                            "type": "string",
+                            "description": "Database Driver",
+                            "default": "mysql",
+                            "enum": ["mysql"]
+                        },
+                        "schema": {
+                            "type": "object",
+                            "description": "Database Schema"
+                        }
+                    }
+                },
                 "whitelisted": {
                     "description": "Is the server whitelisted? (Configure who can bypass the whitelist in the Database)",
                     "type": "boolean",
