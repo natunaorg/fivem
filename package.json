@@ -28,15 +28,17 @@
         "build:dev": "yarn build --mode=development",
         "dev": "yarn build --mode=development --watch",
         "lint": "eslint --ext .ts,.js .",
-        "lint:fix": "yarn lint --fix"
+        "lint:fix": "yarn lint --fix",
+        "db:schema:generate": "node .natuna/database/create-schema.js",
+        "db:migrate": "node .natuna/database/migrate.js"
     },
     "dependencies": {
         "@citizenfx/client": "^2.0.4358-1",
         "@citizenfx/server": "^2.0.4249-1",
-        "@prisma/client": "^3.8.1",
         "@ptkdev/logger": "^1.8.0",
         "dotenv": "^16.0.0",
         "esbuild": "^0.14.12",
+        "mysql2": "^2.3.3",
         "node-fetch": "^2.6.1",
         "tiny-glob": "^0.2.9"
     },
@@ -49,7 +51,6 @@
         "eslint-config-prettier": "^8.3.0",
         "eslint-plugin-prettier": "^4.0.0",
         "prettier": "^2.5.1",
-        "prisma": "^3.8.1",
         "typescript": "^4.5.5"
     },
     "optionalDependencies": {
@@ -102,9 +103,6 @@
             "@typescript-eslint/no-explicit-any": "off"
         }
     },
-    "prisma": {
-        "schema": "src/schema.prisma"
-    },
     "natuna": {
         "whitelisted": true,
         "game": {
@@ -135,6 +133,36 @@
                     "url": "fivem://connect/aasd.com/asdasd"
                 }
             ]
+        },
+        "#database": {
+            "driver": "mysql",
+            "schema": {
+                "whitelist_lists": {
+                    "license": "string"
+                },
+                "users": {
+                    "id": "number",
+                    "license": "string",
+                    "active_character_id": "number",
+                    "last_ip": "string",
+                    "last_login": "string"
+                },
+                "characters": {
+                    "id": "number",
+                    "user_id": "number",
+                    "first_name": "string",
+                    "last_name": "string",
+                    "last_position": "string",
+                    "skin": "string",
+                    "health": "number",
+                    "armour": "number"
+                },
+                "ban_lists": {
+                    "license": "string",
+                    "reason": "string",
+                    "expires": "string"
+                }
+            }
         }
     }
 }
