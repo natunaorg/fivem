@@ -38,8 +38,6 @@ This framework is still far from perfect, so if you you could help me developing
 
 </details>
 
----
-
 ## Features
 
 Instead of the same thing all over and over again, we aim to give you something different by providing this framework, such as:
@@ -118,8 +116,6 @@ With Natuna, all ticks, event, variables are handled with this framework itself.
 Expect more from us in the future! We would give you something different and something more great above your expectation.
 
 </details>
-
----
 
 ## Interested with this framework?
 
