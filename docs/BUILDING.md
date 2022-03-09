@@ -1,28 +1,9 @@
 # Building
-Natuna Framework are made using webpack which compiles all file together in 1 files. This, of course, made the script processing time more fast and if you do the build method with Production method, it would make the compiled script more optimized.
-
----
-
-## Notes
-
-- ### **✔️ You need to build the files when:**
-    1. After cloning this repository on your local machine (Installation).
-    2. After editing a client or server scripts or scripts under client and server folder.
-    3. After editing a Typescript files.
-
-
-
-- ### **❌ You DON'T need to build the files when:**
-    1. After editing UI files or files under UI folder.
-    2. After editing the `natuna.config.js` file (Why? Because this files are included on the core with FiveM NodeJS export-import method).
-
----
+Natuna Framework came in source code form, so you can build it with your own tools. We used EsBuild as our default compiler and it's so fast. Learn more about EsBuild [here](https://esbuild.github.io/)
 
 ## Requirements
 1. Basic knowledge of Command Prompt
 2. Basic knowledge of NodeJS commands
-
----
 
 ## Package Requirements
 We would used a latest version of these packages, so please keep the latest update for these packages.
@@ -31,36 +12,39 @@ We would used a latest version of these packages, so please keep the latest upda
 2. NPM - https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 3. Yarn - https://classic.yarnpkg.com/en/docs/install/#windows-stable
 
----
+## Types of Builds
 
-## Build Options
-There is 2 build options,
+### 1. **Files** <br/>
+Builds all files in the `src` folder. <br/>
 
-1. **Watch options** \
-    It would track any changes on your script and would build the script immediately after a change appears on your script.
+- **✔️ You need to build the files when:**
+    1. After cloning this repository on your local machine (Installation).
+    2. After editing any script under `src` folder.
+    3. After generating a new Database schema.
 
-    I suggest you to use this method if you were developing something.
+- **❌ You DON'T need to build the files when:**
+    1. After editing configuration on `package.json`.
 
-    Command:
-    ```
-    yarn watch
-    ```
+To build files, you need to run:
+- `npm run build` or `yarn build` to perform a single production build.
+- `npm run build:dev` or `yarn build:dev` to perform a development build.
+- `npm run dev` or `yarn dev` to perform a watch build, which will automatically rebuild the files when you change them.
 
-2. **Production options** \
-    This would only run single build operation on your script and the result would be more stable. However the build process would take more time than the watch options but the results would be minified and stable.
+### 2. **Database** <br/>
+Builds the database schema. This is required after you edit the database migration file so that the new schema will be applied to the database module.
 
-    I suggest you to use this method if you wanted to use your script after finished the development.
+Current database is only support MySQL, and its schema is generated from SQL migration file under `.natuna/database/mysql/migration.sql`. 
 
-    Command:
-    ```
-    yarn build
-    ```
-
----
+To build database, you need to run:
+- `npm run db:migrate` or `yarn db:migrate` to perform a a database migration from the migration file.
+- `npm run db:schema:generate` or `yarn db:schema:generate` to generate the new database schema from the migration file.
+- `npm run db:setup` or `yarn db:setup` to perform 2 steps above.
 
 ## Steps
 1. Go to the Natuna Framework folder.
-2. Open command prompt and locate to that folder using `cd` command.
+2. Open command prompt and locate to the project folder using `cd` command.
 3. Run a build command based on your preference, check the build options above.
 4. Wait until it's finished.
 5. If there are no error presented at the end, then you good to go.
+
+> If you're ever wonder, yes, EsBuild is generating your whole file mostly under 1 second.

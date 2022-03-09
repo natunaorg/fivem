@@ -1,6 +1,4 @@
 # Contributing
-
-## Summary
 We're happy if you wanted to help us developing this framework to it's peak! You could help us by creating new feature or maintain current code and fix current bug or etc.
 
 Please keep in mind that we need to keep this framework always tidy and clean, so, there'd be a rules and instruction how to contribute to this framework.
@@ -13,8 +11,11 @@ Please keep in mind that we need to keep this framework always tidy and clean, s
 
     You could discuss this with others on our [Discord Server](https://discord.gg/kGPHBvXzGM).
 
-3. ### *Pull Request*
-    Always maintain to have your fork with the latest version on the upstream branch, and always make sure to have a pull request to `development` branch only!
+3. ### *Make Sure Your Code Is Pass The Testing*
+    We like to have the consistency of the code, so, please make sure your code is pass the testing. Use `npm run lint` or `yarn lint` command to run the test.
+
+4. ### *Pull Request*
+    Always maintain to have your fork with the latest version on the upstream branch, and always make sure to have a pull request to different branch than the master branch.
 
 Also, you don't have to update the documentation, the repository maintainers would handle that.
 
