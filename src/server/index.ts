@@ -24,7 +24,7 @@ import { SharedEventType } from "@shared/events/type";
 
 export type Config = Partial<typeof pkg["natuna"]>;
 
-class Server {
+export class Server {
     constructor() {
         this.events.shared.listen(SharedEventType.GET_CLIENT_CONFIG, () => this.config);
 

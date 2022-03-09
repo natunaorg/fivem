@@ -22,6 +22,15 @@ export type Data = Query & {
     };
 };
 
+export type Identifiers = {
+    steam?: string;
+    license?: string;
+    fivem?: string;
+    discord?: string;
+    ip?: string;
+    [key: string]: any;
+};
+
 export default class Players {
     constructor(
         private db: ReturnType<typeof Database>, //
@@ -218,15 +227,6 @@ export default class Players {
          * ```
          */
         getIdentifiers: (playerServerId: number) => {
-            type Identifiers = {
-                steam?: string;
-                license?: string;
-                fivem?: string;
-                discord?: string;
-                ip?: string;
-                [key: string]: any;
-            };
-
             const fxdkMode = GetConvarInt("sv_fxdkMode", 0);
             const identifiers: Identifiers = {
                 license: fxdkMode ? "fxdk_license" : undefined,

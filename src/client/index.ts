@@ -11,7 +11,7 @@ import Manager from "@client/manager";
 
 import { SharedEventType } from "@shared/events/type";
 
-class Client {
+export class Client {
     constructor() {
         on("onClientResourceStart", this.#onClientResourceStart);
     }

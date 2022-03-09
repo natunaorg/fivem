@@ -8,7 +8,7 @@ import type { DatabaseDriver } from "@server/database/schema";
 import MySQL from "@server/database/mysql";
 
 // prettier-ignore
-type DatabaseDriverUsed = 
+export type DatabaseDriverUsed = 
     DatabaseDriver extends "mysql"
         ? MySQLDatabase
     : DatabaseDriver extends "sqlite"

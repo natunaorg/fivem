@@ -42,9 +42,9 @@
   integrity sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==
 
 "@natunaorg/typedoc-plugin@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@natunaorg/typedoc-plugin/-/typedoc-plugin-1.0.1.tgz#b952bbde0c113116afd89a0afee6cc7f3f025ce6"
-  integrity sha512-YetcNUfbg5zhZHUdaFGrm7MzFiC7no6dU8MOxog7AC6of9B7K1FH4GZwOvqB7YwI9Y4gvNWLeKuacHQwfOUwdg==
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@natunaorg/typedoc-plugin/-/typedoc-plugin-1.0.4.tgz#64526046bb9d1fa67edf66ddc2026ab57ac22f02"
+  integrity sha512-RevBdBk2mRRB4gX98J1R0dBfMVsb5MhidpqqHnZLcyUqwm+YunLEjwDL9KsR2wsfDhK3ChwJKxbN6rVYMX5vqg==
 
 "@nodelib/fs.scandir@2.1.5":
   version "2.1.5"

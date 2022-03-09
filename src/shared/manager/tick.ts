@@ -1,4 +1,4 @@
-type TickHandler = () => void;
+export type TickHandler = () => void;
 
 export default class TickManager {
     constructor() {
