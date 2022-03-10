@@ -33,11 +33,15 @@ Interested using and developing this framework? Let's begin...
 7. **Install all dependencies** <br/>
     Use `npm install` or `yarn` command to install all dependencies.
 
-8. **Build the files** <br/>
-    Run the database migration first before building the files.
+8. **Migrate and generate the database schema** <br/>
+    Run the database migration first before generating the schema.
+    To read and learn about this, please go to [BUILDING.md](BUILDING.md).
+
+9. **Build the files** <br/>
+    **Run the steps 8 first before running this step.**
     To read and learn about building this files, please go to [BUILDING.md](BUILDING.md).
 
-9. **Start your FiveM server** <br/>
+10. **Start your FiveM server** <br/>
     When you starting the server, you will found out a message saying
 
     - `Couldn't start resource natuna.` and
