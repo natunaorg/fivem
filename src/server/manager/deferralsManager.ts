@@ -63,7 +63,7 @@ export default class DeferralsManager {
 
         const newCheckpointData = {
             last_ip: this.#playerIds.ip.toString(),
-            last_login: new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }).toString(),
+            last_login: new Date().toLocaleString("en-US", { timeZone: process.env.TZ }).toString(),
         };
 
         switch (!user) {
