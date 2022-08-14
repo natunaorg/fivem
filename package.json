@@ -29,9 +29,9 @@
         "dev": "yarn build --watch",
         "lint": "eslint --ext .ts,.js .",
         "lint:fix": "yarn lint --fix",
-        "db:schema:generate": "node .natuna/database/create-schema.js",
+        "db:create-schema": "node .natuna/database/create-schema.js",
         "db:migrate": "node .natuna/database/migrate.js",
-        "db:setup": "yarn db:schema:generate && yarn db:migrate"
+        "db:setup": "yarn db:create-schema && yarn db:migrate"
     },
     "dependencies": {
         "@citizenfx/client": "^2.0.4358-1",

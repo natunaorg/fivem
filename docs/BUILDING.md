@@ -37,7 +37,7 @@ Current database is only support MySQL, and its schema is generated from SQL mig
 
 To build database, you need to run:
 - `npm run db:migrate` or `yarn db:migrate` to perform a a database migration from the migration file.
-- `npm run db:schema:generate` or `yarn db:schema:generate` to generate the new database schema from the migration file.
+- `npm run db:create-schema` or `yarn db:create-schema` to generate the new database schema from the migration file.
 - `npm run db:setup` or `yarn db:setup` to perform 2 steps above.
 
 ## Steps
