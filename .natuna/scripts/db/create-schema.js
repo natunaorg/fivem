@@ -7,7 +7,7 @@ dotenv.config({
     path: path.join(process.cwd(), ".env"),
 });
 
-const pkg = require("../../package.json");
+const pkg = require("../../../package.json");
 const mysql = require("./mysql");
 
 let types = "";
