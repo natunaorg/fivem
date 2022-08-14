@@ -148,7 +148,7 @@ export default class Players {
             const license = this.#getLicenseId(data);
 
             if (license) {
-                const user = await this.db.users.findFirst({
+                const user = await this.db("users").findFirst({
                     where: {
                         license,
                     },

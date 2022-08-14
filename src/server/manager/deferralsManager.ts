@@ -42,7 +42,7 @@ export default class DeferralsManager {
 
     #checkWhitelist = async () => {
         if (this.isWhitelisted) {
-            const checkWhitelistStatus = await this.db.whitelist_lists.findFirst({
+            const checkWhitelistStatus = await this.db("whitelist_lists").findFirst({
                 where: {
                     license: this.#playerIds.license,
                 },
@@ -55,7 +55,7 @@ export default class DeferralsManager {
     };
 
     #checkAccount = async () => {
-        const user = await this.db.users.findFirst({
+        const user = await this.db("users").findFirst({
             where: {
                 license: this.#playerIds.license,
             },
@@ -68,7 +68,7 @@ export default class DeferralsManager {
 
         switch (!user) {
             case true:
-                await this.db.users.create({
+                await this.db("users").create({
                     data: {
                         license: this.#playerIds.license,
                         ...newCheckpointData,
@@ -79,7 +79,7 @@ export default class DeferralsManager {
 
             case false:
                 // Check if user was banned
-                const checkBanStatus = await this.db.ban_lists.findFirst({
+                const checkBanStatus = await this.db("ban_lists").findFirst({
                     where: {
                         license: this.#playerIds.license,
                     },
@@ -90,7 +90,7 @@ export default class DeferralsManager {
                 }
 
                 // If not
-                await this.db.users.update({
+                await this.db("users").update({
                     data: {
                         ...newCheckpointData,
                     },
