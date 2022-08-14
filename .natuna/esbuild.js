@@ -48,7 +48,7 @@ const isWatch = process.argv.findIndex((argItem) => argItem === "--watch") >= 0;
                                     modulePath = require.resolve(args.path);
 
                                     // require.resolve return the index.js file, while i'm here
-                                    // just trying to add the root path to the node_modules path
+                                    // just trying to add the root path to the package path in the node_modules folder
 
                                     // [require.resolve] => D:\Servers\NatunaIndonesia\txData\CFX\resources\[local]\natuna\node_modules\mysql2\index.js
                                     // [code below] => D:\Servers\NatunaIndonesia\txData\CFX\resources\[local]\natuna\node_modules\mysql2
