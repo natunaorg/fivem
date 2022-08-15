@@ -24,7 +24,7 @@ import { SharedEventType } from "@shared/events/type";
 
 export type Config = Partial<typeof pkg["natuna"]>;
 
-export class Server {
+export default class Server {
     constructor() {
         this.events.shared.listen(SharedEventType.GET_CLIENT_CONFIG, () => this.config);
 
@@ -55,11 +55,11 @@ export class Server {
         },
     });
 
-    events = new Events();
-    utils = new Utils();
-    db = Database(this.logger);
-    players = new Players(this.db, this.events);
-    manager = new Manager(this.events, this.players, this.utils);
+    events: Events = new Events();
+    utils: Utils = new Utils();
+    db: ReturnType<typeof Database> = Database(this.logger);
+    players: Players = new Players(this.db, this.events);
+    manager: Manager = new Manager(this.events, this.players, this.utils);
 
     #checkPackageVersion = () => {
         return new Promise((resolve) => {

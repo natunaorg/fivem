@@ -11,17 +11,17 @@ import Manager from "@client/manager";
 
 import { SharedEventType } from "@shared/events/type";
 
-export class Client {
+export default class Client {
     constructor() {
         on("onClientResourceStart", this.#onClientResourceStart);
     }
 
     config: Config = {};
-    utils = new Utils();
-    events = new Events();
-    game = new Game(this.utils);
-    manager = new Manager(this.events, this.utils);
-    players = new Players(this.events, this.game);
+    utils: Utils = new Utils();
+    events: Events = new Events();
+    game: Game = new Game(this.utils);
+    manager: Manager = new Manager(this.events, this.utils);
+    players: Players = new Players(this.events, this.game);
 
     #onClientResourceStart = async (resourceName: string) => {
         if (resourceName == GetCurrentResourceName()) {
