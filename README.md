@@ -1,3 +1,19 @@
+> Hi everyone, it's been a long time since I was here last, but a lot of things happened and I can only do those things at a time. First of all, I would like to thank each and every one of you for following Natuna and also joining as a member here. 
+> 
+> In short, I don't have any plans to grow this project much in the future, Natuna was originally created to create a new ecosystem within FiveM that emphasizes the use of Javascript/Typescript, but over time, I didn't see the growth of that ecosystem within FiveM, which led to few people being interested in this project and caused (for now) no one to be interested in contributing massively to this project.
+> 
+> This has led to me having to work full-time on the project, but as we all know, we need money to live, including internet, electricity, and other expenses. Therefore, with no/lack of financial or direct support for this project, I am unable to continue this any further.
+> 
+> I would like to apologize to all members who had high hopes for this project, but it is possible that it will be continued in the future if there are people who are interested in helping with this project.
+> 
+> For now, I have my own agency for website development services, design, marketing, and so on which you can check out at https://runes.asia/. 
+> 
+> And I am also developing a Discord Music Bot called Hupa which you can check out at https://discordbotlist.com/bots/hupa.
+> 
+> And as for this server, it will remain for an indefinite period of time, thank you for everything!
+
+---
+
 # Natuna FiveM Framework
 
 <img src="https://i.ibb.co/PGqZDFh/text.png" align="right" width="350px" />
